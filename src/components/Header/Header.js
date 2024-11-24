@@ -8,7 +8,7 @@ const Header = ({ username }) => {
         display: "flex",
         justifyContent: "space-between",
         alignContent: "center",
-        padding: "3%",
+        padding: "2%",
         height: "10vh",
         width: "100%",
       }}

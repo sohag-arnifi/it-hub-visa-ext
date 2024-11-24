@@ -11,6 +11,15 @@ div.id = "react-root";
 document.body.appendChild(div);
 
 setTimeout(() => {
+  const fixedBanar = document.querySelectorAll(
+    ".col-md-12.d-none.d-md-block.fixed_bar"
+  );
+  fixedBanar.forEach((element) => {
+    if (element.classList.contains("d-md-block")) {
+      element.classList.replace("d-md-block", "d-md-hide");
+    }
+  });
+
   const emergencyNoticeCloseBtn = document.getElementById(
     "emergencyNoticeCloseBtn"
   );

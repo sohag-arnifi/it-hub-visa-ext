@@ -73,7 +73,6 @@ const App = ({ user }) => {
       }}
     >
       <Header username={user?.username} />
-
       {isLoading || initialLoading ? (
         <div
           key={"loading"}
