@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const { fileURLToPath } = require("url");
 
 module.exports = {
   mode: "development",
@@ -31,12 +32,17 @@ module.exports = {
     port: 9000, // Choose a port for the dev server
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(), // Enable HMR
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"], // Provide Buffer as a global variable
+      process: require.resolve("process/browser"),
+    }),
   ],
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
+        type: "javascript/auto",
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -55,6 +61,14 @@ module.exports = {
     ],
   },
   resolve: {
+    fallback: {
+      http: "stream-http", // Change require.resolve to module string
+      https: "https-browserify",
+      buffer: "buffer/",
+      url: "url/",
+      stream: "stream-browserify", // Add stream polyfill
+      util: "util/", // Add utl polyfill
+    },
     extensions: [".js", ".jsx"],
   },
 };

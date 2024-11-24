@@ -1,4 +1,6 @@
-// __webpack_public_path__ = chrome.runtime.getURL("dist/"); // or relative path as needed
+__webpack_public_path__ = chrome.runtime.getURL("dist/"); // or relative path as needed
+
+console.log("Background script loaded");
 
 // chrome.runtime.onInstalled.addListener(() => {
 //   console.log("Hot Reload Extension Installed");
@@ -24,3 +26,6 @@
 //   { urls: ["<all_urls>"] }, // Monitor all URLs or restrict to specific domains
 //   ["responseHeaders"]
 // );
+
+// const button = document.getElementById("emergencyNoticeCloseBtn");
+// console.log(button);

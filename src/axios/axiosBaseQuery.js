@@ -1,4 +1,16 @@
 import axios from "axios";
+import https from "https-browserify";
+import axiosRetry from "axios-retry";
+
+// // Create HTTPS agent with keep-alive enabled
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 60 * 60 * 1000, // 30 minutes
+  maxSockets: 1000, // Max concurrent sockets
+  maxFreeSockets: 10, // Max free sockets
+});
+
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 export const axiosBaseQuery =
   ({ baseUrl } = { baseUrl: "" }) =>
@@ -11,8 +23,9 @@ export const axiosBaseQuery =
         data,
         params,
         headers,
+        httpsAgent, // Use the HTTPS agent with keep-alive
         withCredentials: true, // Ensure credentials are included
-        timeout: 60000,
+        // timeout: 60000,
       });
 
       return { data: result.data }; // Return the result in the expected format

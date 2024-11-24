@@ -37,12 +37,10 @@ const VerifyedOTP = ({
   const [phone, setPhone] = useState(slugPhone);
   const [loadingState, setLoadingState] = useState("");
 
-  const [manageQueue, { iaLoading: queueLoading, isFetching }] =
+  const [manageQueue, { isLoading: queueLoading, isFetching }] =
     useManageQueueMutation();
-  const [generateSlotTime, { iaLoading: timeSlotLoading }] =
+  const [generateSlotTime, { isLoading: timeSlotLoading }] =
     useGenerateSlotTimeMutation();
-
-  console.log(queueLoading && loadingState === "send");
 
   const sendOtp = async () => {
     setLoadingState("send");
@@ -120,6 +118,10 @@ const VerifyedOTP = ({
       console.log(error);
     }
   };
+
+  console.log(
+    (queueLoading || isFetching) && loadingState === "send" ? true : false
+  );
 
   const getDateSlotHandlar = async () => {
     checkerFile._token = csrfToken;

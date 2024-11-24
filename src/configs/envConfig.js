@@ -1,6 +1,6 @@
 const backendProdApi = "https://it-hub-date-service.vercel.app/api";
 // const prodBaseUrl = "https://payment.ivacbd.com";
-const prodBaseUrl = "https://if-hub.pkshohag240.workers.dev";
+const prodBaseUrl = "";
 const devBaseUrl = "http://localhost:5000/api";
 
 const env = "production";
