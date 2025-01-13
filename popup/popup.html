@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="popup.css" />
     <title>Hot Reload Extension</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   </head>
   <body>
     <div class="container">
@@ -47,6 +48,22 @@
         <p>Contact Support: 24/7</p>
       </footer>
     </div>
+
+    <!-- <div>
+      <div
+        class="g-recaptcha"
+        data-sitekey="YOUR_SITE_KEY"
+        data-callback="onRecaptchaSuccess"
+      ></div>
+    </div>
+
+    <script>
+      function onRecaptchaSuccess(token) {
+        console.log("Token received:", token);
+        console.log(token);
+        // parent.postMessage({ token: token }, "*");
+      }
+    </script> -->
     <script src="popup.js"></script>
   </body>
 </html>

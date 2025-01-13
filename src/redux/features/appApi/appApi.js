@@ -12,7 +12,7 @@ const appApi = baseApiSlice.injectEndpoints({
 
     checkWebSession: builder.mutation({
       query: (webId) => ({
-        url: `/payment/check-session/${webId}`,
+        url: `/payment/check/${webId}`,
         method: "GET",
         headers: { "x-requested-with": "XMLHttpRequest" },
       }),

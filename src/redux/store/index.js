@@ -1,17 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import { baseApiSlice } from "../features/baseApi/baseApiSlice";
-import appReducer from "../features/appApi/appSlice";
+import applicationReducer from "../features/application/applicationApiSlice";
+import { backendBaseApiSlice } from "../features/backendBaseApi/backendBaseApiSlice";
+import { appBaseApiSlice } from "../features/appBaseApi/appBaseApiSlice";
+// import { dateApiSlice } from "../features/dateApi/dateApiSlice";
 
 export const store = configureStore({
   reducer: {
-    [baseApiSlice.reducerPath]: baseApiSlice.reducer,
-    app: appReducer,
+    [backendBaseApiSlice.reducerPath]: backendBaseApiSlice.reducer,
+    [appBaseApiSlice.reducerPath]: appBaseApiSlice.reducer,
+    applications: applicationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .concat(baseApiSlice.middleware)
-      .concat(baseApiSlice.middleware),
+      .concat(backendBaseApiSlice.middleware)
+      .concat(appBaseApiSlice.middleware),
+  // .concat(dateApiSlice.middleware),
 });
 
 export const useAppDispatch = () => useDispatch();

@@ -1,10 +1,15 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "../src/App";
 import { Provider } from "react-redux";
 import { store } from "../src/redux/store"; //noticeModal
+import Main from "../src/Main";
 
 __webpack_public_path__ = chrome.runtime.getURL("dist/");
+
+const injectScript = document.createElement("script");
+injectScript.src = chrome.runtime.getURL("injected/injected.js");
+injectScript.type = "text/javascript";
+document.head.appendChild(injectScript);
 
 const div = document.createElement("div");
 div.id = "react-root";
@@ -29,15 +34,11 @@ setTimeout(() => {
   }
 }, 500);
 
-chrome.storage.local.get((result) => {
-  if (result?.logData?.success && result?.logData?.data?.token) {
-    const root = createRoot(document.getElementById("react-root"));
-    root.render(
-      <Provider store={store}>
-        <App user={result?.logData?.data?.user} />
-      </Provider>
-    );
-  } else {
-    div.style.display = "none";
-  }
-});
+const root = createRoot(document.getElementById("react-root"));
+root.render(
+  <Provider store={store}>
+    <Main />
+  </Provider>
+);
+
+console.log("content loaded");

@@ -10,7 +10,7 @@ const httpsAgent = new https.Agent({
   maxFreeSockets: 10, // Max free sockets
 });
 
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+// axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 export const axiosBaseQuery =
   ({ baseUrl } = { baseUrl: "" }) =>
@@ -24,12 +24,13 @@ export const axiosBaseQuery =
         params,
         headers,
         httpsAgent, // Use the HTTPS agent with keep-alive
-        withCredentials: true, // Ensure credentials are included
+        withCredentials: true,
         // timeout: 60000,
       });
 
       return { data: result.data }; // Return the result in the expected format
     } catch (axiosError) {
+      // return axiosError;
       const err = axiosError;
       return {
         error: {

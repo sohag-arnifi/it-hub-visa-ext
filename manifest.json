@@ -23,16 +23,33 @@
   "action": {
     "default_popup": "popup/popup.html"
   },
+
   "content_scripts": [
     {
       "matches": [
         "https://payment.ivacbd.com/",
-        "http://localhost:5000/login",
-        "https://if-hub.pkshohag240.workers.dev/"
+        "http://localhost:5000/",
+        "https://it-hub.programmerhub.xyz/"
       ],
       "js": ["dist/content.bundle.js"],
       "run_at": "document_end"
     }
   ],
-  "host_permissions": ["http://*/*", "https://*/*"]
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*",
+    "https://www.google.com/recaptcha/*"
+  ],
+  "sandbox": {
+    "pages": ["recaptcha.html"]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected/injected.js", "injected/app.js", "db/db.json"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

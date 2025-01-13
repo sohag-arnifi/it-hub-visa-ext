@@ -72,7 +72,15 @@ const paymentOptions = {
   },
 };
 
-const FileContainer = ({ file, slotTime, otp, selectedDate, csrfToken }) => {
+const FileContainer = ({
+  file,
+  slotTime,
+  otp,
+  selectedDate,
+  csrfToken,
+  retrying,
+  timeOut,
+}) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [activeFile, setActiveFile] = useState(null);
   const [selectedTimeSlotIndex, setSelectedTimeSlotIndex] = useState(0);
@@ -85,30 +93,113 @@ const FileContainer = ({ file, slotTime, otp, selectedDate, csrfToken }) => {
   };
 
   const confirmNowHandlar = async () => {
-    try {
-      activeFile._token = csrfToken;
-      activeFile.apiKey = csrfToken;
-      activeFile.action = "payInvoice";
-      activeFile?.info?.forEach((item) => {
-        item.appointment_date = selectedDate;
-        item.otp = otp;
-      });
+    const fileInfo = activeFile?.info?.map((item) => {
+      return {
+        web_id: item?.web_id,
+        web_id_repeat: item?.web_id_repeat,
+        name: item?.name,
+        phone: item?.phone,
+        email: item?.email,
+        amount: item?.amount,
+        center: {
+          id: item?.center?.id,
+          // c_name: item?.center?.c_name,
+          // prefix: item?.center?.prefix,
+        },
+        ivac: {
+          id: item?.ivac?.id,
+          ivac_name: item?.ivac?.ivac_name,
+          // address: item?.ivac?.address,
+          // visa_fee: item?.ivac?.visa_fee,
+          // charge: item?.ivac?.charge,
+          // new_visa_fee: item?.ivac?.new_visa_fee,
+          // notification_text_beside_amount:
+          // item?.ivac?.notification_text_beside_amount,
+        },
+        visa_type: {
+          id: item?.visa_type?.id,
+          type_name: item?.visa_type?.type_name,
+        },
+        confirm_tos: item?.visa_type?.confirm_tos,
+        appointment_date: selectedDate,
+        otp: otp,
+      };
+    });
 
-      activeFile.selected_payment = {
+    const data = {
+      _token: csrfToken,
+      apiKey: csrfToken,
+      action: "payInvoice",
+      info: fileInfo,
+      otp: otp,
+      selected_slot: slotTime?.data?.slot_times[selectedTimeSlotIndex],
+      selected_payment: {
         ...paymentOptions[selectedOption],
         grand_total: activeFile?.info?.length * 824,
-      };
+      },
+    };
 
-      activeFile.otp = otp;
-      activeFile.selected_slot =
-        slotTime?.data?.slot_times[selectedTimeSlotIndex];
-      delete activeFile.resend;
+    console.log(data);
 
-      const response = await payInvoice(activeFile).unwrap();
-      console.log("response", response);
-    } catch (error) {
-      console.log(error);
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    let attempt = 0;
+
+    while (attempt < retrying) {
+      try {
+        const response = await payInvoice(data).unwrap();
+        console.log(response);
+        break;
+      } catch (error) {
+        console.log(error);
+        const statusCode = error?.response?.status;
+
+        if (statusCode === 504) {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 504 Gateway Timeout error.}`,
+          });
+        } else if (statusCode === 502) {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 502 Gateway Timeout error.}`,
+          });
+        } else {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${"Unknown error occurred"}- ${
+              error?.status
+            }`,
+          });
+        }
+      }
+      attempt += 1;
+      await delay(timeOut); // 1-second timeout
     }
+
+    // try {
+    //   activeFile._token = csrfToken;
+    //   activeFile.apiKey = csrfToken;
+    //   activeFile.action = "payInvoice";
+    //   activeFile?.info?.forEach((item) => {
+    //     item.appointment_date = selectedDate;
+    //     item.otp = otp;
+    //   });
+
+    //   activeFile.selected_payment = {
+    //     ...paymentOptions[selectedOption],
+    //     grand_total: activeFile?.info?.length * 824,
+    //   };
+
+    //   activeFile.otp = otp;
+    //   activeFile.selected_slot =
+    //     slotTime?.data?.slot_times[selectedTimeSlotIndex];
+    //   delete activeFile.resend;
+
+    //   const response = await payInvoice(activeFile).unwrap();
+    //   console.log("response", response);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   return (
@@ -306,7 +397,15 @@ const FileContainer = ({ file, slotTime, otp, selectedDate, csrfToken }) => {
   );
 };
 
-const WebFileContainer = ({ data, slotTime, selectedDate, otp, csrfToken }) => {
+const WebFileContainer = ({
+  data,
+  slotTime,
+  selectedDate,
+  otp,
+  csrfToken,
+  timeOut,
+  retrying,
+}) => {
   return (
     <div
       style={{
@@ -327,6 +426,8 @@ const WebFileContainer = ({ data, slotTime, selectedDate, otp, csrfToken }) => {
             selectedDate={selectedDate}
             otp={otp}
             csrfToken={csrfToken}
+            retrying={retrying}
+            timeOut={timeOut}
           />
         );
       })}

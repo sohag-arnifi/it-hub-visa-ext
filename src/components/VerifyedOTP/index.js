@@ -17,7 +17,6 @@ const getNextAvailableDate = () => {
   // Format the date as "YYYY-MM-DD"
   return format(date, "yyyy-MM-dd");
 };
-
 const VerifyedOTP = ({
   checkerFile,
   setOtp,
@@ -30,6 +29,10 @@ const VerifyedOTP = ({
   setPhoneNumbers,
   phoneNumbers,
   slugId,
+  setRetrying,
+  retrying,
+  setTimeOut,
+  timeOut,
 }) => {
   const [sendResponse, setSentResponse] = useState(null);
   const [verifyResponse, setVerifyResponse] = useState(null);
@@ -44,120 +47,424 @@ const VerifyedOTP = ({
 
   const sendOtp = async () => {
     setLoadingState("send");
-    checkerFile._token = csrfToken;
-    checkerFile.apiKey = csrfToken;
-    checkerFile.resend = 0;
-    checkerFile.action = "sendOtp";
 
-    checkerFile?.info?.forEach((item) => {
-      item.phone = phone;
+    const fileInfo = checkerFile?.info?.map((item) => {
+      return {
+        web_id: item?.web_id,
+        web_id_repeat: item?.web_id_repeat,
+        name: item?.name,
+        phone: item?.phone,
+        email: item?.email,
+        amount: item?.amount,
+        center: {
+          id: item?.center?.id,
+          // c_name: item?.center?.c_name,
+          // prefix: item?.center?.prefix,
+        },
+        ivac: {
+          id: item?.ivac?.id,
+          ivac_name: item?.ivac?.ivac_name,
+          // address: item?.ivac?.address,
+          // visa_fee: item?.ivac?.visa_fee,
+          // charge: item?.ivac?.charge,
+          // new_visa_fee: item?.ivac?.new_visa_fee,
+          // notification_text_beside_amount:
+          // item?.ivac?.notification_text_beside_amount,
+        },
+        visa_type: {
+          id: item?.visa_type?.id,
+          type_name: item?.visa_type?.type_name,
+        },
+        confirm_tos: item?.visa_type?.confirm_tos,
+      };
     });
-    checkerFile.resend = sendResponse?.success ? 1 : 0;
 
-    try {
-      const response = await manageQueue(checkerFile).unwrap();
-      console.log(response);
+    const data = {
+      _token: csrfToken,
+      apiKey: csrfToken,
+      action: "sendOtp",
+      info: fileInfo,
+      resend: sendResponse?.success ? 1 : 0,
+      hashed_param: "",
+    };
 
-      if (response?.code === 200) {
-        setSentResponse({
-          success: true,
-          message: response?.message[0],
-        });
-      } else {
-        setSentResponse({
-          success: false,
-          message: response?.message[0],
-        });
+    // checkerFile._token = csrfToken;
+    // checkerFile.apiKey = csrfToken;
+    // checkerFile.resend = 0;
+    // checkerFile.action = "sendOtp";
+
+    // checkerFile?.info?.forEach((item) => {
+    //   item.phone = phone;
+    // });
+
+    // checkerFile.resend = sendResponse?.success ? 1 : 0;
+
+    // const retrying = 10;
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    let attempt = 0;
+
+    while (attempt < retrying) {
+      try {
+        const response = await manageQueue(data).unwrap();
+        console.log(response);
+
+        if (response?.code === 200) {
+          setSentResponse({
+            success: true,
+            message: `Attempt: ${attempt + 1} - ${response?.message[0]}`,
+          });
+          break;
+        } else {
+          setSentResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${response?.message[0]}`,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        const statusCode = error?.response?.status;
+
+        if (statusCode === 504) {
+          setSentResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 504 Gateway Timeout error.}`,
+          });
+        } else if (statusCode === 502) {
+          setSentResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 502 Gateway Timeout error.}`,
+          });
+        } else {
+          setSentResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${"Unknown error occurred"}- ${
+              error?.status
+            }`,
+          });
+        }
       }
-    } catch (error) {
-      console.log(error);
+
+      attempt += 1;
+      await delay(timeOut); // 1-second timeout
     }
+
+    // try {
+    //   const response = await manageQueue(data).unwrap();
+    //   console.log(response);
+
+    //   if (response?.code === 200) {
+    //     setSentResponse({
+    //       success: true,
+    //       message: response?.message[0],
+    //     });
+    //   } else {
+    //     setSentResponse({
+    //       success: false,
+    //       message: response?.message[0],
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const verifyOtp = async () => {
     setLoadingState("verify");
-    checkerFile._token = csrfToken;
-    checkerFile.apiKey = csrfToken;
 
-    checkerFile.action = "verifyOtp";
-    checkerFile.otp = otp;
-
-    checkerFile?.info?.forEach((item) => {
-      item.otp = otp;
+    const fileInfo = checkerFile?.info?.map((item) => {
+      return {
+        web_id: item?.web_id,
+        web_id_repeat: item?.web_id_repeat,
+        name: item?.name,
+        phone: item?.phone,
+        email: item?.email,
+        amount: item?.amount,
+        center: {
+          id: item?.center?.id,
+          // c_name: item?.center?.c_name,
+          // prefix: item?.center?.prefix,
+        },
+        ivac: {
+          id: item?.ivac?.id,
+          ivac_name: item?.ivac?.ivac_name,
+          // address: item?.ivac?.address,
+          // visa_fee: item?.ivac?.visa_fee,
+          // charge: item?.ivac?.charge,
+          // new_visa_fee: item?.ivac?.new_visa_fee,
+          // notification_text_beside_amount:
+          // item?.ivac?.notification_text_beside_amount,
+        },
+        visa_type: {
+          id: item?.visa_type?.id,
+          type_name: item?.visa_type?.type_name,
+        },
+        confirm_tos: item?.visa_type?.confirm_tos,
+        otp: otp,
+      };
     });
-    delete checkerFile.resend;
 
-    try {
-      const response = await manageQueue(checkerFile).unwrap();
-      console.log(response);
+    const data = {
+      _token: csrfToken,
+      apiKey: csrfToken,
+      action: "verifyOtp",
+      info: fileInfo,
+      otp: otp,
+      hashed_param: "",
+    };
 
-      if (response?.code === 200) {
-        const firstDate = response?.data?.slot_dates[0];
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    let attempt = 0;
 
-        setVerifyResponse({
-          success: true,
-          message: "OTP Verified",
-          data: {
-            ...response?.data,
-            slot_dates: [
-              firstDate
-                ? [...response?.data?.slot_dates]
-                : getNextAvailableDate(),
-            ],
-          },
-        });
+    while (attempt < retrying) {
+      try {
+        const response = await manageQueue(data).unwrap();
+        console.log(response);
 
-        setSelectedDate(firstDate ?? getNextAvailableDate());
-      } else {
-        setVerifyResponse({
-          success: false,
-          message: response?.message[0],
-        });
+        if (response?.code === 200) {
+          const firstDate = response?.data?.slot_dates[0];
+          const slotTime = response?.data?.slot_times;
+
+          setVerifyResponse({
+            success: true,
+            message: "OTP Verified",
+            data: {
+              ...response?.data,
+              slot_dates: [
+                firstDate
+                  ? [...response?.data?.slot_dates]
+                  : getNextAvailableDate(),
+              ],
+            },
+          });
+          setSelectedDate(firstDate ?? getNextAvailableDate());
+
+          if (slotTime?.length) {
+            setSlotTime({
+              success: true,
+              message: "Slot Time Get Successfully",
+              data: {
+                status: "OK",
+                data: [""],
+                slot_dates: firstDate
+                  ? [...response?.data?.slot_dates]
+                  : getNextAvailableDate(),
+                slot_times: slotTime,
+              },
+            });
+          }
+
+          // setSlotTime({
+          //   success: true,
+          //   message: "Slot Time Get Successfully",
+          //   data: {
+          //     ...response,
+          //   },
+          // });
+
+          break;
+        } else {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${response?.message[0]}`,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        const statusCode = error?.response?.status;
+
+        if (statusCode === 504) {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 504 Gateway Timeout error.}`,
+          });
+        } else if (statusCode === 502) {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 502 Gateway Timeout error.}`,
+          });
+        } else {
+          setVerifyResponse({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${"Unknown error occurred"}- ${
+              error?.status
+            }`,
+          });
+        }
       }
-    } catch (error) {
-      console.log(error);
+
+      attempt += 1;
+      await delay(timeOut); // 1-second timeout
     }
+
+    // checkerFile._token = csrfToken;
+    // checkerFile.apiKey = csrfToken;
+
+    // checkerFile.action = "verifyOtp";
+    // checkerFile.otp = otp;
+
+    // checkerFile?.info?.forEach((item) => {
+    //   item.otp = otp;
+    // });
+    // delete checkerFile.resend;
+
+    // try {
+    //   const response = await manageQueue(checkerFile).unwrap();
+    //   console.log(response);
+
+    //   if (response?.code === 200) {
+    //     const firstDate = response?.data?.slot_dates[0];
+
+    // setVerifyResponse({
+    //   success: true,
+    //   message: "OTP Verified",
+    //   data: {
+    //     ...response?.data,
+    //     slot_dates: [
+    //       firstDate
+    //         ? [...response?.data?.slot_dates]
+    //         : getNextAvailableDate(),
+    //     ],
+    //   },
+    // });
+
+    //     setSelectedDate(firstDate ?? getNextAvailableDate());
+    //   } else {
+    //     setVerifyResponse({
+    //       success: false,
+    //       message: response?.message[0],
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
-  console.log(
-    (queueLoading || isFetching) && loadingState === "send" ? true : false
-  );
-
   const getDateSlotHandlar = async () => {
-    checkerFile._token = csrfToken;
-    checkerFile.apiKey = csrfToken;
-    checkerFile.action = "generateSlotTime";
-    checkerFile?.info?.forEach((item) => {
-      item.appointment_time = selectedDate;
-      item.otp = otp;
+    const fileInfo = checkerFile?.info?.map((item) => {
+      return {
+        web_id: item?.web_id,
+        web_id_repeat: item?.web_id_repeat,
+        name: item?.name,
+        phone: item?.phone,
+        email: item?.email,
+        amount: item?.amount,
+        center: {
+          id: item?.center?.id,
+          // c_name: item?.center?.c_name,
+          // prefix: item?.center?.prefix,
+        },
+        ivac: {
+          id: item?.ivac?.id,
+          ivac_name: item?.ivac?.ivac_name,
+          // address: item?.ivac?.address,
+          // visa_fee: item?.ivac?.visa_fee,
+          // charge: item?.ivac?.charge,
+          // new_visa_fee: item?.ivac?.new_visa_fee,
+          // notification_text_beside_amount:
+          // item?.ivac?.notification_text_beside_amount,
+        },
+        visa_type: {
+          id: item?.visa_type?.id,
+          type_name: item?.visa_type?.type_name,
+        },
+        confirm_tos: item?.visa_type?.confirm_tos,
+        otp: otp,
+        appointment_time: selectedDate,
+      };
     });
-    checkerFile.specific_date = selectedDate;
-    delete checkerFile.resend;
 
-    try {
-      const response = await generateSlotTime(checkerFile).unwrap();
-      console.log(response);
+    const data = {
+      _token: csrfToken,
+      apiKey: csrfToken,
+      action: "generateSlotTime",
+      info: fileInfo,
+      otp: otp,
+      specific_date: selectedDate,
+    };
 
-      if (response?.status === "OK") {
-        setSlotTime({
-          success: true,
-          message: "Slot Time Get Successfully",
-          data: {
-            ...response,
-          },
-        });
-      } else {
-        setSlotTime({
-          success: false,
-          message: response?.message[0],
-          data: {
-            ...response,
-          },
-        });
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    let attempt = 0;
+
+    while (attempt < retrying) {
+      try {
+        const response = await generateSlotTime(data).unwrap();
+        console.log(response);
+
+        if (response?.status === "OK") {
+          setSlotTime({
+            success: true,
+            message: "Slot Time Get Successfully",
+            data: {
+              ...response,
+            },
+          });
+          break;
+        } else {
+          setSlotTime({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${response?.message[0]}`,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        const statusCode = error?.response?.status;
+
+        if (statusCode === 504) {
+          setSlotTime({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 504 Gateway Timeout error.}`,
+          });
+        } else if (statusCode === 502) {
+          setSlotTime({
+            success: false,
+            message: `Attempt: ${attempt + 1} - 502 Gateway Timeout error.}`,
+          });
+        } else {
+          setSlotTime({
+            success: false,
+            message: `Attempt: ${attempt + 1} - ${"Unknown error occurred"}- ${
+              error?.status
+            }`,
+          });
+        }
       }
-    } catch (error) {
-      console.log(error);
+
+      attempt += 1;
+      await delay(timeOut); // 1-second timeout
     }
+
+    // checkerFile._token = csrfToken;
+    // checkerFile.apiKey = csrfToken;
+    // checkerFile.action = "generateSlotTime";
+    // checkerFile?.info?.forEach((item) => {
+    //   item.appointment_time = selectedDate;
+    //   item.otp = otp;
+    // });
+    // checkerFile.specific_date = selectedDate;
+    // delete checkerFile.resend;
+    // try {
+    //   const response = await generateSlotTime(checkerFile).unwrap();
+    //   console.log(response);
+    // if (response?.status === "OK") {
+    //   setSlotTime({
+    //     success: true,
+    //     message: "Slot Time Get Successfully",
+    //     data: {
+    //       ...response,
+    //     },
+    //   });
+    // } else {
+    //     setSlotTime({
+    //       success: false,
+    //       message: response?.message[0],
+    //       data: {
+    //         ...response,
+    //       },
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const handlePhoneNumber = () => {
@@ -188,6 +495,34 @@ const VerifyedOTP = ({
         gap: "0.5rem",
       }}
     >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <p>Retry Request:</p>
+        <input
+          type="number"
+          onChange={(e) => setRetrying(Number(e.target.value))}
+          value={retrying}
+          style={{
+            padding: "10px",
+            width: "100px",
+          }}
+        />
+        <p>Timeout Delay:</p>
+        <input
+          type="number"
+          onChange={(e) => setTimeOut(Number(e.target.value))}
+          value={timeOut}
+          style={{
+            padding: "10px",
+            width: "100px",
+          }}
+        />
+      </div>
       <div>
         <input
           onChange={(e) => setPhone(e.target.value)}

@@ -1,6 +1,12 @@
-__webpack_public_path__ = chrome.runtime.getURL("dist/"); // or relative path as needed
+__webpack_public_path__ = chrome.runtime.getURL("dist/");
 
 console.log("Background script loaded");
+
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   if (message.type === "logScope") {
+//     console.log("Scope data:", message.data);
+//   }
+// });
 
 // chrome.runtime.onInstalled.addListener(() => {
 //   console.log("Hot Reload Extension Installed");

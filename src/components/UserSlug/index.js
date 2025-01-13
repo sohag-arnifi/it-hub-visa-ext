@@ -10,7 +10,10 @@ const UserSlug = ({ data, csrfToken, checkerFile }) => {
 
   const [otp, setOtp] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-  const [slotTime, setSlotTime] = useState("");
+  const [slotTime, setSlotTime] = useState(null);
+
+  const [retrying, setRetrying] = useState(1);
+  const [timeOut, setTimeOut] = useState(1000);
 
   return (
     <div>
@@ -27,6 +30,10 @@ const UserSlug = ({ data, csrfToken, checkerFile }) => {
         setSlotTime={setSlotTime}
         csrfToken={csrfToken}
         slugId={data?.id}
+        setTimeOut={setTimeOut}
+        timeOut={timeOut}
+        setRetrying={setRetrying}
+        retrying={retrying}
       />
 
       {slotTime?.success && (
@@ -37,6 +44,9 @@ const UserSlug = ({ data, csrfToken, checkerFile }) => {
           selectedDate={selectedDate}
           otp={otp}
           csrfToken={csrfToken}
+          setRetrying={setRetrying}
+          retrying={retrying}
+          timeOut={timeOut}
         />
       )}
     </div>
