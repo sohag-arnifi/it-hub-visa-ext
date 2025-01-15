@@ -3,6 +3,7 @@ import React from "react";
 import { useGetApplicationsQuery } from "./redux/features/application/applicationApi";
 import ApplicationContainer from "./components/ApplicationContainer";
 import GlobalLoader from "./components/GlobalLoader";
+import TimerContainer from "./components/TimerContainer";
 
 const App = () => {
   const { isLoading } = useGetApplicationsQuery({});
@@ -20,8 +21,17 @@ const App = () => {
       }}
     >
       <Paper variant="outlined" sx={{ padding: "20px", height: "100%" }}>
-        <Typography>Hello world</Typography>
-
+        <Box
+          sx={{
+            borderBottom: "1px solid #E0E0E0",
+            // paddingY: "0.5rem",
+          }}
+        >
+          <Typography sx={{ fontSize: "18px", fontWeight: 600, color: "blue" }}>
+            It-Hub
+          </Typography>
+        </Box>
+        <TimerContainer />
         {isLoading ? <GlobalLoader /> : <ApplicationContainer />}
       </Paper>
     </Box>

@@ -7,6 +7,45 @@ if (token && key) {
   localStorage.setItem("apiKey", key);
 }
 
+const baseUrl =
+  window.location.origin === "https://payment.ivacbd.com"
+    ? "https://it-hub.programmerhub.xyz"
+    : "http://localhost:5000";
+
+const socketScript = document.createElement("script");
+socketScript.src = "https://cdn.socket.io/4.0.0/socket.io.min.js";
+socketScript.onload = async () => {
+  const socket = io(baseUrl, {
+    transports: ["websocket"],
+  });
+
+  socket.on("connect", () => {
+    console.log("Connected to server: Inject js");
+  });
+
+  socket.on("get-captcha-token", async (data) => {
+    if (window?.grecaptcha?.reset) {
+      window.grecaptcha.reset();
+    }
+    const url = document.getElementsByTagName("iframe")[0]?.src ?? "";
+    socket.emit("received-url", { url, phone: data?.phone });
+  });
+};
+document.head.appendChild(socketScript);
+
+// const getRTL = async () => {
+//   if (window.setRecaptchaTokenPay) {
+//     window.grecaptcha.reset();
+//     await new Promise((resolve) => setTimeout(resolve, 1500));
+//     const url = document.getElementsByTagName("iframe")[0].src;
+//     return url;
+//   } else {
+//     return "";
+//   }
+// };
+
+// console.log(window.setRecaptchaToken);
+
 // // const env = "development";
 // const env = "production";
 

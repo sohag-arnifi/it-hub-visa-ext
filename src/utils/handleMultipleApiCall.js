@@ -1,16 +1,11 @@
-const handleMultipleApiCall = async (
-  apiFn,
-  payload,
-  setMessage,
-  signal = ""
-) => {
+const handleMultipleApiCall = async (apiFn, payload, setMessage) => {
   let attempt = 0;
   const maxAttempts = 5;
   const retryDelay = 500;
 
   while (attempt < maxAttempts) {
     try {
-      const response = await apiFn(payload, { signal }).unwrap();
+      const response = await apiFn(payload).unwrap();
       console.log(response);
       if (response?.code === 200) {
         if (payload?.action === "sendOtp" || payload?.action === "verifyOtp") {
@@ -29,7 +24,7 @@ const handleMultipleApiCall = async (
         return response;
       } else if (response.status === "FAIL") {
         setMessage({
-          message: "Time Slot not found!",
+          message: response?.message ?? "Time Slot not found!",
           type: "error",
         });
         return response;
@@ -58,6 +53,7 @@ const handleMultipleApiCall = async (
           message: response?.message[0],
           type: "error",
         });
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         attempt++;
         continue;
       }

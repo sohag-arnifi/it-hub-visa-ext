@@ -10,7 +10,7 @@ const applicationApiSlice = createSlice({
     },
 
     setApplicatonOtp: (state, action) => {
-      const { otp, phone } = action.payload;
+      const { otp, phone, resend } = action.payload;
 
       const index = state.findIndex(
         (application) => application?.info?.[0]?.phone === phone
@@ -20,12 +20,13 @@ const applicationApiSlice = createSlice({
       const updatedInfo = application.info.map((info) => {
         return {
           ...info,
-          otp,
+          otp: otp,
         };
       });
 
       state[index].info = updatedInfo;
       state[index].otp = otp;
+      state[index].resend = resend;
       return state;
     },
 

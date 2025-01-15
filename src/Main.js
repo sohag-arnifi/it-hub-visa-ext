@@ -9,9 +9,8 @@ export const socket = io(envConfig.backendBaseUrl, {
   transports: ["websocket"],
 });
 
-const Main = () => {
+const Main = ({ getRTL }) => {
   const [isOpen, setIsOpen] = useState(true);
-
   const userId = 101;
 
   useEffect(() => {

@@ -34,10 +34,20 @@ setTimeout(() => {
   }
 }, 500);
 
+// chrome.runtime.sendMessage({ type: "get-rtl", url: "" });
+
+const getRTL = () => {
+  // console.log(window.setRecaptchaTokenPay);
+  // console.log(grecaptcha);
+  // grecaptcha.reset();
+  // window.grecaptcha.reset();
+  // return document.getElementsByTagName("iframe")[0].src;
+};
+
 const root = createRoot(document.getElementById("react-root"));
 root.render(
   <Provider store={store}>
-    <Main />
+    <Main getRTL={getRTL} />
   </Provider>
 );
 

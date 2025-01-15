@@ -1,11 +1,13 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyledTypography } from "..";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
 import { useManageQueueMutation } from "../../../redux/features/appBaseApi/appBaseApiSlice";
 import { getSendOtpPayload } from "../../../utils/appPayload";
 import { socket } from "../../../Main";
 import envConfig from "../../../configs/envConfig";
+import { useAppDispatch } from "../../../redux/store";
+import { setApplicatonOtp } from "../../../redux/features/application/applicationApiSlice";
 
 const SendOtp = ({ data, otpRef }) => {
   const [message, setMessage] = useState({
@@ -14,26 +16,27 @@ const SendOtp = ({ data, otpRef }) => {
   });
   const phone = data?.info?.[0]?.phone;
   const [manageQueue, { isLoading }] = useManageQueueMutation();
+  const dispatch = useAppDispatch();
 
-  const handleSendOtp = async (signal) => {
+  const handleSendOtp = async () => {
     const payload = getSendOtpPayload(data);
     const result = await handleMultipleApiCall(
       manageQueue,
       payload,
-      setMessage,
-      signal
+      setMessage
     );
 
     if (result?.code === 200) {
+      dispatch(
+        setApplicatonOtp({
+          otp: "",
+          phone,
+          resend: data?.resend ? data?.resend + 1 : 1,
+        })
+      );
       socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
     }
   };
-
-  useEffect(() => {
-    if (otpRef) {
-      otpRef.current = handleSendOtp;
-    }
-  }, [otpRef]);
 
   return (
     <Box
@@ -46,8 +49,9 @@ const SendOtp = ({ data, otpRef }) => {
     >
       <StyledTypography>Send to - {phone}</StyledTypography>
       <Button
+        ref={otpRef}
         disabled={isLoading}
-        onClick={() => handleSendOtp()}
+        onClick={handleSendOtp}
         variant="contained"
         color="error"
         size="small"

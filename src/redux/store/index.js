@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import applicationReducer from "../features/application/applicationApiSlice";
 import { backendBaseApiSlice } from "../features/backendBaseApi/backendBaseApiSlice";
 import { appBaseApiSlice } from "../features/appBaseApi/appBaseApiSlice";
-// import { dateApiSlice } from "../features/dateApi/dateApiSlice";
+import automationReducer from "../features/automation/automationSlice";
 
 export const store = configureStore({
   reducer: {
     [backendBaseApiSlice.reducerPath]: backendBaseApiSlice.reducer,
     [appBaseApiSlice.reducerPath]: appBaseApiSlice.reducer,
     applications: applicationReducer,
+    automation: automationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

@@ -1,12 +1,12 @@
-import { Box, Button, Paper, styled, Typography } from "@mui/material";
-import React, { useRef, useState } from "react";
+import { Box, Paper, styled, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import SendOtp from "./SendOtp";
 import VerifyOtp from "./VerifyOtp";
 import DateTime from "./DateTime";
 import PayNow from "./PayNow";
 import DownloadSlip from "./DownloadSlip";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { useAppSelector } from "../../redux/store";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { setLastUpdate } from "../../redux/features/automation/automationSlice";
 
 export const StyledTypography = styled(Typography)(() => ({
   fontSize: "12px",
@@ -17,25 +17,27 @@ export const StyledTypography = styled(Typography)(() => ({
 const ApplicationContainer = () => {
   const { applications } = useAppSelector((state) => state);
   const otpRefs = useRef(applications.map(() => React.createRef()));
-  const abortControllers = useRef([]);
 
-  const [appStart, setAppStart] = useState(false);
+  const { hitNow } = useAppSelector((state) => state?.automation);
+  const dispatch = useAppDispatch();
 
   const sendOtpToAllApplications = () => {
-    if (appStart) {
-      abortControllers.current.forEach((controller) => controller.abort());
-      abortControllers.current = [];
-      setAppStart(false);
-    } else {
-      // Start API calls
-      setAppStart(true);
-      applications.forEach((_, index) => {
-        const controller = new AbortController();
-        abortControllers.current.push(controller);
-        otpRefs.current[index]?.current(controller.signal);
-      });
-    }
+    applications.forEach((_, index) => {
+      otpRefs.current[index]?.current?.click();
+    });
   };
+
+  const totalProcessFiles = applications?.reduce(
+    (acc, curr) => acc + curr?.info?.length,
+    0
+  );
+
+  useEffect(() => {
+    if (hitNow) {
+      dispatch(setLastUpdate({ hitNow: false }));
+      sendOtpToAllApplications();
+    }
+  }, [hitNow]);
 
   return (
     <Box
@@ -57,23 +59,14 @@ const ApplicationContainer = () => {
       >
         <Typography
           sx={{
-            fontSize: "2rem",
+            fontSize: "1.5rem",
             fontWeight: "bold",
             lineHeight: "18px",
           }}
         >
-          Total Applications:{" "}
-          <span style={{ color: "blue" }}>{applications?.length}</span>
+          Total process files:{" "}
+          <span style={{ color: "blue" }}>{totalProcessFiles}</span>
         </Typography>
-        <Button
-          onClick={sendOtpToAllApplications}
-          variant="contained"
-          color={appStart ? "error" : "success"}
-          sx={{ textTransform: "none", boxShadow: "none" }}
-          endIcon={<RestartAltIcon />}
-        >
-          {appStart ? "Stop Now!" : "Start Now!"}
-        </Button>
       </Box>
 
       {applications?.map((item, i) => {
@@ -108,9 +101,9 @@ const ApplicationContainer = () => {
                 </Box>
               </Box>
               <SendOtp data={item} otpRef={otpRefs.current[i]} />
-              <VerifyOtp data={item} />
-              <DateTime data={item} />
-              <PayNow data={item} />
+              <VerifyOtp data={item} otpRef={otpRefs.current[i]} />
+              <DateTime data={item} otpRef={otpRefs.current[i]} />
+              <PayNow data={item} otpRef={otpRefs.current[i]} />
               <DownloadSlip />
             </Box>
           </Paper>

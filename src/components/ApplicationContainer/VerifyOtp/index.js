@@ -11,7 +11,7 @@ import {
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
 
-const VerifyOtp = ({ data }) => {
+const VerifyOtp = ({ data, otpRef }) => {
   const [otp, setOtp] = useState(data?.otp);
   const [message, setMessage] = useState({
     message: "",
@@ -37,10 +37,14 @@ const VerifyOtp = ({ data }) => {
       setMessage
     );
 
+    if (result?.message[0] === "OTP expired. Please try again") {
+      otpRef.current.click();
+    }
+
     const status = result?.status;
     const slot_dates = result?.data?.slot_dates ?? [];
-
     if (status === "SUCCESS") {
+      socket.emit("create-captcha", { phone });
       dispatch(setApplicatonOtp({ otp, phone }));
       socket.emit("otp-verified", { phone, otp });
       const availableTimeSlot = applications?.find((application) => {
@@ -108,8 +112,6 @@ const VerifyOtp = ({ data }) => {
 
   useEffect(() => {
     socket.on("otp-get", (result) => {
-      console.log(result);
-
       if (!otp && phone?.trim() === result?.to?.trim()) {
         setOtp(result?.otp);
         if (formRef.current) {
@@ -121,11 +123,16 @@ const VerifyOtp = ({ data }) => {
         }
       }
     });
-
     return () => {
       socket.off("otp-get");
     };
   }, []);
+
+  useEffect(() => {
+    if (data?.resend && !data?.otp) {
+      setOtp("");
+    }
+  }, [data]);
 
   return (
     <Box

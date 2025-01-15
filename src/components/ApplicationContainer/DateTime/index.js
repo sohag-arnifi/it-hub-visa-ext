@@ -15,6 +15,7 @@ import {
   setPaymentUrl,
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
+import { socket } from "../../../Main";
 
 const DateTime = ({ data }) => {
   const specific_date = data?.slot_dates?.length
@@ -24,6 +25,7 @@ const DateTime = ({ data }) => {
   const timeSlot = data?.slot_times?.length
     ? data?.slot_times[0] ?? "Not Available"
     : "Not Available";
+  const [has_params, setHasParams] = useState("");
 
   const { applications } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
@@ -39,7 +41,6 @@ const DateTime = ({ data }) => {
 
   const handleGenerateSlotTime = async () => {
     const currentApplication = data?.info?.[0];
-
     const payload = getSlotPayload(data, specific_date);
     const result = await handleMultipleApiCall(
       generateSlotTime,
@@ -70,7 +71,7 @@ const DateTime = ({ data }) => {
   };
 
   const handlePayInvoice = async () => {
-    const payload = getPayInvoicePayload(data);
+    const payload = getPayInvoicePayload({ ...data, hash_params: has_params });
     const result = await handleMultipleApiCall(payInvoice, payload, setMessage);
     if (result?.data?.url) {
       dispatch(setPaymentUrl({ url: result?.data?.url + "bkash", phone }));
@@ -81,6 +82,7 @@ const DateTime = ({ data }) => {
     if (
       specific_date !== "Not Available" &&
       timeSlot !== "Not Available" &&
+      has_params &&
       !data?.paymentUrl
     ) {
       handlePayInvoice();
@@ -91,7 +93,16 @@ const DateTime = ({ data }) => {
     ) {
       handleGenerateSlotTime();
     }
-  }, [specific_date, timeSlot, data]);
+  }, [specific_date, timeSlot, data, has_params]);
+
+  useEffect(() => {
+    socket.on("captcha-solved", (data) => {
+      if (phone === data?.phone) {
+        setHasParams(data?.token);
+        console.log("captcha-solved", data?.token);
+      }
+    });
+  }, [socket]);
 
   return (
     <Box
@@ -124,10 +135,15 @@ const DateTime = ({ data }) => {
         </span>
       </StyledTypography>
 
+      <StyledTypography sx={{ lineHeight: "10px" }}>
+        {has_params ? "Captcha solved" : "Captcha not solved"}
+      </StyledTypography>
+
       <Button
         disabled={
           specific_date === "Not Available" ||
           timeSlot === "Not Available" ||
+          !has_params ||
           isPayLoading
         }
         onClick={handlePayInvoice}
