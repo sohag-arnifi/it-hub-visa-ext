@@ -18,6 +18,7 @@ const App = () => {
         width: "100vw",
         bgcolor: "#FFF",
         zIndex: 1000,
+        overflowY: "auto",
       }}
     >
       <Paper variant="outlined" sx={{ padding: "20px", height: "100%" }}>

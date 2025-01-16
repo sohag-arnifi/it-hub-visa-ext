@@ -11,7 +11,6 @@ const applicationApiSlice = createSlice({
 
     setApplicatonOtp: (state, action) => {
       const { otp, phone, resend } = action.payload;
-
       const index = state.findIndex(
         (application) => application?.info?.[0]?.phone === phone
       );
@@ -77,6 +76,15 @@ const applicationApiSlice = createSlice({
       state[index].paymentUrl = url;
       return state;
     },
+
+    setHashParams: (state, action) => {
+      const { hash_params, phone } = action.payload;
+      const index = state.findIndex(
+        (application) => application?.info?.[0]?.phone === phone
+      );
+      state[index].hash_params = hash_params;
+      return state;
+    },
   },
 });
 
@@ -86,5 +94,6 @@ export const {
   setApplicatonOtp,
   setSlotTimes,
   setPaymentUrl,
+  setHashParams,
 } = applicationApiSlice.actions;
 export default applicationApiSlice.reducer;

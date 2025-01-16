@@ -1,5 +1,5 @@
 import { backendBaseApiSlice } from "../backendBaseApi/backendBaseApiSlice";
-import { setApplications } from "./applicationApiSlice";
+import { setApplications, setHashParams } from "./applicationApiSlice";
 
 const applicationApi = backendBaseApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,7 +10,6 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         headers: { "content-type": "application/json" },
       }),
       providesTags: ["applications"],
-
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -20,7 +19,33 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         }
       },
     }),
+
+    getCaptchaToken: builder.mutation({
+      query: ({ phone }) => ({
+        url: `/recaptcha-token`,
+        method: "GET",
+        headers: { "content-type": "application/json" },
+      }),
+      async onQueryStarted({ phone }, { dispatch, queryFulfilled }) {
+        dispatch(setHashParams({ hash_params: "solving", phone }));
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            setHashParams({
+              hash_params: data.data,
+              phone,
+            })
+          );
+          setTimeout(() => {
+            dispatch(setHashParams({ hash_params: "", phone }));
+          }, 120000);
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetApplicationsQuery } = applicationApi;
+export const { useGetApplicationsQuery, useGetCaptchaTokenMutation } =
+  applicationApi;

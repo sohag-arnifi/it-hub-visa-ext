@@ -6,22 +6,21 @@ import {
   setLastUpdate,
   setStartAutomation,
 } from "../../redux/features/automation/automationSlice";
+import useWakeLock from "../../hooks/useWakeLock";
 
 const TimerContainer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  useWakeLock(); // Prevent the screen from turning off
 
   const { isAutomationOn, lastUpdate, hitNow } = useAppSelector(
     (state) => state?.automation
   );
   const dispatch = useAppDispatch();
   const checkingTimes = [
-    // "12:37:30 PM",
-    "12:41:00 PM",
-    "12:41:30 PM",
-    "12:42:00 PM",
-    "12:42:30 PM",
-    "12:43:00 PM",
-    "12:43:30 PM",
+    "1:55:00 PM",
+    "1:58:00 PM",
+    "2:00:00 PM",
+    "2:05:00 PM",
     "3:00:00 PM",
     "3:15:00 PM",
     "3:30:00 PM",
@@ -65,20 +64,29 @@ const TimerContainer = () => {
     if (isAutomationOn) {
       const interval = setInterval(() => {
         const now = new Date();
-        setCurrentTime(now);
+        const formattedTime = now.toLocaleTimeString();
 
-        const checkTime = checkingTimes.find(
-          (time) => time === now.toLocaleTimeString()
-        );
-
-        if (checkTime) {
+        if (checkingTimes.includes(formattedTime)) {
           dispatch(
             setLastUpdate({
-              lastUpdate: currentTime.toLocaleTimeString(),
+              lastUpdate: formattedTime,
               hitNow: true,
             })
           );
         }
+        setCurrentTime(now);
+        // const checkTime = checkingTimes.find(
+        //   (time) => time === now.toLocaleTimeString()
+        // );
+
+        // if (checkTime) {
+        //   dispatch(
+        //     setLastUpdate({
+        //       lastUpdate: currentTime.toLocaleTimeString(),
+        //       hitNow: true,
+        //     })
+        //   );
+        // }
       }, 1000);
       return () => clearInterval(interval);
     }
@@ -104,7 +112,6 @@ const TimerContainer = () => {
       >
         {currentTime.toLocaleTimeString()}
       </Typography>
-
       {lastUpdate && (
         <Typography
           sx={{
@@ -117,7 +124,6 @@ const TimerContainer = () => {
           Last update: {lastUpdate}
         </Typography>
       )}
-
       <Box
         sx={{
           maxWidth: "70vw",
@@ -147,10 +153,6 @@ const TimerContainer = () => {
       <Box sx={{ display: "flex", justifyContent: "center", paddingY: "1rem" }}>
         <Button
           onClick={handleStartAutomation}
-          //   onClick={() => {
-          //     dispatch(setStartAutomation(!isAutomationOn));
-          //     localStorage.setItem("isAutomationOn", !isAutomationOn);
-          //   }}
           variant="contained"
           color={!isAutomationOn ? "error" : "success"}
           sx={{ textTransform: "none", boxShadow: "none" }}

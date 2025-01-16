@@ -10,6 +10,7 @@ import {
   setSlotDates,
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
+import { useGetCaptchaTokenMutation } from "../../../redux/features/application/applicationApi";
 
 const VerifyOtp = ({ data, otpRef }) => {
   const [otp, setOtp] = useState(data?.otp);
@@ -17,6 +18,8 @@ const VerifyOtp = ({ data, otpRef }) => {
     message: "",
     type: "",
   });
+
+  const [getCaptchaToken] = useGetCaptchaTokenMutation();
 
   const formRef = useRef(null);
 
@@ -44,7 +47,7 @@ const VerifyOtp = ({ data, otpRef }) => {
     const status = result?.status;
     const slot_dates = result?.data?.slot_dates ?? [];
     if (status === "SUCCESS") {
-      socket.emit("create-captcha", { phone });
+      // socket.emit("create-captcha", { phone });
       dispatch(setApplicatonOtp({ otp, phone }));
       socket.emit("otp-verified", { phone, otp });
       const availableTimeSlot = applications?.find((application) => {
@@ -107,6 +110,7 @@ const VerifyOtp = ({ data, otpRef }) => {
           }
         }
       }
+      await getCaptchaToken({ phone });
     }
   };
 

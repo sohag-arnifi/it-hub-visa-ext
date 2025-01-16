@@ -16,6 +16,7 @@ import {
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
 import { socket } from "../../../Main";
+import { useGetCaptchaTokenMutation } from "../../../redux/features/application/applicationApi";
 
 const DateTime = ({ data }) => {
   const specific_date = data?.slot_dates?.length
@@ -30,6 +31,11 @@ const DateTime = ({ data }) => {
   const { applications } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const phone = data?.info?.[0]?.phone;
+
+  const [getCaptchaToken] = useGetCaptchaTokenMutation();
+  const handleCaptchaToken = async () => {
+    await getCaptchaToken({ phone });
+  };
 
   const [message, setMessage] = useState({
     message: "",
@@ -71,7 +77,10 @@ const DateTime = ({ data }) => {
   };
 
   const handlePayInvoice = async () => {
-    const payload = getPayInvoicePayload({ ...data, hash_params: has_params });
+    const payload = getPayInvoicePayload({
+      ...data,
+      hash_params: data?.hash_params,
+    });
     const result = await handleMultipleApiCall(payInvoice, payload, setMessage);
     if (result?.data?.url) {
       dispatch(setPaymentUrl({ url: result?.data?.url + "bkash", phone }));
@@ -82,7 +91,8 @@ const DateTime = ({ data }) => {
     if (
       specific_date !== "Not Available" &&
       timeSlot !== "Not Available" &&
-      has_params &&
+      data?.hash_params &&
+      data?.hash_params !== "solving" &&
       !data?.paymentUrl
     ) {
       handlePayInvoice();
@@ -93,7 +103,7 @@ const DateTime = ({ data }) => {
     ) {
       handleGenerateSlotTime();
     }
-  }, [specific_date, timeSlot, data, has_params]);
+  }, [specific_date, timeSlot, data]);
 
   useEffect(() => {
     socket.on("captcha-solved", (data) => {
@@ -135,9 +145,22 @@ const DateTime = ({ data }) => {
         </span>
       </StyledTypography>
 
-      <StyledTypography sx={{ lineHeight: "10px" }}>
-        {has_params ? "Captcha solved" : "Captcha not solved"}
-      </StyledTypography>
+      {!data?.hash_params ? (
+        <StyledTypography
+          onClick={handleCaptchaToken}
+          sx={{ lineHeight: "10px", color: "red" }}
+        >
+          Captcha not solved
+        </StyledTypography>
+      ) : data?.hash_params === "solving" ? (
+        <StyledTypography sx={{ lineHeight: "10px", color: "blue" }}>
+          Captcha solving...
+        </StyledTypography>
+      ) : (
+        <StyledTypography sx={{ lineHeight: "10px", color: "green" }}>
+          Captcha solved
+        </StyledTypography>
+      )}
 
       <Button
         disabled={

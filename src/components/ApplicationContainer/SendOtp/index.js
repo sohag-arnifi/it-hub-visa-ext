@@ -19,22 +19,24 @@ const SendOtp = ({ data, otpRef }) => {
   const dispatch = useAppDispatch();
 
   const handleSendOtp = async () => {
-    const payload = getSendOtpPayload(data);
-    const result = await handleMultipleApiCall(
-      manageQueue,
-      payload,
-      setMessage
-    );
-
-    if (result?.code === 200) {
-      dispatch(
-        setApplicatonOtp({
-          otp: "",
-          phone,
-          resend: data?.resend ? data?.resend + 1 : 1,
-        })
+    if (!isLoading) {
+      const payload = getSendOtpPayload(data);
+      const result = await handleMultipleApiCall(
+        manageQueue,
+        payload,
+        setMessage
       );
-      socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
+
+      if (result?.code === 200) {
+        dispatch(
+          setApplicatonOtp({
+            otp: "",
+            phone,
+            resend: data?.resend ? data?.resend + 1 : 1,
+          })
+        );
+        socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
+      }
     }
   };
 
