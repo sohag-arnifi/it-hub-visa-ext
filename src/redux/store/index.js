@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import applicationReducer from "../features/application/applicationApiSlice";
 import { backendBaseApiSlice } from "../features/backendBaseApi/backendBaseApiSlice";
 import { appBaseApiSlice } from "../features/appBaseApi/appBaseApiSlice";
 import automationReducer from "../features/automation/automationSlice";
 import authReducer from "../features/auth/authSlice";
+import applicationReducer from "../features/application/applicationApiSlice";
 
 export const store = configureStore({
   reducer: {
