@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { RestartAlt } from "@mui/icons-material";
 import {
@@ -13,6 +13,8 @@ const TimerContainer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   useWakeLock(); // Prevent the screen from turning off
 
+  const timeRefs = useRef([]);
+
   const { isAutomationOn, lastUpdate, hitNow } = useAppSelector(
     (state) => state?.automation
   );
@@ -24,7 +26,7 @@ const TimerContainer = () => {
     "11:20:00 PM",
     "11:40:00 PM",
     "2:00:00 PM",
-    "2:05:00 PM",
+    "3:07:00 AM",
     "3:00:00 PM",
     "3:15:00 PM",
     "3:30:00 PM",
@@ -93,6 +95,15 @@ const TimerContainer = () => {
               hitNow: true,
             })
           );
+
+          const index = checkingTimes.indexOf(formattedTime);
+          if (timeRefs.current[index]) {
+            timeRefs.current[index].scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+              inline: "center",
+            });
+          }
         }
         setCurrentTime(now);
       }, 1000);
@@ -151,6 +162,7 @@ const TimerContainer = () => {
         {checkingTimes?.map((time, i) => (
           <Box
             key={i}
+            ref={(el) => (timeRefs.current[i] = el)}
             sx={{
               bgcolor: getButtonColor(time),
               padding: "5px",
@@ -192,32 +204,6 @@ const TimerContainer = () => {
         ))}
       </Box>
 
-      <Box
-        sx={{
-          maxWidth: "70vw",
-          marginX: "auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "0.5rem",
-          paddingY: "1rem",
-          flexWrap: "wrap",
-        }}
-      >
-        {checkingTimes.map((time) => {
-          return (
-            <Button
-              key={time}
-              size="small"
-              variant="contained"
-              color={getButtonColor(time)}
-              sx={{ textTransform: "none", boxShadow: "none" }}
-            >
-              {time}
-            </Button>
-          );
-        })}
-      </Box>
       <Box sx={{ display: "flex", justifyContent: "center", paddingY: "1rem" }}>
         <Button
           onClick={handleStartAutomation}
