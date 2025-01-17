@@ -11,7 +11,7 @@ const GlobalLoader = ({ height = "40vh" }) => {
       flexDirection="column"
     >
       <CircularProgress variant="indeterminate" />
-      <Typography sx={{ padding: "16px", fontSize: "2rem" }}>
+      <Typography sx={{ padding: "16px", fontSize: "2rem", fontWeight: 600 }}>
         Loading...
       </Typography>
     </Box>

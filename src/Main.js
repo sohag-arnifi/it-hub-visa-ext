@@ -4,24 +4,32 @@ import React, { useEffect, useState } from "react";
 import envConfig from "./configs/envConfig";
 import { io } from "socket.io-client";
 import App from "./App";
+import { useGetLoginUserQuery } from "./redux/features/auth/authApi";
+import GlobalLoader from "./components/GlobalLoader";
 
 export const socket = io(envConfig.backendBaseUrl, {
   transports: ["websocket"],
 });
 
-const Main = ({ getRTL }) => {
+const Main = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const userId = 101;
+  const { data, isLoading } = useGetLoginUserQuery({});
 
   useEffect(() => {
-    socket.emit("user-online", userId);
-    socket.on("message", (message) => {
-      console.log("Received message:", message);
-    });
-    return () => {
-      socket.disconnect();
-    };
+    if (data?.data?._id) {
+      socket.emit("user-online", data?.data?._id);
+      socket.on("message", (message) => {
+        console.log("Received message:", message);
+      });
+      return () => {
+        socket.disconnect();
+      };
+    }
   }, []);
+
+  if (isLoading) {
+    return <GlobalLoader height="70vh" />;
+  }
 
   return (
     <Box sx={{ zIndex: 1000 }}>

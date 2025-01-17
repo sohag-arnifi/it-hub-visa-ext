@@ -7,6 +7,7 @@ import {
   setStartAutomation,
 } from "../../redux/features/automation/automationSlice";
 import useWakeLock from "../../hooks/useWakeLock";
+import CircleIcon from "@mui/icons-material/Circle";
 
 const TimerContainer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -19,6 +20,9 @@ const TimerContainer = () => {
   const checkingTimes = [
     "1:55:00 PM",
     "1:58:00 PM",
+    "11:00:00 PM",
+    "11:20:00 PM",
+    "11:40:00 PM",
     "2:00:00 PM",
     "2:05:00 PM",
     "3:00:00 PM",
@@ -60,6 +64,22 @@ const TimerContainer = () => {
     return currentTime < targetTime ? "primary" : "error";
   };
 
+  const getEventText = (timeString) => {
+    const [hours, minutes, seconds] = timeString.split(/[: ]/);
+    const ampm = timeString.split(" ")[1];
+    // Create a date object for comparison
+    let targetTime = new Date(currentTime);
+    targetTime.setHours(
+      ampm === "PM" && parseInt(hours) !== 12
+        ? parseInt(hours) + 12
+        : parseInt(hours),
+      parseInt(minutes),
+      parseInt(seconds)
+    );
+    // Compare currentTime to targetTime
+    return currentTime < targetTime ? "Upcoming" : "Pass";
+  };
+
   useEffect(() => {
     if (isAutomationOn) {
       const interval = setInterval(() => {
@@ -75,18 +95,6 @@ const TimerContainer = () => {
           );
         }
         setCurrentTime(now);
-        // const checkTime = checkingTimes.find(
-        //   (time) => time === now.toLocaleTimeString()
-        // );
-
-        // if (checkTime) {
-        //   dispatch(
-        //     setLastUpdate({
-        //       lastUpdate: currentTime.toLocaleTimeString(),
-        //       hitNow: true,
-        //     })
-        //   );
-        // }
       }, 1000);
       return () => clearInterval(interval);
     }
@@ -124,6 +132,66 @@ const TimerContainer = () => {
           Last update: {lastUpdate}
         </Typography>
       )}
+
+      <Box
+        sx={{
+          my: "16px",
+          maxWidth: "700px",
+          display: "flex",
+          justifyContent: "start",
+          mx: "auto",
+          alignItems: "center",
+          gap: "10px",
+          overflowX: "auto",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        }}
+      >
+        {checkingTimes?.map((time, i) => (
+          <Box
+            key={i}
+            sx={{
+              bgcolor: getButtonColor(time),
+              padding: "5px",
+              borderRadius: "5px",
+              minWidth: "120px",
+              flex: "0 0 auto",
+              bgcolor: getButtonColor(time) === "primary" ? "green" : "red",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              sx={{
+                width: "100%",
+                textAlign: "center",
+                color: "#FFF",
+                fontWeight: 600,
+                fontSize: "14px",
+              }}
+            >
+              {time}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                gap: "2px",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircleIcon sx={{ fontSize: "10px", color: "#FFF" }} />
+              <Typography sx={{ fontSize: "10px", color: "#FFF" }}>
+                {getEventText(time)}
+              </Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+
       <Box
         sx={{
           maxWidth: "70vw",

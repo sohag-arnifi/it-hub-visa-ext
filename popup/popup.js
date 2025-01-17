@@ -1,5 +1,9 @@
-const backendProdApi = "https://it-hub-date-service.vercel.app/api/v1";
-const backendDevApi = "http://localhost:5000/api/v1";
+const baseUrl =
+  window.location.origin === "http://localhost:5000"
+    ? "http://localhost:5000"
+    : "https://it-hub.programmerhub.xyz";
+
+console.log(baseUrl);
 
 document.addEventListener("DOMContentLoaded", () => {
   // Check if the user is logged in
@@ -35,7 +39,7 @@ function login(event) {
   loginBtn.style.cursor = "not-allowed";
   loginBtn.style.opacity = 0.5;
 
-  fetch(`${backendProdApi}/auth/login`, {
+  fetch(`${"http://localhost:5000"}/api/v1/users/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

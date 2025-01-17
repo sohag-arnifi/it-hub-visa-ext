@@ -1,12 +1,20 @@
-import { Box, Paper, Typography } from "@mui/material";
-import React from "react";
+import { Box, Paper } from "@mui/material";
+import React, { useState } from "react";
 import { useGetApplicationsQuery } from "./redux/features/application/applicationApi";
 import ApplicationContainer from "./components/ApplicationContainer";
 import GlobalLoader from "./components/GlobalLoader";
 import TimerContainer from "./components/TimerContainer";
+import { useAppSelector } from "./redux/store";
+import Header from "./components/Header/Header";
+import ManageApplications from "./components/ManageApplications";
 
 const App = () => {
+  const [isOpenManageApplication, setIsOpenManageApplication] = useState(false);
   const { isLoading } = useGetApplicationsQuery({});
+
+  const { user } = useAppSelector((state) => state.auth);
+  console.log("user", user);
+  console.log("isOpenManageApplication", isOpenManageApplication);
 
   return (
     <Box
@@ -22,18 +30,21 @@ const App = () => {
       }}
     >
       <Paper variant="outlined" sx={{ padding: "20px", height: "100%" }}>
-        <Box
-          sx={{
-            borderBottom: "1px solid #E0E0E0",
-            // paddingY: "0.5rem",
-          }}
-        >
-          <Typography sx={{ fontSize: "18px", fontWeight: 600, color: "blue" }}>
-            It-Hub
-          </Typography>
-        </Box>
-        <TimerContainer />
-        {isLoading ? <GlobalLoader /> : <ApplicationContainer />}
+        <Header
+          user={user}
+          setIsOpenManageApplication={setIsOpenManageApplication}
+        />
+
+        {isLoading ? (
+          <GlobalLoader />
+        ) : isOpenManageApplication ? (
+          <ManageApplications />
+        ) : (
+          <>
+            <TimerContainer />
+            <ApplicationContainer />
+          </>
+        )}
       </Paper>
     </Box>
   );
