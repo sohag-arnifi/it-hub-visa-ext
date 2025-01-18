@@ -55,7 +55,7 @@ const Header = ({ user, setIsOpenManageApplication }) => {
   }, [open]);
 
   return (
-    <Box>
+    <Box sx={{ zIndex: 100 }}>
       {/* Header Top Section */}
       <Box
         sx={{
@@ -82,9 +82,14 @@ const Header = ({ user, setIsOpenManageApplication }) => {
             {user?.companyId?.companyName}
           </Typography>
           <Divider flexItem orientation="vertical" />
-          <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "red" }}>
-            Balance:{" "}
-            {user?.companyId?.currentDue + user?.companyId?.previousDue}
+          <Typography
+            sx={{
+              fontSize: "16px",
+              fontWeight: 600,
+              color: user?.companyId?.currentBalance >= 0 ? "green" : "red",
+            }}
+          >
+            Balance: {user?.companyId?.currentBalance.toLocaleString()}
           </Typography>
         </Box>
       </Box>
@@ -97,6 +102,7 @@ const Header = ({ user, setIsOpenManageApplication }) => {
           alignItems: "center",
           marginTop: "10px",
           paddingRight: "15px",
+          zIndex: 100,
         }}
       >
         <Box
@@ -134,6 +140,10 @@ const Header = ({ user, setIsOpenManageApplication }) => {
           placement="bottom-start"
           transition
           disablePortal
+          sx={{
+            zIndex: 100,
+            bgcolor: "#FFF",
+          }}
         >
           {({ TransitionProps, placement }) => (
             <Grow
@@ -152,7 +162,7 @@ const Header = ({ user, setIsOpenManageApplication }) => {
                     onKeyDown={handleListKeyDown}
                   >
                     <MenuItem onClick={handleApplicationToken}>
-                      Applications eToken
+                      Applications e-Token
                     </MenuItem>
                     <MenuItem onClick={handleManageApplication}>
                       Manage Applications

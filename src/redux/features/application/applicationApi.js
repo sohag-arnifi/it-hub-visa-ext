@@ -5,7 +5,7 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getApplications: builder.query({
       query: () => ({
-        url: `/applications/get-all`,
+        url: `/applications/get-process`,
         method: "GET",
         headers: { "content-type": "application/json" },
       }),
@@ -20,6 +20,43 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
       },
     }),
 
+    createNewApplication: builder.mutation({
+      query: (data) => ({
+        url: `/applications`,
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: data,
+      }),
+      invalidatesTags: ["applications"],
+    }),
+
+    getAllApplications: builder.query({
+      query: () => ({
+        url: `/applications`,
+        method: "GET",
+        headers: { "content-type": "application/json" },
+      }),
+      providesTags: ["applications"],
+    }),
+    deleteApplication: builder.mutation({
+      query: (data) => ({
+        url: `/applications/${data?._id}`,
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: data,
+      }),
+      invalidatesTags: ["applications"],
+    }),
+
+    updateApplication: builder.mutation({
+      query: (data) => ({
+        url: `/applications/${data?._id}`,
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: data,
+      }),
+      invalidatesTags: ["applications"],
+    }),
     getCaptchaToken: builder.mutation({
       query: ({ phone }) => ({
         url: `/recaptcha-token`,
@@ -47,5 +84,11 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetApplicationsQuery, useGetCaptchaTokenMutation } =
-  applicationApi;
+export const {
+  useGetApplicationsQuery,
+  useGetCaptchaTokenMutation,
+  useCreateNewApplicationMutation,
+  useGetAllApplicationsQuery,
+  useDeleteApplicationMutation,
+  useUpdateApplicationMutation,
+} = applicationApi;

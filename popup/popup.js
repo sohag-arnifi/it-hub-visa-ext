@@ -58,6 +58,12 @@ function login(event) {
             showLoggedInState();
           }
         );
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs.length > 0) {
+            chrome.tabs.reload(tabs[0].id);
+          }
+        });
+        window.close();
       } else {
         loginBtn.disabled = false;
         loginBtn.textContent = "Login";
@@ -86,6 +92,11 @@ function logout() {
   chrome.storage.local.clear(() => {
     showLoggedOutState(); // Update UI to reflect the logged-out state
     window.close(); // Optionally close the current window (if needed)
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        chrome.tabs.reload(tabs[0].id);
+      }
+    });
   });
 }
 
