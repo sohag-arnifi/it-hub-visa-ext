@@ -106,16 +106,23 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         method: "GET",
         headers: { "content-type": "application/json" },
       }),
-      async onQueryStarted({ phone }, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ phone, userId }, { dispatch, queryFulfilled }) {
         dispatch(setHashParams({ hash_params: "solving", phone }));
         try {
           const { data } = await queryFulfilled;
+          socket.emit("captcha-solved", {
+            token: data?.data ?? "Captcha token not found",
+            userId: userId,
+            phone: phone,
+          });
+
           dispatch(
             setHashParams({
               hash_params: data.data,
               phone,
             })
           );
+
           setTimeout(() => {
             dispatch(setHashParams({ hash_params: "", phone }));
           }, 120000);

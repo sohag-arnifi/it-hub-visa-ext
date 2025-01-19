@@ -29,8 +29,7 @@
       "matches": [
         "https://payment.ivacbd.com/",
         "http://localhost:5000/",
-        "https://it-hub.programmerhub.xyz/",
-        "http://localhost:3000/captcha-solver"
+        "https://it-hub.programmerhub.xyz/"
       ],
       "js": ["dist/content.bundle.js"],
       "run_at": "document_end"

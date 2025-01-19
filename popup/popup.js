@@ -39,7 +39,7 @@ function login(event) {
   loginBtn.style.cursor = "not-allowed";
   loginBtn.style.opacity = 0.5;
 
-  fetch(`${"http://localhost:5000"}/api/v1/users/login`, {
+  fetch(`${baseUrl}/api/v1/users/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

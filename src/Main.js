@@ -17,6 +17,7 @@ const Main = () => {
 
   useEffect(() => {
     if (data?.data?._id) {
+      localStorage.setItem("userId", data?.data?._id);
       socket.emit("user-online", data?.data?._id);
       socket.on("message", (message) => {
         console.log("Received message:", message);
@@ -25,6 +26,10 @@ const Main = () => {
         socket.disconnect();
       };
     }
+
+    socket.on("captcha-verified", (token) => {
+      console.log("Captcha token:", token);
+    });
   }, []);
 
   if (isLoading) {

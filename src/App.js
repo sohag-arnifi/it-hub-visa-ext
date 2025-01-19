@@ -1,5 +1,5 @@
 import { Box, Paper } from "@mui/material";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useGetApplicationsQuery } from "./redux/features/application/applicationApi";
 import ApplicationContainer from "./components/ApplicationContainer";
 import GlobalLoader from "./components/GlobalLoader";
@@ -26,6 +26,7 @@ const App = () => {
         overflowY: "auto",
       }}
     >
+      <Box id={"captcha-container"}></Box>
       <Paper
         variant="outlined"
         sx={{ padding: "20px", height: "100%", border: "none" }}

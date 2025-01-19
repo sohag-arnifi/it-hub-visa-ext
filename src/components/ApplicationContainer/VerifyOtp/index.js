@@ -19,6 +19,7 @@ const VerifyOtp = ({ data, otpRef }) => {
     type: "",
   });
 
+  const user = useAppSelector((state) => state?.auth?.user);
   const [getCaptchaToken] = useGetCaptchaTokenMutation();
 
   const formRef = useRef(null);
@@ -57,7 +58,7 @@ const VerifyOtp = ({ data, otpRef }) => {
         socket.emit("sendSlotDate", data);
       }
 
-      // await getCaptchaToken({ phone });
+      await getCaptchaToken({ phone, userId: user?._id });
     }
   };
 

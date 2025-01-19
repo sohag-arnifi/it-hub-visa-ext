@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { StyledTypography } from "..";
 import {
@@ -12,6 +12,7 @@ import {
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import {
+  setHashParams,
   setPaymentUrl,
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
@@ -23,6 +24,8 @@ const DateTime = ({ data }) => {
     ? data?.slot_dates[0] ?? "Not Available"
     : "Not Available"; // "2024-12-31";
 
+  const user = useAppSelector((state) => state?.auth?.user);
+
   const timeSlot = data?.slot_times?.length
     ? data?.slot_times[0] ?? "Not Available"
     : "Not Available";
@@ -33,7 +36,7 @@ const DateTime = ({ data }) => {
 
   const [getCaptchaToken] = useGetCaptchaTokenMutation();
   const handleCaptchaToken = async () => {
-    await getCaptchaToken({ phone });
+    await getCaptchaToken({ phone, userId: user?._id });
   };
 
   const [message, setMessage] = useState({
@@ -118,10 +121,21 @@ const DateTime = ({ data }) => {
     socket.on("captcha-solved", (data) => {
       if (phone === data?.phone) {
         setHasParams(data?.token);
-        console.log("captcha-solved", data?.token);
       }
     });
-  }, [socket]);
+
+    socket.on("captcha-received", (data) => {
+      if (user?._id === data?.userId && phone === data?.phone) {
+        dispatch(setHashParams({ hash_params: data?.token, phone }));
+        setHasParams(data?.token);
+      }
+    });
+
+    return () => {
+      socket.off("captcha-solved");
+      socket.off("captcha-received");
+    };
+  }, []);
 
   return (
     <Box

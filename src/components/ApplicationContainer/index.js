@@ -7,6 +7,7 @@ import PayNow from "./PayNow";
 import DownloadSlip from "./DownloadSlip";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { setLastUpdate } from "../../redux/features/automation/automationSlice";
+import CaptchaSolver from "./CaptchaSolver";
 
 export const StyledTypography = styled(Typography)(() => ({
   fontSize: "12px",
@@ -99,6 +100,7 @@ const ApplicationContainer = () => {
               />
               <VerifyOtp data={item} otpRef={otpRefs.current[i]} />
               <DateTime data={item} otpRef={otpRefs.current[i]} />
+              <CaptchaSolver data={item} />
               <PayNow data={item} otpRef={otpRefs.current[i]} />
               <DownloadSlip />
             </Box>
