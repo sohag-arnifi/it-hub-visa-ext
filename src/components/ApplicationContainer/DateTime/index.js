@@ -28,7 +28,6 @@ const DateTime = ({ data }) => {
     : "Not Available";
   const [has_params, setHasParams] = useState("");
 
-  const { applications } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const phone = data?.info?.[0]?.phone;
 

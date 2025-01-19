@@ -15,7 +15,7 @@ export const StyledTypography = styled(Typography)(() => ({
 }));
 
 const ApplicationContainer = () => {
-  const { applications } = useAppSelector((state) => state);
+  const applications = useAppSelector((state) => state?.applications);
   const otpRefs = useRef(applications.map(() => React.createRef()));
 
   const { hitNow, apiCallRunning, otpSend } = useAppSelector(

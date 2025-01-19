@@ -58,7 +58,7 @@ const emptyInidialvalues = {
 const ManageApplications = () => {
   const [openModal, setOpenModal] = useState(false);
   const [initialValues, setInitialValues] = useState(emptyInidialvalues);
-  const { user } = useAppSelector((state) => state.auth);
+  const user = useAppSelector((state) => state?.auth?.user);
   const { data, isLoading } = useGetAllApplicationsQuery();
 
   const totalApplications = data?.data?.length ?? 0;

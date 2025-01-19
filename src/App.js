@@ -11,7 +11,7 @@ import ManageApplications from "./components/ManageApplications";
 const App = () => {
   const [isOpenManageApplication, setIsOpenManageApplication] = useState(false);
   const { isLoading } = useGetApplicationsQuery({});
-  const { user } = useAppSelector((state) => state.auth);
+  const user = useAppSelector((state) => state?.auth?.user);
 
   return (
     <Box

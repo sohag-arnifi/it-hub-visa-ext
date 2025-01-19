@@ -7,7 +7,6 @@ const handleMultipleApiCall = async (apiFn, payload, setMessage) => {
     try {
       const response = await apiFn(payload).unwrap();
       console.log(response);
-
       if (response?.code === 200) {
         if (payload?.action === "sendOtp" || payload?.action === "verifyOtp") {
           setMessage({
