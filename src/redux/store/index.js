@@ -14,6 +14,7 @@ export const store = configureStore({
     automation: automationReducer,
     auth: authReducer,
   },
+  devTools: false,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(backendBaseApiSlice.middleware)

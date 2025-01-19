@@ -15,9 +15,8 @@ const TimerContainer = () => {
 
   const timeRefs = useRef([]);
 
-  const { isAutomationOn, lastUpdate, hitNow } = useAppSelector(
-    (state) => state?.automation
-  );
+  const { isAutomationOn, lastUpdate, apiCallRunning, otpSend } =
+    useAppSelector((state) => state?.automation);
   const dispatch = useAppDispatch();
   const checkingTimes = [
     "1:55:00 PM",
@@ -89,13 +88,14 @@ const TimerContainer = () => {
         const formattedTime = now.toLocaleTimeString();
 
         if (checkingTimes.includes(formattedTime)) {
-          dispatch(
-            setLastUpdate({
-              lastUpdate: formattedTime,
-              hitNow: true,
-            })
-          );
-
+          if (!apiCallRunning && !otpSend) {
+            dispatch(
+              setLastUpdate({
+                lastUpdate: formattedTime,
+                hitNow: true,
+              })
+            );
+          }
           const index = checkingTimes.indexOf(formattedTime);
           if (timeRefs.current[index]) {
             timeRefs.current[index].scrollIntoView({
@@ -129,7 +129,7 @@ const TimerContainer = () => {
           color: "blue",
         }}
       >
-        {currentTime.toLocaleTimeString()}
+        {currentTime?.toLocaleTimeString()}
       </Typography>
       {lastUpdate && (
         <Typography

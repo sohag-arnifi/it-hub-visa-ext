@@ -44,7 +44,7 @@ const Main = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "column",
-                height: "100vh",
+                height: "90vh",
                 width: "100vw",
                 bgcolor: "#EDE7F6",
                 position: "fixed",

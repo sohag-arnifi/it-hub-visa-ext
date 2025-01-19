@@ -18,19 +18,20 @@ const ApplicationContainer = () => {
   const { applications } = useAppSelector((state) => state);
   const otpRefs = useRef(applications.map(() => React.createRef()));
 
-  const { hitNow } = useAppSelector((state) => state?.automation);
+  const { hitNow, apiCallRunning, otpSend } = useAppSelector(
+    (state) => state?.automation
+  );
   const dispatch = useAppDispatch();
 
   const sendOtpToAllApplications = () => {
-    applications.forEach((_, index) => {
-      otpRefs.current[index]?.current?.click();
-    });
+    if (!apiCallRunning && !otpSend) {
+      applications.forEach((_, index) => {
+        setTimeout(() => {
+          otpRefs.current[index]?.current?.click();
+        }, index * 1000);
+      });
+    }
   };
-
-  const totalProcessFiles = applications?.reduce(
-    (acc, curr) => acc + curr?.info?.length,
-    0
-  );
 
   useEffect(() => {
     if (hitNow) {
@@ -45,29 +46,19 @@ const ApplicationContainer = () => {
         display: "flex",
         flexDirection: "column",
         gap: "0.5rem",
+        paddingBottom: "2rem",
       }}
     >
-      <Box
+      <Typography
         sx={{
-          paddingY: "1rem",
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "1rem",
+          fontSize: "1rem",
+          fontWeight: "bold",
+          lineHeight: "18px",
         }}
       >
-        <Typography
-          sx={{
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-            lineHeight: "18px",
-          }}
-        >
-          Total process files:{" "}
-          <span style={{ color: "blue" }}>{totalProcessFiles}</span>
-        </Typography>
-      </Box>
+        Process Applications -{" "}
+        <span style={{ color: "blue" }}>{applications?.length}</span>
+      </Typography>
 
       {applications?.map((item, i) => {
         const ivac = item?.info[0]?.ivac;
@@ -100,7 +91,12 @@ const ApplicationContainer = () => {
                   </Box>
                 </Box>
               </Box>
-              <SendOtp data={item} otpRef={otpRefs.current[i]} />
+              <SendOtp
+                data={item}
+                otpRef={otpRefs.current[i]}
+                applications={applications}
+                index={i}
+              />
               <VerifyOtp data={item} otpRef={otpRefs.current[i]} />
               <DateTime data={item} otpRef={otpRefs.current[i]} />
               <PayNow data={item} otpRef={otpRefs.current[i]} />

@@ -55,24 +55,33 @@ const DateTime = ({ data }) => {
     );
     if (result.status === "OK") {
       if (result?.slot_times?.length) {
-        dispatch(setSlotTimes({ slotTimes: result?.slot_times, phone }));
-      } else {
-        const availableSlot = applications?.find((application) => {
-          const availableInfo = application?.info[0];
-          if (
-            availableInfo?.center?.id === currentApplication?.center?.id &&
-            availableInfo?.ivac?.id === currentApplication?.ivac?.id &&
-            availableInfo?.visa_type?.id ===
-              currentApplication?.visa_type?.id &&
-            availableInfo?.slot_times?.length
-          ) {
-            return true;
-          } else {
-            false;
-          }
-        });
-        dispatch(setSlotTimes({ slotTimes: availableSlot?.slot_times, phone }));
+        const data = {
+          center: currentApplication?.center?.id,
+          ivac: currentApplication?.ivac?.id,
+          visa_type: currentApplication?.visa_type?.id,
+          slot_times: result?.slot_times,
+        };
+        socket.emit("sendSlotTime", data);
       }
+      // if (result?.slot_times?.length) {
+      //   dispatch(setSlotTimes({ slotTimes: result?.slot_times, phone }));
+      // } else {
+      //   const availableSlot = applications?.find((application) => {
+      //     const availableInfo = application?.info[0];
+      //     if (
+      //       availableInfo?.center?.id === currentApplication?.center?.id &&
+      //       availableInfo?.ivac?.id === currentApplication?.ivac?.id &&
+      //       availableInfo?.visa_type?.id ===
+      //         currentApplication?.visa_type?.id &&
+      //       availableInfo?.slot_times?.length
+      //     ) {
+      //       return true;
+      //     } else {
+      //       false;
+      //     }
+      //   });
+      //   dispatch(setSlotTimes({ slotTimes: availableSlot?.slot_times, phone }));
+      // }
     }
   };
 
@@ -99,6 +108,7 @@ const DateTime = ({ data }) => {
     } else if (
       specific_date !== "Not Available" &&
       timeSlot === "Not Available" &&
+      data?.otp &&
       !data?.paymentUrl
     ) {
       handleGenerateSlotTime();
@@ -124,7 +134,7 @@ const DateTime = ({ data }) => {
       }}
     >
       <StyledTypography sx={{ lineHeight: "12px" }}>
-        Select Date:{" "}
+        Slot Date:{" "}
         <span
           style={{ color: specific_date === "Not Available" ? "red" : "green" }}
         >
@@ -135,7 +145,7 @@ const DateTime = ({ data }) => {
         sx={{ lineHeight: "12px" }}
         onClick={handleGenerateSlotTime}
       >
-        Select Time:{" "}
+        Slot Time:{" "}
         <span style={{ color: "blue" }}>
           {isLoading
             ? "Getting..."

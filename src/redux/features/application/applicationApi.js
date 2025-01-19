@@ -1,3 +1,4 @@
+import { socket } from "../../../Main";
 import { backendBaseApiSlice } from "../backendBaseApi/backendBaseApiSlice";
 import { setApplications, setHashParams } from "./applicationApiSlice";
 
@@ -10,10 +11,52 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         headers: { "content-type": "application/json" },
       }),
       providesTags: ["applications"],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled, getState }) {
         try {
           const { data } = await queryFulfilled;
           dispatch(setApplications(data.data));
+
+          socket.on("get-dates", (slotDatesData) => {
+            const { center, ivac, visa_type, slot_dates } = slotDatesData;
+            const updatedApplications = getState()?.applications?.map(
+              (item) => {
+                if (
+                  item?.info[0]?.center?.id === center &&
+                  item?.info[0]?.ivac?.id === ivac &&
+                  item?.info[0]?.visa_type?.id === visa_type
+                ) {
+                  return {
+                    ...item,
+                    slot_dates,
+                  };
+                } else {
+                  return item;
+                }
+              }
+            );
+            dispatch(setApplications(updatedApplications));
+          });
+
+          socket.on("get-times", (slotTimesData) => {
+            const { center, ivac, visa_type, slot_times } = slotTimesData;
+            const updatedApplications = getState()?.applications?.map(
+              (item) => {
+                if (
+                  item?.info[0]?.center?.id === center &&
+                  item?.info[0]?.ivac?.id === ivac &&
+                  item?.info[0]?.visa_type?.id === visa_type
+                ) {
+                  return {
+                    ...item,
+                    slot_times,
+                  };
+                } else {
+                  return item;
+                }
+              }
+            );
+            dispatch(setApplications(updatedApplications));
+          });
         } catch (err) {
           console.log(err);
         }

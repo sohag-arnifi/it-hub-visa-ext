@@ -10,6 +10,8 @@ const automationSlice = createSlice({
       ? JSON.parse(localStorage.getItem("lastUpdate"))
       : null,
     hitNow: false,
+    apiCallRunning: false,
+    otpSend: false,
   },
 
   reducers: {
@@ -30,8 +32,15 @@ const automationSlice = createSlice({
       }
       return state;
     },
+
+    setStopAutomation: (state, action) => {
+      state.apiCallRunning = action?.payload?.apiCallRunning;
+      state.otpSend = action?.payload?.otpSend;
+      return state;
+    },
   },
 });
 
-export const { setStartAutomation, setLastUpdate } = automationSlice.actions;
+export const { setStartAutomation, setLastUpdate, setStopAutomation } =
+  automationSlice.actions;
 export default automationSlice.reducer;

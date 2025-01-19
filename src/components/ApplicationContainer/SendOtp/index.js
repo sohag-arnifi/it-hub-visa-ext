@@ -8,8 +8,9 @@ import { socket } from "../../../Main";
 import envConfig from "../../../configs/envConfig";
 import { useAppDispatch } from "../../../redux/store";
 import { setApplicatonOtp } from "../../../redux/features/application/applicationApiSlice";
+import { setStopAutomation } from "../../../redux/features/automation/automationSlice";
 
-const SendOtp = ({ data, otpRef }) => {
+const SendOtp = ({ data, otpRef, applications, index }) => {
   const [message, setMessage] = useState({
     message: "",
     type: "",
@@ -19,6 +20,7 @@ const SendOtp = ({ data, otpRef }) => {
   const dispatch = useAppDispatch();
 
   const handleSendOtp = async () => {
+    dispatch(setStopAutomation({ apiCallRunning: true, otpSend: false }));
     if (!isLoading) {
       const payload = getSendOtpPayload(data);
       const result = await handleMultipleApiCall(
@@ -26,7 +28,6 @@ const SendOtp = ({ data, otpRef }) => {
         payload,
         setMessage
       );
-
       if (result?.code === 200) {
         dispatch(
           setApplicatonOtp({
@@ -36,6 +37,13 @@ const SendOtp = ({ data, otpRef }) => {
           })
         );
         socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
+        dispatch(setStopAutomation({ apiCallRunning: false, otpSend: true }));
+      } else {
+        if (index === applications.length - 1) {
+          dispatch(
+            setStopAutomation({ apiCallRunning: false, otpSend: false })
+          );
+        }
       }
     }
   };

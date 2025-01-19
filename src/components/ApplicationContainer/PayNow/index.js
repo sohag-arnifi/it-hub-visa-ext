@@ -21,7 +21,10 @@ const PayNow = ({ data }) => {
       }}
     >
       <StyledTypography>
-        Payment Methode <span>BKASH</span>
+        Payment Method: <span>{data?.selected_payment?.name}</span>
+      </StyledTypography>
+      <StyledTypography>
+        Payable Amount: <span>{data?.info?.length * 824}</span>
       </StyledTypography>
       <Box sx={{ display: "flex", gap: "5px" }}>
         <Button

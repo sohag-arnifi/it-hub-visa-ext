@@ -123,19 +123,17 @@ export const getSlotPayload = (item, date) => {
 export const getPayInvoicePayload = (item) => {
   const info = item?.info?.map((data) => {
     return {
-      web_id: data?.web_id, //
-      name: data?.name, //
-      phone: data?.phone, //
-      email: data?.email, //
-      amount: 800.0, //
-      is_open: true, //
-      confirm_tos: true, //
+      web_id: data?.web_id,
+      name: data?.name,
+      phone: data?.phone,
+      email: data?.email,
+      amount: 800.0,
+      is_open: true,
+      confirm_tos: true,
       amountChangeData: data?.amountChangeData,
-      // otp: item?.otp,
-      otp: 123456,
-      // appointment_date: item?.specific_date,
-      appointment_date: "2025-01-14",
-      // appointment_time: item?.slotTime?.hour,
+      otp: item?.otp,
+      appointment_date: item?.specific_date,
+      appointment_time: item?.slotTime?.hour,
       appointment_time: 10,
       center: {
         id: data?.center?.id,
@@ -163,23 +161,11 @@ export const getPayInvoicePayload = (item) => {
     action: "payInvoice",
     info,
     selected_payment: {
-      name: "Bkash",
-      slug: "bkash",
-      grand_total: info.length * 824,
-      link: "https://securepay.sslcommerz.com/gwprocess/v4/image/gw1/bkash.png",
+      ...item?.selected_payment,
+      grand_total: item?.info?.length * 824,
     },
-    // selected_slot: item?.slot_times?.length ? item?.slot_times[0] : {},
-    selected_slot: {
-      id: 172468,
-      ivac_id: 17,
-      visa_type: 13,
-      hour: 10,
-      date: "2025-01-14",
-      availableSlot: 56,
-      time_display: "10:00 - 10:59",
-    },
+    selected_slot: item?.slot_times?.length ? item?.slot_times[0] : {},
     hash_params: item?.hash_params,
-    // hash_params: "",
   };
 
   return data;

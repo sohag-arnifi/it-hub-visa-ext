@@ -5,7 +5,9 @@ const applicationApiSlice = createSlice({
   initialState: [],
   reducers: {
     setApplications: (state, action) => {
-      state = action.payload;
+      state = [...(action?.payload || [])].sort(
+        (a, b) => new Date(a?.createdAt) - new Date(b?.createdAt)
+      );
       return state;
     },
 

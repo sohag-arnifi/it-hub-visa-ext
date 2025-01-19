@@ -23,8 +23,6 @@ const VerifyOtp = ({ data, otpRef }) => {
 
   const formRef = useRef(null);
 
-  const { applications } = useAppSelector((state) => state);
-
   const phone = data?.info?.[0]?.phone;
 
   const [manageQueue, { isLoading }] = useManageQueueMutation();
@@ -46,71 +44,20 @@ const VerifyOtp = ({ data, otpRef }) => {
 
     const status = result?.status;
     const slot_dates = result?.data?.slot_dates ?? [];
+
     if (status === "SUCCESS") {
-      // socket.emit("create-captcha", { phone });
-      dispatch(setApplicatonOtp({ otp, phone }));
-      socket.emit("otp-verified", { phone, otp });
-      const availableTimeSlot = applications?.find((application) => {
-        const availableInfo = application?.info[0];
-        if (
-          availableInfo?.center?.id === currentApplication?.center?.id &&
-          availableInfo?.ivac?.id === currentApplication?.ivac?.id &&
-          availableInfo?.visa_type?.id === currentApplication?.visa_type?.id &&
-          availableInfo?.slot_dates?.length &&
-          availableInfo?.slot_times?.length
-        ) {
-          return true;
-        } else {
-          false;
-        }
-      });
-      if (availableTimeSlot) {
-        dispatch(
-          setSlotTimes({
-            slotTimes: availableTimeSlot?.slot_times,
-            phone,
-          })
-        );
-        dispatch(
-          setSlotDates({
-            slotDates: availableTimeSlot?.slot_dates,
-            phone,
-          })
-        );
-      } else {
-        if (slot_dates?.length) {
-          dispatch(
-            setSlotDates({
-              slotDates: slot_dates,
-              phone,
-            })
-          );
-        } else {
-          const availableDateSlot = applications?.find((application) => {
-            const availableInfo = application?.info[0];
-            if (
-              availableInfo?.center?.id === currentApplication?.center?.id &&
-              availableInfo?.ivac?.id === currentApplication?.ivac?.id &&
-              availableInfo?.visa_type?.id ===
-                currentApplication?.visa_type?.id &&
-              availableInfo?.slot_dates?.length
-            ) {
-              return true;
-            } else {
-              false;
-            }
-          });
-          if (availableDateSlot?.slot_dates?.length) {
-            dispatch(
-              setSlotDates({
-                slotDates: availableDateSlot?.slot_dates,
-                phone,
-              })
-            );
-          }
-        }
+      dispatch(setApplicatonOtp({ otp, phone, resend: data?.resend + 1 }));
+      if (slot_dates?.length) {
+        const data = {
+          center: currentApplication?.center?.id,
+          ivac: currentApplication?.ivac?.id,
+          visa_type: currentApplication?.visa_type?.id,
+          slot_dates,
+        };
+        socket.emit("sendSlotDate", data);
       }
-      await getCaptchaToken({ phone });
+
+      // await getCaptchaToken({ phone });
     }
   };
 

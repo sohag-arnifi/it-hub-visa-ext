@@ -26,7 +26,10 @@ const App = () => {
         overflowY: "auto",
       }}
     >
-      <Paper variant="outlined" sx={{ padding: "20px", height: "100%" }}>
+      <Paper
+        variant="outlined"
+        sx={{ padding: "20px", height: "100%", border: "none" }}
+      >
         <Header
           user={user}
           setIsOpenManageApplication={setIsOpenManageApplication}
