@@ -19,7 +19,8 @@ const handleMultipleApiCall = async (apiFn, payload, setMessage) => {
 
       if (response?.status === "FAIL") {
         setMessage({
-          message: response?.message ?? "Time Slot not found!",
+          message:
+            response?.message ?? response?.errors ?? "Time Slot not found!",
           type: "error",
         });
         return response;

@@ -17,6 +17,7 @@ const CaptchaSolver = ({ data }) => {
   };
 
   const requestCaptchaTokenHandlar = () => {
+    // localStorage.setItem("userId", JSON.stringify(user?._id));
     socket.emit("captcha-neded", { phone, userId: user?._id });
   };
 

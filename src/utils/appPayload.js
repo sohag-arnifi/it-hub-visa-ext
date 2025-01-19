@@ -131,9 +131,11 @@ export const getPayInvoicePayload = (item) => {
       is_open: true,
       confirm_tos: true,
       amountChangeData: data?.amountChangeData,
-      otp: item?.otp,
-      appointment_date: item?.specific_date,
-      appointment_time: item?.slotTime?.hour,
+      // otp: item?.otp,
+      otp: "421242",
+      // appointment_date: item?.specific_date,
+      appointment_date: "2025-01-20",
+      // appointment_time: item?.slotTime?.hour,
       appointment_time: 10,
       center: {
         id: data?.center?.id,
@@ -164,7 +166,16 @@ export const getPayInvoicePayload = (item) => {
       ...item?.selected_payment,
       grand_total: item?.info?.length * 824,
     },
-    selected_slot: item?.slot_times?.length ? item?.slot_times[0] : {},
+    // selected_slot:  item?.slot_times?.length ? item?.slot_times[0] : {},
+    selected_slot: {
+      id: 142049,
+      ivac_id: 17,
+      visa_type: 13,
+      hour: 10,
+      date: "2024-10-17",
+      availableSlot: 1,
+      time_display: "10:00 - 10:59",
+    },
     hash_params: item?.hash_params,
   };
 

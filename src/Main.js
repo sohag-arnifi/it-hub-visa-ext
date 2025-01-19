@@ -15,10 +15,11 @@ const Main = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { data, isLoading } = useGetLoginUserQuery({});
 
+  console.log(data?.data?._id, "data?.data?._id");
   useEffect(() => {
     if (data?.data?._id) {
-      localStorage.setItem("userId", data?.data?._id);
       socket.emit("user-online", data?.data?._id);
+
       socket.on("message", (message) => {
         console.log("Received message:", message);
       });
@@ -31,6 +32,12 @@ const Main = () => {
       console.log("Captcha token:", token);
     });
   }, []);
+
+  useEffect(() => {
+    if (data?.data?._id) {
+      localStorage.setItem("userId", JSON.stringify(data?.data?._id));
+    }
+  }, [data, isLoading]);
 
   if (isLoading) {
     return <GlobalLoader height="70vh" />;

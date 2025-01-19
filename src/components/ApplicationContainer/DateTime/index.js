@@ -92,9 +92,18 @@ const DateTime = ({ data }) => {
       ...data,
       hash_params: data?.hash_params,
     });
+
+    console.log("payload", data?.selected_payment?.slug);
+
+    console.log("payload", payload);
     const result = await handleMultipleApiCall(payInvoice, payload, setMessage);
     if (result?.data?.url) {
-      dispatch(setPaymentUrl({ url: result?.data?.url + "bkash", phone }));
+      dispatch(
+        setPaymentUrl({
+          url: result?.data?.url + data?.selected_payment?.slug,
+          phone,
+        })
+      );
     }
   };
 
@@ -186,12 +195,12 @@ const DateTime = ({ data }) => {
       )}
 
       <Button
-        disabled={
-          specific_date === "Not Available" ||
-          timeSlot === "Not Available" ||
-          !has_params ||
-          isPayLoading
-        }
+        // disabled={
+        //   specific_date === "Not Available" ||
+        //   timeSlot === "Not Available" ||
+        //   !has_params ||
+        //   isPayLoading
+        // }
         onClick={handlePayInvoice}
         variant="contained"
         color="error"
