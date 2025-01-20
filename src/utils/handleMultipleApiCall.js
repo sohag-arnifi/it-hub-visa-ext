@@ -61,7 +61,7 @@ const handleMultipleApiCall = async (
           message: response?.message[0],
           type: "error",
         });
-        attempt++;
+        // attempt++;
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
         continue;
       }

@@ -57,8 +57,7 @@ const VerifyOtp = ({ data, otpRef }) => {
         };
         socket.emit("sendSlotDate", data);
       }
-
-      // await getCaptchaToken({ phone, userId: user?._id });
+      await getCaptchaToken({ phone, userId: user?._id });
     }
   };
 
