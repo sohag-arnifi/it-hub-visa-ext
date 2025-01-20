@@ -223,3 +223,5 @@ injectedContainer.innerHTML = `
     </div>
   </div>
 `;
+
+document.body.appendChild(injectedContainer);

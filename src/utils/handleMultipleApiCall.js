@@ -1,11 +1,23 @@
-const handleMultipleApiCall = async (apiFn, payload, setMessage) => {
+const handleMultipleApiCall = async (
+  apiFn,
+  payload,
+  setMessage,
+  abortSignal
+) => {
   let attempt = 0;
-  let maxAttempts = 3;
-  let retryDelay = 1500;
+  let maxAttempts = 1000;
+  let retryDelay = 2000;
 
   while (attempt < maxAttempts) {
     try {
-      const response = await apiFn(payload).unwrap();
+      if (abortSignal?.aborted) {
+        setMessage({
+          message: "Request was aborted by the user.",
+          type: "error",
+        });
+        break; // Exit the loop immediately if aborted
+      }
+      const response = await apiFn(payload, { signal: abortSignal }).unwrap();
       console.log(response);
       if (response?.code === 200) {
         if (payload?.action === "sendOtp" || payload?.action === "verifyOtp") {
@@ -16,7 +28,6 @@ const handleMultipleApiCall = async (apiFn, payload, setMessage) => {
         }
         return response;
       }
-
       if (response?.status === "FAIL") {
         setMessage({
           message:

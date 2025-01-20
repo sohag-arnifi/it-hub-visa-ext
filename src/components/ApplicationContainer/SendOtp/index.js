@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyledTypography } from "..";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
 import { useManageQueueMutation } from "../../../redux/features/appBaseApi/appBaseApiSlice";
@@ -18,16 +18,25 @@ const SendOtp = ({ data, otpRef, applications, index }) => {
   const phone = data?.info?.[0]?.phone;
   const [manageQueue, { isLoading }] = useManageQueueMutation();
   const dispatch = useAppDispatch();
+  const [apiCallRunning, setApiCallRunning] = useState(false);
+  const [otpSend, setOptSend] = useState(false);
+  const [abortController, setAbortController] = useState(null);
 
   const handleSendOtp = async () => {
-    dispatch(setStopAutomation({ apiCallRunning: true, otpSend: false }));
-    if (!isLoading) {
+    // dispatch(setStopAutomation({ apiCallRunning: true, otpSend: false }));
+    if ((!isLoading, !apiCallRunning, !otpSend)) {
+      const controller = new AbortController(); // Create a new AbortController
+      setAbortController(controller);
+      setApiCallRunning(true);
       const payload = getSendOtpPayload(data);
       const result = await handleMultipleApiCall(
         manageQueue,
         payload,
-        setMessage
+        setMessage,
+        controller.signal
       );
+
+      setApiCallRunning(false);
       if (result?.code === 200) {
         dispatch(
           setApplicatonOtp({
@@ -36,17 +45,43 @@ const SendOtp = ({ data, otpRef, applications, index }) => {
             resend: data?.resend ? data?.resend + 1 : 1,
           })
         );
+        setOptSend(true);
         socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
-        dispatch(setStopAutomation({ apiCallRunning: false, otpSend: true }));
+        // dispatch(setStopAutomation({ apiCallRunning: false, otpSend: true }));
       } else {
         if (index === applications.length - 1) {
-          dispatch(
-            setStopAutomation({ apiCallRunning: false, otpSend: false })
-          );
+          // dispatch(
+          //   setStopAutomation({ apiCallRunning: false, otpSend: false })
+          // );
         }
       }
     }
   };
+
+  const handleForceStop = () => {
+    console.log("force stop call");
+    if (abortController) {
+      console.log("Force stop call");
+      abortController.abort();
+      setApiCallRunning(false);
+      setAbortController(null);
+    }
+  };
+
+  useEffect(() => {
+    const handleOtpReceived = () => {
+      if (!apiCallRunning && !otpSend) {
+        setTimeout(() => {
+          handleSendOtp();
+        }, index * 1500);
+      }
+    };
+
+    socket.once("otp-received", handleOtpReceived);
+    return () => {
+      socket.off("otp-received", handleOtpReceived);
+    };
+  }, []);
 
   return (
     <Box
@@ -72,6 +107,21 @@ const SendOtp = ({ data, otpRef, applications, index }) => {
         }}
       >
         {isLoading ? "Sending..." : "Send OTP"}
+      </Button>
+
+      <Button
+        disabled={!abortController}
+        onClick={handleForceStop}
+        variant="contained"
+        color="error"
+        size="small"
+        sx={{
+          textTransform: "none",
+          fontSize: "10px",
+          boxShadow: "none",
+        }}
+      >
+        Force Stop
       </Button>
 
       <Typography

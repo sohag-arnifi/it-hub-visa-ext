@@ -8,6 +8,7 @@ import {
 } from "../../redux/features/automation/automationSlice";
 import useWakeLock from "../../hooks/useWakeLock";
 import CircleIcon from "@mui/icons-material/Circle";
+import { socket } from "../../Main";
 
 const TimerContainer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -82,39 +83,41 @@ const TimerContainer = () => {
   };
 
   useEffect(() => {
-    if (isAutomationOn) {
-      const interval = setInterval(() => {
-        const now = new Date();
-        const formattedTime = now.toLocaleTimeString();
+    const interval = setInterval(() => {
+      const now = new Date();
+      const formattedTime = now.toLocaleTimeString();
 
-        if (checkingTimes.includes(formattedTime)) {
-          if (!apiCallRunning && !otpSend) {
-            dispatch(
-              setLastUpdate({
-                lastUpdate: formattedTime,
-                hitNow: true,
-              })
-            );
-          }
-          const index = checkingTimes.indexOf(formattedTime);
-          if (timeRefs.current[index]) {
-            timeRefs.current[index].scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              inline: "center",
-            });
-          }
+      if (checkingTimes.includes(formattedTime)) {
+        const index = checkingTimes.indexOf(formattedTime);
+        if (timeRefs.current[index]) {
+          timeRefs.current[index].scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+          });
         }
-        setCurrentTime(now);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [isAutomationOn]);
+      }
+      setCurrentTime(now);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleStartAutomation = () => {
     dispatch(setStartAutomation(!isAutomationOn));
   };
 
+  // useEffect(() => {
+  //   socket.on("otp-received", () => {
+  //     if (!apiCallRunning && !otpSend) {
+  //       dispatch(
+  //         setLastUpdate({
+  //           lastUpdate: formattedTime,
+  //           hitNow: true,
+  //         })
+  //       );
+  //     }
+  //   });
+  // }, []);
   return (
     <Box
       sx={{
