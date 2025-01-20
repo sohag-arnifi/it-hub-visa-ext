@@ -2,22 +2,15 @@ const handleMultipleApiCall = async (
   apiFn,
   payload,
   setMessage,
-  abortSignal
+  abortSignal,
+  retryDelay = 1500
 ) => {
   let attempt = 0;
   let maxAttempts = 1000;
-  let retryDelay = 2000;
 
   while (attempt < maxAttempts) {
     try {
-      if (abortSignal?.aborted) {
-        setMessage({
-          message: "Request was aborted by the user.",
-          type: "error",
-        });
-        break; // Exit the loop immediately if aborted
-      }
-      const response = await apiFn(payload, { signal: abortSignal }).unwrap();
+      const response = await apiFn({ payload, signal: abortSignal }).unwrap();
       console.log(response);
       if (response?.code === 200) {
         if (payload?.action === "sendOtp" || payload?.action === "verifyOtp") {
@@ -72,30 +65,45 @@ const handleMultipleApiCall = async (
       if (error?.status === 429) {
         break;
       }
-
       const status = error?.status || 500;
-      // Handle retryable status codes
-      if ([500, 502, 504].includes(status)) {
+      if (status === 502) {
         setMessage({
-          message: `Server error: ${status}. Retrying... Attempt ${attempt}`,
+          message: "Bad Gateway(502) - Trying...",
           type: "error",
         });
-      } else {
+      } else if (status === 504) {
         setMessage({
-          message: `Something went wrong! Attempt ${attempt}`,
+          message: "Timeout(504) - Trying...",
+          type: "error",
+        });
+      } else if (status === 500) {
+        setMessage({
+          message: "Internal Server Error(500) - Trying...",
+          type: "error",
+        });
+      } else if (status === 419) {
+        setMessage({
+          message: "Session Expired(419) - Trying...",
+          type: "error",
+        });
+      } else if (status === 400) {
+        setMessage({
+          message: "Bad Request(400) - Trying...",
+          type: "error",
+        });
+      } else if (error?.status === 429) {
+        setMessage({
+          message: "Too Many Requests(429)- Please change Network",
+          type: "error",
+        });
+        break;
+      } else if (error.name === "AbortError") {
+        setMessage({
+          message: "Request aborted",
           type: "error",
         });
       }
 
-      // If max attempts reached, throw an error
-      if (attempt >= maxAttempts) {
-        setMessage({
-          message: `Max attempts reached. Last status: ${status}`,
-          type: "error",
-        });
-        throw new Error(`Max attempts reached. Last status: ${status}`);
-      }
-      // Wait for a delay before retrying
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
   }

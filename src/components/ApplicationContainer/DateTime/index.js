@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyledTypography } from "..";
 import {
   useGenerateSlotTimeMutation,
@@ -31,6 +31,8 @@ const DateTime = ({ data }) => {
     : "Not Available";
   const [has_params, setHasParams] = useState("");
 
+  const abortControllerRef = useRef(null);
+
   const dispatch = useAppDispatch();
   const phone = data?.info?.[0]?.phone;
 
@@ -48,12 +50,17 @@ const DateTime = ({ data }) => {
   const [payInvoice, { isLoading: isPayLoading }] = usePayInvoiceMutation();
 
   const handleGenerateSlotTime = async () => {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     const currentApplication = data?.info?.[0];
     const payload = getSlotPayload(data, specific_date);
     const result = await handleMultipleApiCall(
       generateSlotTime,
       payload,
-      setMessage
+      setMessage,
+      controller.signal,
+      1000
     );
     if (result.status === "OK") {
       if (result?.slot_times?.length) {
@@ -88,15 +95,21 @@ const DateTime = ({ data }) => {
   };
 
   const handlePayInvoice = async () => {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     const payload = getPayInvoicePayload({
       ...data,
       hash_params: data?.hash_params,
     });
 
-    console.log("payload", data?.selected_payment?.slug);
-
-    console.log("payload", payload);
-    const result = await handleMultipleApiCall(payInvoice, payload, setMessage);
+    const result = await handleMultipleApiCall(
+      payInvoice,
+      payload,
+      setMessage,
+      controller.signal,
+      1000
+    );
     if (result?.data?.url) {
       dispatch(
         setPaymentUrl({

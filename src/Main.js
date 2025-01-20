@@ -1,5 +1,5 @@
 import { Add, Close } from "@mui/icons-material";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import envConfig from "./configs/envConfig";
 import { io } from "socket.io-client";
@@ -15,29 +15,20 @@ const Main = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { data, isLoading } = useGetLoginUserQuery({});
 
-  console.log(data?.data?._id, "data?.data?._id");
+  const handleLogout = () => {
+    chrome.storage.local.clear(() => {
+      window.location.reload();
+    });
+  };
+
   useEffect(() => {
     if (data?.data?._id) {
       socket.emit("user-online", data?.data?._id);
-
-      socket.on("message", (message) => {
-        console.log("Received message:", message);
-      });
       return () => {
         socket.disconnect();
       };
     }
-
-    socket.on("captcha-verified", (token) => {
-      console.log("Captcha token:", token);
-    });
   }, []);
-
-  useEffect(() => {
-    if (data?.data?._id) {
-      localStorage.setItem("userId", JSON.stringify(data?.data?._id));
-    }
-  }, [data, isLoading]);
 
   if (isLoading) {
     return <GlobalLoader height="70vh" />;
@@ -56,7 +47,7 @@ const Main = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 flexDirection: "column",
-                height: "90vh",
+                height: "100vh",
                 width: "100vw",
                 bgcolor: "#EDE7F6",
                 position: "fixed",
@@ -73,12 +64,22 @@ const Main = () => {
               >
                 500
               </Typography>
-              <Typography sx={{ fontSize: "2rem", fontWeight: "bold" }}>
+              <Typography
+                sx={{ fontSize: "2rem", fontWeight: 600, color: "red" }}
+              >
                 Internal Server Error
               </Typography>
               <Typography sx={{ fontSize: "1rem", fontWeight: "bold" }}>
                 Please logout and login again!
               </Typography>
+              <Button
+                color="error"
+                variant="contained"
+                sx={{ mt: 2 }}
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             </Box>
           )}
         </>

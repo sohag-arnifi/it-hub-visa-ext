@@ -25,11 +25,12 @@ export const appBaseApiSlice = createApi({
   tagTypes: ["applications"],
   endpoints: (builder) => ({
     manageQueue: builder.mutation({
-      query: (data) => ({
+      query: ({ payload, signal }) => ({
         url: `/queue-manage`,
         method: "POST",
         headers,
-        data,
+        signal,
+        data: payload,
       }),
     }),
 

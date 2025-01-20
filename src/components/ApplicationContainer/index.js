@@ -13,6 +13,7 @@ export const StyledTypography = styled(Typography)(() => ({
   fontSize: "12px",
   fontWeight: "bold",
   lineHeight: "14px",
+  textAlign: "center",
 }));
 
 const ApplicationContainer = () => {

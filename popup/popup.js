@@ -3,8 +3,6 @@ const baseUrl =
     ? "http://localhost:5000"
     : "https://it-hub.programmerhub.xyz";
 
-console.log(baseUrl);
-
 document.addEventListener("DOMContentLoaded", () => {
   // Check if the user is logged in
   chrome.storage.local.get(["loggedIn"], (result) => {
@@ -39,7 +37,7 @@ function login(event) {
   loginBtn.style.cursor = "not-allowed";
   loginBtn.style.opacity = 0.5;
 
-  fetch(`${baseUrl}/api/v1/users/login`, {
+  fetch(`${"http://localhost:5000"}/api/v1/users/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -52,7 +50,7 @@ function login(event) {
         chrome.storage.local.set(
           {
             loggedIn: true,
-            logData: data,
+            logData: data?.data,
           },
           () => {
             showLoggedInState();

@@ -14,7 +14,7 @@ const httpsAgent = new https.Agent({
 
 export const axiosBaseQuery =
   ({ baseUrl } = { baseUrl: "" }) =>
-  async ({ url, method, data, params, headers }) => {
+  async ({ url, method, data, params, headers, signal }) => {
     try {
       // Make the request using axios
       const result = await axios({
@@ -25,6 +25,7 @@ export const axiosBaseQuery =
         headers,
         httpsAgent, // Use the HTTPS agent with keep-alive
         withCredentials: true,
+        signal,
         // timeout: 60000,
       });
 

@@ -22,6 +22,8 @@ const VerifyOtp = ({ data, otpRef }) => {
   const user = useAppSelector((state) => state?.auth?.user);
   const [getCaptchaToken] = useGetCaptchaTokenMutation();
 
+  const abortControllerRef = useRef(null);
+
   const formRef = useRef(null);
 
   const phone = data?.info?.[0]?.phone;
@@ -31,12 +33,18 @@ const VerifyOtp = ({ data, otpRef }) => {
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     const currentApplication = data?.info?.[0];
     const payload = getVerifyOtpPayload({ ...data, otp });
     const result = await handleMultipleApiCall(
       manageQueue,
       payload,
-      setMessage
+      setMessage,
+      controller.signal,
+      1000
     );
 
     if (result?.message[0] === "OTP expired. Please try again") {
@@ -57,7 +65,7 @@ const VerifyOtp = ({ data, otpRef }) => {
         };
         socket.emit("sendSlotDate", data);
       }
-      await getCaptchaToken({ phone, userId: user?._id });
+      // await getCaptchaToken({ phone, userId: user?._id });
     }
   };
 

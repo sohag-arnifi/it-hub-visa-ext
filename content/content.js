@@ -7,7 +7,7 @@ import Main from "../src/Main";
 __webpack_public_path__ = chrome.runtime.getURL("dist/");
 
 chrome.storage.local.get(["logData"], (result) => {
-  const token = result.logData?.data;
+  const token = result.logData?.token;
   if (token) {
     const injectScript = document.createElement("script");
     injectScript.src = chrome.runtime.getURL("injected/injected.js");
@@ -37,6 +37,7 @@ chrome.storage.local.get(["logData"], (result) => {
     }, 500);
 
     localStorage.setItem("token", JSON.stringify(token));
+    localStorage.setItem("userId", JSON.stringify(result.logData?._id));
     const root = createRoot(document.getElementById("react-root"));
     root.render(
       <Provider store={store}>
