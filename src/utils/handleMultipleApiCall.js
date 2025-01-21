@@ -103,8 +103,7 @@ const handleMultipleApiCall = async (
           type: "error",
         });
       }
-
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
   }
 };

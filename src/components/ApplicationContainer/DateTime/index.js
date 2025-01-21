@@ -29,7 +29,7 @@ const DateTime = ({ data }) => {
   const timeSlot = data?.slot_times?.length
     ? data?.slot_times[0] ?? "Not Available"
     : "Not Available";
-  const [has_params, setHasParams] = useState("");
+  const [has_params, setHasParams] = useState(data?.hash_params?.token ?? "");
 
   const abortControllerRef = useRef(null);
 
@@ -100,7 +100,7 @@ const DateTime = ({ data }) => {
 
     const payload = getPayInvoicePayload({
       ...data,
-      hash_params: data?.hash_params,
+      hash_params: data?.hash_params?.token,
     });
 
     const result = await handleMultipleApiCall(
@@ -124,8 +124,7 @@ const DateTime = ({ data }) => {
     if (
       specific_date !== "Not Available" &&
       timeSlot !== "Not Available" &&
-      data?.hash_params &&
-      data?.hash_params !== "solving" &&
+      data?.hash_params?.token &&
       !data?.paymentUrl
     ) {
       handlePayInvoice();
@@ -142,13 +141,30 @@ const DateTime = ({ data }) => {
   useEffect(() => {
     socket.on("captcha-solved", (data) => {
       if (phone === data?.phone) {
+        dispatch(
+          setHashParams({
+            hash_params: {
+              token: data?.token,
+              message: "Solved",
+            },
+            phone,
+          })
+        );
         setHasParams(data?.token);
       }
     });
 
     socket.on("captcha-received", (data) => {
       if (user?._id === data?.userId && phone === data?.phone) {
-        dispatch(setHashParams({ hash_params: data?.token, phone }));
+        dispatch(
+          setHashParams({
+            hash_params: {
+              token: data?.token,
+              message: "Captcha solved",
+            },
+            phone,
+          })
+        );
         setHasParams(data?.token);
       }
     });
@@ -190,30 +206,25 @@ const DateTime = ({ data }) => {
         </span>
       </StyledTypography>
 
-      {!data?.hash_params ? (
+      {data?.hash_params?.message && (
         <StyledTypography
           onClick={handleCaptchaToken}
-          sx={{ lineHeight: "10px", color: "red" }}
+          sx={{
+            lineHeight: "10px",
+            color: data?.hash_params?.token ? "green" : "red",
+          }}
         >
-          Captcha not solved
-        </StyledTypography>
-      ) : data?.hash_params === "solving" ? (
-        <StyledTypography sx={{ lineHeight: "10px", color: "blue" }}>
-          Captcha solving...
-        </StyledTypography>
-      ) : (
-        <StyledTypography sx={{ lineHeight: "10px", color: "green" }}>
-          Captcha solved
+          {data?.hash_params?.message}
         </StyledTypography>
       )}
 
       <Button
-        // disabled={
-        //   specific_date === "Not Available" ||
-        //   timeSlot === "Not Available" ||
-        //   !has_params ||
-        //   isPayLoading
-        // }
+        disabled={
+          specific_date === "Not Available" ||
+          timeSlot === "Not Available" ||
+          !data?.hash_params?.token ||
+          isPayLoading
+        }
         onClick={handlePayInvoice}
         variant="contained"
         color="error"

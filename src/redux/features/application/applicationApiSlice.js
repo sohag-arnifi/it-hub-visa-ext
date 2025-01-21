@@ -84,7 +84,13 @@ const applicationApiSlice = createSlice({
       const index = state.findIndex(
         (application) => application?.info?.[0]?.phone === phone
       );
-      state[index].hash_params = hash_params;
+
+      state[index].hash_params = {
+        ...state[index].hash_params,
+        token: hash_params?.token,
+        message: hash_params?.message,
+      };
+
       return state;
     },
   },

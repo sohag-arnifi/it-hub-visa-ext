@@ -14,7 +14,19 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled, getState }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setApplications(data.data));
+          dispatch(
+            setApplications(
+              data.data?.map((item) => {
+                return {
+                  ...item,
+                  hash_params: {
+                    token: "",
+                    message: "Captcha not found.",
+                  },
+                };
+              })
+            )
+          );
 
           socket.on("get-dates", (slotDatesData) => {
             const { center, ivac, visa_type, slot_dates } = slotDatesData;
@@ -107,25 +119,20 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         headers: { "content-type": "application/json" },
       }),
       async onQueryStarted({ phone, userId }, { dispatch, queryFulfilled }) {
-        dispatch(setHashParams({ hash_params: "solving", phone }));
+        dispatch(
+          setHashParams({
+            hash_params: { token: "", message: "Solving.." },
+            phone,
+          })
+        );
         try {
           const { data } = await queryFulfilled;
-          socket.emit("captcha-solved", {
-            token: data?.data ?? "Captcha token not found",
-            userId: userId,
-            phone: phone,
-          });
-
           dispatch(
             setHashParams({
-              hash_params: data.data,
+              hash_params: { token: data?.data, message: "Solved" },
               phone,
             })
           );
-
-          setTimeout(() => {
-            dispatch(setHashParams({ hash_params: "", phone }));
-          }, 120000);
         } catch (err) {
           console.log(err);
         }

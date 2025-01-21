@@ -7,6 +7,7 @@ import { socket } from "../../../Main";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import {
   setApplicatonOtp,
+  setHashParams,
   setSlotDates,
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
@@ -23,7 +24,6 @@ const VerifyOtp = ({ data, otpRef }) => {
   const [getCaptchaToken] = useGetCaptchaTokenMutation();
 
   const abortControllerRef = useRef(null);
-
   const formRef = useRef(null);
 
   const phone = data?.info?.[0]?.phone;
@@ -65,7 +65,7 @@ const VerifyOtp = ({ data, otpRef }) => {
         };
         socket.emit("sendSlotDate", data);
       }
-      // await getCaptchaToken({ phone, userId: user?._id });
+      await getCaptchaToken({ phone, userId: user?._id });
     }
   };
 

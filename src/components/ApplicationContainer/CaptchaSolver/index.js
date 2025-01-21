@@ -2,17 +2,20 @@ import { Box, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { StyledTypography } from "..";
 import { socket } from "../../../Main";
-import { useAppSelector } from "../../../redux/store";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import { setHashParams } from "../../../redux/features/application/applicationApiSlice";
 
 const CaptchaSolver = ({ data }) => {
   const phone = data?.info[0]?.phone;
   const user = useAppSelector((state) => state?.auth?.user);
   const [captchaContainerOpen, setCaptchaContainerOpen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0); // 2 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(-1); // 2 minutes in seconds
+
+  const dispatch = useAppDispatch();
 
   const handleCaptchaReceived = (data) => {
     if (user?._id === data?.userId && phone === data?.phone) {
-      setTimeLeft(120); // Reset timer to 2 minutes when captcha is received
+      setTimeLeft(90); // Reset timer to 2 minutes when captcha is received
     }
   };
 
@@ -63,6 +66,26 @@ const CaptchaSolver = ({ data }) => {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? `0${secs}` : secs}`;
   };
+
+  useEffect(() => {
+    if (data?.hash_params?.token && data?.hash_params?.message === "Solved") {
+      setTimeLeft(90);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      dispatch(
+        setHashParams({
+          hash_params: {
+            token: data?.hash_params?.token,
+            message: "Captcha Expire soon.",
+          },
+          phone,
+        })
+      );
+    }
+  }, [timeLeft]);
 
   return (
     <Box
