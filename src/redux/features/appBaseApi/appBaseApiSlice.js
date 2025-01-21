@@ -35,20 +35,22 @@ export const appBaseApiSlice = createApi({
     }),
 
     generateSlotTime: builder.mutation({
-      query: (data) => ({
+      query: ({ payload, signal }) => ({
         url: `/get_payment_options_v2`,
         method: "POST",
         headers,
-        data,
+        signal,
+        data: payload,
       }),
     }),
 
     payInvoice: builder.mutation({
-      query: (data) => ({
+      query: ({ payload, signal }) => ({
         url: `/slot_pay_now`,
         method: "POST",
         headers,
-        data,
+        signal,
+        data: payload,
       }),
     }),
   }),

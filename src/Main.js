@@ -75,7 +75,7 @@ const Main = () => {
               <Button
                 color="error"
                 variant="contained"
-                sx={{ mt: 2 }}
+                sx={{ mt: 2, textTransform: "none" }}
                 onClick={handleLogout}
               >
                 Logout

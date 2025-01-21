@@ -44,7 +44,7 @@ const VerifyOtp = ({ data, otpRef }) => {
       payload,
       setMessage,
       controller.signal,
-      1000
+      1500
     );
 
     if (result?.message[0] === "OTP expired. Please try again") {
@@ -66,6 +66,14 @@ const VerifyOtp = ({ data, otpRef }) => {
         socket.emit("sendSlotDate", data);
       }
       await getCaptchaToken({ phone, userId: user?._id });
+    }
+  };
+
+  const handleForceStop = () => {
+    if (abortControllerRef?.current) {
+      abortControllerRef.current.abort(); // Abort the ongoing request using ref
+      abortControllerRef.current = null; // Reset the ref to null
+      console.log("API call aborted");
     }
   };
 
@@ -116,19 +124,36 @@ const VerifyOtp = ({ data, otpRef }) => {
           fontSize: "12px",
         }}
       />
-      <Button
-        disabled={isLoading || otp?.length !== 6}
-        type="submit"
-        variant="contained"
-        size="small"
-        sx={{
-          textTransform: "none",
-          fontSize: "10px",
-          boxShadow: "none",
-        }}
-      >
-        {isLoading ? "Loading..." : "Verify OTP"}
-      </Button>
+      <Box sx={{ display: "flex", gap: "5px" }}>
+        <Button
+          disabled={isLoading || otp?.length !== 6}
+          type="submit"
+          variant="contained"
+          size="small"
+          sx={{
+            textTransform: "none",
+            fontSize: "10px",
+            boxShadow: "none",
+          }}
+        >
+          {isLoading ? "Loading..." : "Verify OTP"}
+        </Button>
+        <Button
+          onClick={handleForceStop}
+          disabled={!abortControllerRef?.current}
+          color="error"
+          variant="contained"
+          size="small"
+          sx={{
+            textTransform: "none",
+            fontSize: "10px",
+            boxShadow: "none",
+          }}
+        >
+          Force Stop
+        </Button>
+      </Box>
+
       <Typography
         sx={{
           fontSize: "10px",

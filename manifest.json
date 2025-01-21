@@ -48,7 +48,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["injected/injected.js", "injected/app.js", "db/db.json"],
+      "resources": ["injected/injected.js"],
       "matches": ["<all_urls>"]
     }
   ]

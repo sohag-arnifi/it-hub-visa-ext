@@ -54,9 +54,13 @@ const handleMultipleApiCall = async (
           message: response?.message[0],
           type: "error",
         });
-        // attempt++;
-        await new Promise((resolve) => setTimeout(resolve, retryDelay));
-        continue;
+        if (payload?.action === "sendOtp") {
+          // attempt++;
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          continue;
+        } else {
+          break;
+        }
       }
 
       break;
