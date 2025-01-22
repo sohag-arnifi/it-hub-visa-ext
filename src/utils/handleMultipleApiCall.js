@@ -21,6 +21,7 @@ const handleMultipleApiCall = async (
         }
         return response;
       }
+
       if (response?.status === "FAIL") {
         setMessage({
           message:

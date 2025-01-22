@@ -138,6 +138,15 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         }
       },
     }),
+
+    updatePaymentStatus: builder.mutation({
+      query: ({ phone, data }) => ({
+        url: `/applications/payment-status/${phone}`,
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -148,4 +157,5 @@ export const {
   useGetAllApplicationsQuery,
   useDeleteApplicationMutation,
   useUpdateApplicationMutation,
+  useUpdatePaymentStatusMutation,
 } = applicationApi;

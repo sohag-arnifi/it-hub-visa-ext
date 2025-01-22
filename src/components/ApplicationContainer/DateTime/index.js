@@ -17,7 +17,10 @@ import {
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
 import { socket } from "../../../Main";
-import { useGetCaptchaTokenMutation } from "../../../redux/features/application/applicationApi";
+import {
+  useGetCaptchaTokenMutation,
+  useUpdatePaymentStatusMutation,
+} from "../../../redux/features/application/applicationApi";
 
 const DateTime = ({ data }) => {
   const specific_date = data?.slot_dates?.length
@@ -31,7 +34,8 @@ const DateTime = ({ data }) => {
     : "Not Available";
   const [has_params, setHasParams] = useState(data?.hash_params?.token ?? "");
 
-  const abortControllerRef = useRef(null);
+  const timeSlotabortControllerRef = useRef(null);
+  const payInvoiceAbortControllerRef = useRef(null);
 
   const dispatch = useAppDispatch();
   const phone = data?.info?.[0]?.phone;
@@ -48,10 +52,11 @@ const DateTime = ({ data }) => {
 
   const [generateSlotTime, { isLoading }] = useGenerateSlotTimeMutation();
   const [payInvoice, { isLoading: isPayLoading }] = usePayInvoiceMutation();
+  const [updatePaymentStatus] = useUpdatePaymentStatusMutation();
 
   const handleGenerateSlotTime = async () => {
     const controller = new AbortController();
-    abortControllerRef.current = controller;
+    timeSlotabortControllerRef.current = controller;
 
     const currentApplication = data?.info?.[0];
     const payload = getSlotPayload(data, specific_date);
@@ -96,13 +101,11 @@ const DateTime = ({ data }) => {
 
   const handlePayInvoice = async () => {
     const controller = new AbortController();
-    abortControllerRef.current = controller;
-
+    payInvoiceAbortControllerRef.current = controller;
     const payload = getPayInvoicePayload({
       ...data,
       hash_params: data?.hash_params?.token,
     });
-
     const result = await handleMultipleApiCall(
       payInvoice,
       payload,
@@ -110,7 +113,6 @@ const DateTime = ({ data }) => {
       controller.signal,
       1000
     );
-
     console.log(result);
 
     if (result?.url) {
@@ -120,6 +122,37 @@ const DateTime = ({ data }) => {
           phone,
         })
       );
+
+      const successPayload = {
+        resend: data?.resend ?? 0,
+        otp: data?.otp,
+        slot_dates: data?.slot_dates,
+        slot_time: payload?.selected_slot,
+        paymentStatus: {
+          ...result,
+          url: result?.url + data?.selected_payment?.slug,
+        },
+      };
+
+      await updatePaymentStatus({ phone, data: successPayload });
+    } else {
+      dispatch(
+        setHashParams({
+          hash_params: {
+            token: "",
+            message: "Captcha not solved",
+          },
+          phone,
+        })
+      );
+    }
+  };
+
+  const payInvoiceAbortHandlar = () => {
+    if (payInvoiceAbortControllerRef.current) {
+      payInvoiceAbortControllerRef.current.abort();
+      payInvoiceAbortControllerRef.current = null;
+      console.log("API call aborted");
     }
   };
 
@@ -221,25 +254,41 @@ const DateTime = ({ data }) => {
         </StyledTypography>
       )}
 
-      <Button
-        disabled={
-          specific_date === "Not Available" ||
-          timeSlot === "Not Available" ||
-          !data?.hash_params?.token ||
-          isPayLoading
-        }
-        onClick={handlePayInvoice}
-        variant="contained"
-        color="error"
-        size="small"
-        sx={{
-          textTransform: "none",
-          fontSize: "10px",
-          boxShadow: "none",
-        }}
-      >
-        {isPayLoading ? "Booking..." : "Book Now"}
-      </Button>
+      <Box display={"flex"} gap={"5px"}>
+        <Button
+          // disabled={
+          //   specific_date === "Not Available" ||
+          //   timeSlot === "Not Available" ||
+          //   !data?.hash_params?.token ||
+          //   isPayLoading
+          // }
+          onClick={handlePayInvoice}
+          variant="contained"
+          color="error"
+          size="small"
+          sx={{
+            textTransform: "none",
+            fontSize: "10px",
+            boxShadow: "none",
+          }}
+        >
+          {isPayLoading ? "Booking..." : "Book Now"}
+        </Button>
+        <Button
+          disabled={!payInvoiceAbortControllerRef?.current}
+          onClick={payInvoiceAbortHandlar}
+          variant="contained"
+          color="error"
+          size="small"
+          sx={{
+            textTransform: "none",
+            fontSize: "10px",
+            boxShadow: "none",
+          }}
+        >
+          Force Stop
+        </Button>
+      </Box>
       <Typography
         sx={{
           fontSize: "10px",

@@ -12,6 +12,7 @@ import {
   setSlotTimes,
 } from "../../../redux/features/application/applicationApiSlice";
 import { useGetCaptchaTokenMutation } from "../../../redux/features/application/applicationApi";
+import { StyledTypography } from "..";
 
 const VerifyOtp = ({ data, otpRef }) => {
   const [otp, setOtp] = useState(data?.otp);
@@ -19,6 +20,8 @@ const VerifyOtp = ({ data, otpRef }) => {
     message: "",
     type: "",
   });
+
+  const [countdown, setCountdown] = useState(0); // 5 minutes in seconds
 
   const user = useAppSelector((state) => state?.auth?.user);
   const [getCaptchaToken] = useGetCaptchaTokenMutation();
@@ -33,7 +36,6 @@ const VerifyOtp = ({ data, otpRef }) => {
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
-
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
@@ -53,7 +55,6 @@ const VerifyOtp = ({ data, otpRef }) => {
 
     const status = result?.status;
     const slot_dates = result?.data?.slot_dates ?? [];
-
     if (status === "SUCCESS") {
       dispatch(setApplicatonOtp({ otp, phone, resend: data?.resend + 1 }));
       if (slot_dates?.length) {
@@ -65,8 +66,34 @@ const VerifyOtp = ({ data, otpRef }) => {
         };
         socket.emit("sendSlotDate", data);
       }
-      await getCaptchaToken({ phone, userId: user?._id });
+      setCountdown(300);
+      startCountdown();
+      // await getCaptchaToken({ phone, userId: user?._id });
     }
+  };
+
+  const startCountdown = () => {
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (countdown === 0 && otp) {
+      setCountdown(-1);
+    }
+  }, [countdown]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secondsLeft = seconds % 60;
+    return `${minutes}:${secondsLeft < 10 ? "0" + secondsLeft : secondsLeft}`;
   };
 
   const handleForceStop = () => {
@@ -154,14 +181,24 @@ const VerifyOtp = ({ data, otpRef }) => {
         </Button>
       </Box>
 
-      <Typography
-        sx={{
-          fontSize: "10px",
-          color: message.type === "success" ? "green" : "red",
-        }}
-      >
-        {message.message}
-      </Typography>
+      {countdown > 0 ? (
+        <StyledTypography
+          sx={{ fontSize: "12px", color: countdown > 50 ? "green" : "red" }}
+        >
+          {countdown > 0
+            ? `OTP Verified. Valid for: ${formatTime(countdown)}`
+            : `OTP expired. Please resend.`}
+        </StyledTypography>
+      ) : (
+        <Typography
+          sx={{
+            fontSize: "10px",
+            color: message.type === "success" ? "green" : "red",
+          }}
+        >
+          {message.message}
+        </Typography>
+      )}
     </Box>
   );
 };
