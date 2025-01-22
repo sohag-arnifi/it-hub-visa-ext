@@ -110,10 +110,13 @@ const DateTime = ({ data }) => {
       controller.signal,
       1000
     );
-    if (result?.data?.url) {
+
+    console.log(result);
+
+    if (result?.url) {
       dispatch(
         setPaymentUrl({
-          url: result?.data?.url + data?.selected_payment?.slug,
+          url: result?.url + data?.selected_payment?.slug,
           phone,
         })
       );

@@ -31,7 +31,7 @@ const handleMultipleApiCall = async (
       }
 
       if (response?.status === "OK") {
-        if (response?.data?.url) {
+        if (response?.url) {
           setMessage({
             message: "Slot booked successfully!",
             type: "success",
