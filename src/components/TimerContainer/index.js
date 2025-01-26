@@ -11,6 +11,8 @@ const TimerContainer = () => {
     message: "",
   });
 
+  const [latestNotish, setLatestNotish] = useState("");
+
   useWakeLock();
 
   const handleUpdateCaseCookie = async () => {
@@ -35,7 +37,27 @@ const TimerContainer = () => {
         }
 
         const htmlText = await response.text();
-        console.log(htmlText);
+
+        const matchedMessage = htmlText.match(/"en":"(.*?)"/);
+
+        if (matchedMessage) {
+          setLatestNotish(matchedMessage[1].replace(/\\\//g, "/"));
+        } else {
+          console.log("Message not found.");
+        }
+
+        const regex = /var csrf_token = "(.*?)";/;
+        const match = htmlText.match(regex);
+
+        if (match && match[1]) {
+          const csrfToken = match[1];
+          if (csrfToken?.length === 40) {
+            localStorage.setItem("_token", csrfToken);
+            localStorage.setItem("apiKey", csrfToken);
+          }
+        } else {
+          console.log("CSRF token not found");
+        }
 
         setMessage({
           color: "green",
@@ -133,6 +155,28 @@ const TimerContainer = () => {
             {message?.message}
           </Typography>
         )}
+      </Box>
+
+      <Box
+        sx={{
+          mt: "10px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          paddingX: "4rem",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: "12px",
+            fontWeight: 600,
+            color: "red",
+            textAlign: "center",
+          }}
+        >
+          {latestNotish && latestNotish}
+        </Typography>
       </Box>
 
       {/* <Typography
