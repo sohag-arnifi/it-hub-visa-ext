@@ -9,7 +9,7 @@ import { useAppDispatch } from "../../../redux/store";
 import { setApplicatonOtp } from "../../../redux/features/application/applicationApiSlice";
 import envConfig from "../../../configs/envConfig";
 
-const SendOtp = ({ data, applications, index }) => {
+const SendOtp = ({ data, applications, index, otpRef }) => {
   const [message, setMessage] = useState({
     message: "",
     type: "",
@@ -21,15 +21,16 @@ const SendOtp = ({ data, applications, index }) => {
   const [countdown, setCountdown] = useState(300); // 5 minutes in seconds
 
   const abortControllerRef = useRef(null);
-  const [isRequestActive, setIsRequestActive] = useState(false);
+  const isRequestActiveRef = useRef(false);
+  const isSendOtpRef = useRef(false);
 
-  const handleSendOtp = async ({ apiDelay = 4000 }) => {
-    if (isRequestActive || otpSend) return;
+  const handleSendOtp = async ({ apiDelay = 3000 }) => {
+    if (isRequestActiveRef.current || isSendOtpRef.current) return;
+    isRequestActiveRef.current = true; // Update the ref immediately
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const payload = getSendOtpPayload(data);
-    setIsRequestActive(true);
 
     const result = await handleMultipleApiCall(
       manageQueue,
@@ -39,16 +40,16 @@ const SendOtp = ({ data, applications, index }) => {
       apiDelay
     );
 
-    setIsRequestActive(false);
+    isRequestActiveRef.current = false;
     if (result?.code === 200) {
       dispatch(
         setApplicatonOtp({
-          otp: "",
+          otp: data?.otp,
           phone,
           resend: data?.resend ? data?.resend + 1 : 1,
         })
       );
-      setOptSend(true);
+      isSendOtpRef.current = true;
       setCountdown(300);
       startCountdown();
       socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
@@ -68,8 +69,8 @@ const SendOtp = ({ data, applications, index }) => {
   };
 
   useEffect(() => {
-    if (countdown === 0 && otpSend) {
-      setOptSend(false);
+    if (countdown === 0 && isSendOtpRef?.current) {
+      isSendOtpRef.current = false;
     }
   }, [countdown]);
 
@@ -83,21 +84,21 @@ const SendOtp = ({ data, applications, index }) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort(); // Abort the ongoing request using ref
       abortControllerRef.current = null; // Reset the ref to null
-      setIsRequestActive(false); // Disable Force Stop button
+      isRequestActiveRef.current = false;
       console.log("API call aborted");
     }
   };
 
   useEffect(() => {
     socket.once("otp-received", () => {
-      if (!isRequestActive && !otpSend) {
+      if (!isRequestActiveRef.current && !isSendOtpRef.current) {
         handleSendOtp({ apiDelay: 1500 });
       }
     });
     return () => {
       socket.off("otp-received");
     };
-  });
+  }, [index]);
 
   return (
     <Box
@@ -110,6 +111,7 @@ const SendOtp = ({ data, applications, index }) => {
     >
       <StyledTypography>Send to - {phone}</StyledTypography>
       <Button
+        ref={otpRef}
         disabled={isLoading || otpSend}
         onClick={handleSendOtp}
         variant="contained"
@@ -125,7 +127,7 @@ const SendOtp = ({ data, applications, index }) => {
       </Button>
 
       <Button
-        disabled={!isRequestActive}
+        disabled={!isRequestActiveRef?.current}
         onClick={handleForceStop}
         variant="contained"
         color="error"

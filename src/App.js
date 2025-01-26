@@ -1,5 +1,5 @@
-import { Box, Paper } from "@mui/material";
-import React, { useRef, useState } from "react";
+import { Box, Button, Paper } from "@mui/material";
+import React, { useState } from "react";
 import { useGetApplicationsQuery } from "./redux/features/application/applicationApi";
 import ApplicationContainer from "./components/ApplicationContainer";
 import GlobalLoader from "./components/GlobalLoader";

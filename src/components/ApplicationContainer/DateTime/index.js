@@ -21,6 +21,7 @@ import {
   useGetCaptchaTokenMutation,
   useUpdatePaymentStatusMutation,
 } from "../../../redux/features/application/applicationApi";
+import envConfig from "../../../configs/envConfig";
 
 const DateTime = ({ data }) => {
   const specific_date = data?.slot_dates?.length
@@ -134,7 +135,9 @@ const DateTime = ({ data }) => {
         },
       };
 
-      await updatePaymentStatus({ phone, data: successPayload });
+      if (!envConfig?.isTesting) {
+        await updatePaymentStatus({ phone, data: successPayload });
+      }
     } else {
       dispatch(
         setHashParams({
@@ -256,12 +259,12 @@ const DateTime = ({ data }) => {
 
       <Box display={"flex"} gap={"5px"}>
         <Button
-          // disabled={
-          //   specific_date === "Not Available" ||
-          //   timeSlot === "Not Available" ||
-          //   !data?.hash_params?.token ||
-          //   isPayLoading
-          // }
+          disabled={
+            specific_date === "Not Available" ||
+            timeSlot === "Not Available" ||
+            !data?.hash_params?.token ||
+            isPayLoading
+          }
           onClick={handlePayInvoice}
           variant="contained"
           color="error"

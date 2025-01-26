@@ -103,7 +103,7 @@ const ApplicationContainer = () => {
               <DateTime data={item} otpRef={otpRefs.current[i]} />
               <CaptchaSolver data={item} />
               <PayNow data={item} otpRef={otpRefs.current[i]} />
-              <DownloadSlip />
+              {/* <DownloadSlip /> */}
             </Box>
           </Paper>
         );

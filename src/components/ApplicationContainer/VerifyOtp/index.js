@@ -68,7 +68,10 @@ const VerifyOtp = ({ data, otpRef }) => {
       }
       setCountdown(300);
       startCountdown();
-      // await getCaptchaToken({ phone, userId: user?._id });
+
+      if (!data?.hash_params?.token) {
+        await getCaptchaToken({ phone, userId: user?._id });
+      }
     }
   };
 
