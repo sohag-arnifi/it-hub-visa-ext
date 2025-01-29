@@ -14,6 +14,6 @@ export const backendBaseApiSlice = createApi({
     },
     credentials: "include",
   }),
-  tagTypes: ["applications"],
+  tagTypes: ["applications", "user"],
   endpoints: () => ({}),
 });

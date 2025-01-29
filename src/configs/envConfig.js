@@ -1,5 +1,7 @@
 const url = window.location.origin;
 const appBaseUrl = url === "https://payment.ivacbd.com" ? url : url + "/api/v1";
+// const appBaseUrl = "https://payment.ivacbd.com";
+// const backendBaseUrl = "http://localhost:5000";
 const backendBaseUrl =
   url === "http://localhost:5000" ? url : "https://it-hub.programmerhub.xyz";
 

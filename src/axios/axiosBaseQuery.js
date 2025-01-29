@@ -26,7 +26,7 @@ export const axiosBaseQuery =
         httpsAgent, // Use the HTTPS agent with keep-alive
         withCredentials: true,
         signal,
-        timeout: 30000,
+        // timeout: 30000,
       });
 
       return { data: result.data }; // Return the result in the expected format

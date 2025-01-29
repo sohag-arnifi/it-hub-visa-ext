@@ -8,6 +8,7 @@ const authApi = backendBaseApiSlice.injectEndpoints({
         url: "/users/me",
         method: "GET",
       }),
+      providesTags: ["user"],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -20,7 +21,15 @@ const authApi = backendBaseApiSlice.injectEndpoints({
         }
       },
     }),
+    login: builder.mutation({
+      query: (data) => ({
+        url: "/users/login",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["user"],
+    }),
   }),
 });
 
-export const { useGetLoginUserQuery } = authApi;
+export const { useGetLoginUserQuery, useLoginMutation } = authApi;

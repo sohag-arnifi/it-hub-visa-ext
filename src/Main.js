@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import App from "./App";
 import { useGetLoginUserQuery } from "./redux/features/auth/authApi";
 import GlobalLoader from "./components/GlobalLoader";
+import LoginPage from "./components/Login";
 
 export const socket = io(envConfig.backendBaseUrl, {
   transports: ["websocket"],
@@ -55,7 +56,8 @@ const Main = () => {
                 left: "0px",
               }}
             >
-              <Typography
+              <LoginPage />
+              {/* <Typography
                 sx={{
                   fontSize: "5rem",
                   fontWeight: "bold",
@@ -79,7 +81,7 @@ const Main = () => {
                 onClick={handleLogout}
               >
                 Logout
-              </Button>
+              </Button> */}
             </Box>
           )}
         </>

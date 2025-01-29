@@ -29,7 +29,8 @@
       "matches": [
         "https://payment.ivacbd.com/",
         "http://localhost:5000/",
-        "https://it-hub.programmerhub.xyz/"
+        "https://it-hub.programmerhub.xyz/",
+        "https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3--5000--1b4252dd.local-credentialless.webcontainer-api.io/"
       ],
       "js": ["dist/content.bundle.js"],
       "run_at": "document_end"
