@@ -78,25 +78,6 @@ const DateTime = ({ data }) => {
         };
         socket.emit("sendSlotTime", data);
       }
-      // if (result?.slot_times?.length) {
-      //   dispatch(setSlotTimes({ slotTimes: result?.slot_times, phone }));
-      // } else {
-      //   const availableSlot = applications?.find((application) => {
-      //     const availableInfo = application?.info[0];
-      //     if (
-      //       availableInfo?.center?.id === currentApplication?.center?.id &&
-      //       availableInfo?.ivac?.id === currentApplication?.ivac?.id &&
-      //       availableInfo?.visa_type?.id ===
-      //         currentApplication?.visa_type?.id &&
-      //       availableInfo?.slot_times?.length
-      //     ) {
-      //       return true;
-      //     } else {
-      //       false;
-      //     }
-      //   });
-      //   dispatch(setSlotTimes({ slotTimes: availableSlot?.slot_times, phone }));
-      // }
     }
   };
 
@@ -114,7 +95,6 @@ const DateTime = ({ data }) => {
       controller.signal,
       1000
     );
-    console.log(result);
 
     if (result?.url) {
       dispatch(

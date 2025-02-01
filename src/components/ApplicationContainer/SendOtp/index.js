@@ -17,16 +17,16 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
   const phone = data?.info?.[0]?.phone;
   const [manageQueue, { isLoading }] = useManageQueueMutation();
   const dispatch = useAppDispatch();
-  const [otpSend, setOptSend] = useState(false);
-  const [countdown, setCountdown] = useState(300); // 5 minutes in seconds
+  const [countdown, setCountdown] = useState(-1); // 5 minutes in seconds
 
   const abortControllerRef = useRef(null);
-  const isRequestActiveRef = useRef(false);
-  const isSendOtpRef = useRef(false);
+  const isRequestActiveRef = useRef(null);
+  const isSendOtpRef = useRef(null);
 
   const handleSendOtp = async ({ apiDelay = 3000 }) => {
     if (isRequestActiveRef.current || isSendOtpRef.current) return;
     isRequestActiveRef.current = true; // Update the ref immediately
+    isSendOtpRef.current = false;
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -41,15 +41,16 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
     );
 
     isRequestActiveRef.current = false;
+    isSendOtpRef.current = true;
+
     if (result?.code === 200) {
       dispatch(
         setApplicatonOtp({
           otp: data?.otp,
           phone,
-          resend: data?.resend ? data?.resend + 1 : 1,
+          resend: data?.resend + 1,
         })
       );
-      isSendOtpRef.current = true;
       setCountdown(300);
       startCountdown();
       socket.emit("otp-send", { phone, isTesting: envConfig?.isTesting });
@@ -71,6 +72,12 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
   useEffect(() => {
     if (countdown === 0 && isSendOtpRef?.current) {
       isSendOtpRef.current = false;
+      // if (!data?.paymentUrl) {
+      //   console.log("time up. reasy to next try -1500");
+      //   setTimeout(() => {
+      //     handleSendOtp({ apiDelay: 1500 });
+      //   }, 3000);
+      // }
     }
   }, [countdown]);
 
@@ -91,7 +98,11 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
 
   useEffect(() => {
     socket.once("otp-received", () => {
-      if (!isRequestActiveRef.current && !isSendOtpRef.current) {
+      if (
+        !isRequestActiveRef.current &&
+        !isSendOtpRef.current &&
+        !data?.selected_payment?.link
+      ) {
         handleSendOtp({ apiDelay: 1500 });
       }
     });
@@ -112,7 +123,7 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
       <StyledTypography>Send to - {phone}</StyledTypography>
       <Button
         ref={otpRef}
-        disabled={isLoading || otpSend}
+        disabled={isLoading || isSendOtpRef?.current}
         onClick={handleSendOtp}
         variant="contained"
         color="error"
@@ -141,15 +152,17 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
         Force Stop
       </Button>
 
-      {otpSend ? (
+      {isSendOtpRef?.current && (
         <StyledTypography
           sx={{ fontSize: "12px", color: countdown > 50 ? "green" : "red" }}
         >
           {countdown > 0
             ? `OTP sent. Time remaining: ${formatTime(countdown)}`
-            : `OTP expired. Please resend.`}
+            : `OTP expired. try again.`}
         </StyledTypography>
-      ) : (
+      )}
+
+      {message?.message && (
         <Typography
           sx={{
             fontSize: "12px",
@@ -160,18 +173,6 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
           {message?.message}
         </Typography>
       )}
-
-      {/* <Box>
-        {otpSend && (
-          <StyledTypography
-            sx={{ fontSize: "12px", color: countdown > 50 ? "green" : "red" }}
-          >
-            {countdown > 0
-              ? `OTP sent. Time remaining: ${formatTime(countdown)}`
-              : `OTP expired. Please resend.`}
-          </StyledTypography>
-        )}
-      </Box> */}
     </Box>
   );
 };

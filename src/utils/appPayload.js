@@ -86,7 +86,7 @@ export const getSlotPayload = (item, date) => {
       is_open: true,
       appointment_time: date,
       confirm_tos: true,
-      amountChangeData: data?.amountChangeData,
+      // amountChangeData: data?.amountChangeData,
       center: {
         id: data?.center?.id,
         c_name: data?.center?.c_name,
@@ -111,7 +111,7 @@ export const getSlotPayload = (item, date) => {
     _token: localStorage.getItem("_token"),
     apiKey: localStorage.getItem("apiKey"),
     action: "generateSlotTime",
-    amount: 10.0,
+    // amount: 10.0,
     ivac_id: info[0]?.ivac?.id,
     visa_type: info[0]?.visa_type?.id,
     specific_date: date,
