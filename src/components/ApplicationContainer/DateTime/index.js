@@ -86,8 +86,11 @@ const DateTime = ({ data }) => {
     payInvoiceAbortControllerRef.current = controller;
     const payload = getPayInvoicePayload({
       ...data,
+      specific_date,
+      slot_time: timeSlot,
       hash_params: data?.hash_params?.token,
     });
+
     const result = await handleMultipleApiCall(
       payInvoice,
       payload,
@@ -203,8 +206,8 @@ const DateTime = ({ data }) => {
         gap: "5px",
       }}
     >
-      <StyledTypography sx={{ lineHeight: "12px" }}>
-        Slot Date:{" "}
+      <StyledTypography sx={{ lineHeight: "12px", textAlign: "left" }}>
+        Date:{" "}
         <span
           style={{ color: specific_date === "Not Available" ? "red" : "green" }}
         >
@@ -212,10 +215,10 @@ const DateTime = ({ data }) => {
         </span>
       </StyledTypography>
       <StyledTypography
-        sx={{ lineHeight: "12px" }}
+        sx={{ lineHeight: "12px", textAlign: "left" }}
         onClick={handleGenerateSlotTime}
       >
-        Slot Time:{" "}
+        Time:{" "}
         <span style={{ color: "blue" }}>
           {isLoading
             ? "Getting..."

@@ -133,7 +133,7 @@ export const getPayInvoicePayload = (item) => {
       amountChangeData: data?.amountChangeData,
       otp: item?.otp,
       appointment_date: item?.specific_date,
-      appointment_time: item?.slotTime?.hour,
+      appointment_time: item?.slot_time?.hour,
       center: {
         id: data?.center?.id,
         c_name: data?.center?.c_name,
@@ -163,7 +163,7 @@ export const getPayInvoicePayload = (item) => {
       ...item?.selected_payment,
       grand_total: item?.info?.length * 824,
     },
-    selected_slot: item?.slot_times?.length ? item?.slot_times[0] : {},
+    selected_slot: item?.slot_time ?? {},
     hash_params: item?.hash_params,
   };
 
