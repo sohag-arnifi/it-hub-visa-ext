@@ -126,7 +126,7 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
             <InputField name="phone" label="Enter Phone Number" type="number" />
           </Grid>
           <Grid item xs={4}>
-            <InputField name="email" label="Enter Email" />
+            <InputField name="password" label="Enter Password" />
           </Grid>
 
           {values?.info?.map((item, index) => (
@@ -161,6 +161,10 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
           ))}
 
           <Grid item xs={4}>
+            <InputField name="visit_purpose" label="Visit Purpose" />
+          </Grid>
+
+          <Grid item xs={4}>
             <SelectField
               name="paymentMethod"
               label="Payment Method"
@@ -171,9 +175,9 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
             />
           </Grid>
 
-          <Grid item xs={4}>
+          {/* <Grid item xs={4}>
             <InputField name="paymentNumber" label="Phone Number" />
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

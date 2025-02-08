@@ -169,3 +169,23 @@ export const getPayInvoicePayload = (item) => {
 
   return data;
 };
+
+export const getMobileVerifyPayload = (item) => {
+  return {
+    _token: localStorage.getItem("_token"),
+    mobile_no: item?.phone,
+  };
+};
+export const getPasswordVerifyPayload = (item) => {
+  return {
+    _token: localStorage.getItem("_token"),
+    password: item?.password,
+  };
+};
+
+export const getOtpVerifyPayload = (otp) => {
+  return {
+    _token: localStorage.getItem("_token"),
+    otp: otp,
+  };
+};

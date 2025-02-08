@@ -122,8 +122,12 @@ const ApplicationsTable = ({
 
                   <Grid item xs={2}>
                     <Box>
-                      <StyledTypography>{item?.phone}</StyledTypography>
-                      <StyledTypography>{item?.email}</StyledTypography>
+                      <StyledTypography>
+                        Login Mobile: {item?.phone}
+                      </StyledTypography>
+                      <StyledTypography>
+                        Login Password: {item?.password}
+                      </StyledTypography>
                     </Box>
                   </Grid>
 

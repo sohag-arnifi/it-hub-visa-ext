@@ -53,6 +53,35 @@ export const appBaseApiSlice = createApi({
         data: payload,
       }),
     }),
+
+    mobileVerify: builder.mutation({
+      query: ({ payload, signal }) => ({
+        url: `/mobile-verify`,
+        method: "POST",
+        headers,
+        signal,
+        data: payload,
+      }),
+    }),
+    authVerify: builder.mutation({
+      query: ({ payload, signal }) => ({
+        url: `/login-auth-submit`,
+        method: "POST",
+        headers,
+        signal,
+        data: payload,
+      }),
+    }),
+
+    loginOtpVerify: builder.mutation({
+      query: ({ payload, signal }) => ({
+        url: `/login-otp-submit`,
+        method: "POST",
+        headers,
+        signal,
+        data: payload,
+      }),
+    }),
   }),
 });
 
@@ -60,4 +89,7 @@ export const {
   useManageQueueMutation,
   useGenerateSlotTimeMutation,
   usePayInvoiceMutation,
+  useMobileVerifyMutation,
+  useAuthVerifyMutation,
+  useLoginOtpVerifyMutation,
 } = appBaseApiSlice;

@@ -8,8 +8,17 @@ let captchaData;
 let userId;
 
 if (token && key) {
+  const userImgElement = document.querySelector("img.rounded-circle");
+  const userImg = userImgElement ? userImgElement.getAttribute("src") : "";
+
   localStorage.setItem("_token", token);
   localStorage.setItem("apiKey", key);
+
+  if (userImg) {
+    localStorage.setItem("userImg", userImg);
+  } else {
+    localStorage.setItem("userImg", "");
+  }
 }
 
 const baseUrl =

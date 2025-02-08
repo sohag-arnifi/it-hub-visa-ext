@@ -15,18 +15,13 @@ const validationSchema = Yup.object({
   center: Yup.string().required("Mission is required"),
   ivac: Yup.string().required("IVAC is required"),
   visaType: Yup.string().required("Visa Type is required"),
-  email: Yup.string()
-    .email("Pleaes enter a valid email address")
-    .required("Email is required"),
+  password: Yup.string().required("Password is required"),
   phone: Yup.string()
     .matches(/^\d+$/, "Enter a valid number")
     .length(11, "Phone must be exactly 11 characters")
     .required("Phone number is required"),
   paymentMethod: Yup.string().required("Payment Method is required"),
-  paymentNumber: Yup.string()
-    .matches(/^\d+$/, "Enter a valid number")
-    .length(11, "Phone must be exactly 11 characters")
-    .required("Phone number is required"),
+  visit_purpose: Yup.string().required("Visit Purpose is required"),
   info: Yup.array().of(
     Yup.object().shape({
       web_id: Yup.string().required("Web ID is required"),
@@ -43,7 +38,7 @@ const emptyInidialvalues = {
   ivac: "",
   visaType: "",
   phone: "",
-  email: "",
+  password: "",
   info: [
     {
       web_id: "",

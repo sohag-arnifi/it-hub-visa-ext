@@ -8,6 +8,8 @@ import DownloadSlip from "./DownloadSlip";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { setLastUpdate } from "../../redux/features/automation/automationSlice";
 import CaptchaSolver from "./CaptchaSolver";
+import { getIVAC, getVisaType } from "../../constanse";
+import ApplicantLogin from "./ApplicantLogin";
 
 export const StyledTypography = styled(Typography)(() => ({
   fontSize: "12px",
@@ -63,10 +65,29 @@ const ApplicationContainer = () => {
       </Typography>
 
       {applications?.map((item, i) => {
-        const ivac = item?.info[0]?.ivac;
-        const type = item?.info[0]?.visa_type;
+        const ivac = getIVAC(item?.ivac);
+        const type = getVisaType(item?.visaType);
+
         return (
           <Paper key={i} variant="outlined" sx={{ padding: "1rem" }}>
+            <Box sx={{ width: "100%", paddingBottom: "10px" }}>
+              <Box sx={{ display: "flex", gap: "1rem" }}>
+                <StyledTypography>{i + 1}.</StyledTypography>
+                <StyledTypography>{ivac?.ivac_name},</StyledTypography>
+                <StyledTypography>{type?.type_name},</StyledTypography>
+                <StyledTypography>
+                  Application- {item?.info?.length}
+                </StyledTypography>
+
+                {item?.info?.map((info, i) => (
+                  <Box key={i} sx={{ display: "flex", gap: "5px" }}>
+                    <StyledTypography>{i + 1}.</StyledTypography>
+                    <StyledTypography>{info?.web_id},</StyledTypography>
+                    <StyledTypography>{info?.name}</StyledTypography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
             <Box
               sx={{
                 display: "flex",
@@ -75,7 +96,8 @@ const ApplicationContainer = () => {
                 alignItems: "start",
               }}
             >
-              <Box sx={{ display: "flex", gap: "5px" }}>
+              <ApplicantLogin data={item} />
+              {/* <Box sx={{ display: "flex", gap: "5px" }}>
                 <StyledTypography>{i + 1}.</StyledTypography>
                 <Box>
                   <Box>
@@ -92,8 +114,8 @@ const ApplicationContainer = () => {
                     ))}
                   </Box>
                 </Box>
-              </Box>
-              <SendOtp
+              </Box> */}
+              {/* <SendOtp
                 data={item}
                 otpRef={otpRefs.current[i]}
                 applications={applications}
@@ -102,7 +124,7 @@ const ApplicationContainer = () => {
               <VerifyOtp data={item} otpRef={otpRefs.current[i]} />
               <DateTime data={item} otpRef={otpRefs.current[i]} />
               <CaptchaSolver data={item} />
-              <PayNow data={item} otpRef={otpRefs.current[i]} />
+              <PayNow data={item} otpRef={otpRefs.current[i]} /> */}
               {/* <DownloadSlip /> */}
             </Box>
           </Paper>
