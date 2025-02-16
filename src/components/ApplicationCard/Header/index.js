@@ -17,13 +17,9 @@ const Header = ({ data }) => {
       <Typography
         sx={{ fontSize: "12px", fontWeight: 600, lineHeight: "18px" }}
       >
-        {ivac?.ivac_name}
+        {ivac?.ivac_name}, {visaType?.type_name}
       </Typography>
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: 600, lineHeight: "18px" }}
-      >
-        {visaType?.type_name}
-      </Typography>
+
       <Typography
         sx={{ fontSize: "12px", fontWeight: 600, lineHeight: "18px" }}
       >

@@ -17,6 +17,10 @@ const Main = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { data, isLoading } = useGetLoginUserQuery({});
 
+  const url = new URL(window.location.href);
+  const params = new URLSearchParams(url.search);
+  const applicationId = params.get("applicationId");
+
   const handleLogout = () => {
     chrome.storage.local.clear(() => {
       window.location.reload();
@@ -38,7 +42,7 @@ const Main = () => {
 
   return (
     <Box sx={{ zIndex: 1000 }}>
-      {isOpen && (
+      {applicationId ? (
         <Box
           sx={{
             position: "fixed",
@@ -53,41 +57,46 @@ const Main = () => {
         >
           <ApplicationCard />
         </Box>
-        // <>
-        //   {data?.data?._id && data?.data?.companyId?._id ? (
-        //     <App />
-        //   ) : (
-        //     <Box
-        //       sx={{
-        //         display: "flex",
-        //         justifyContent: "center",
-        //         alignItems: "center",
-        //         flexDirection: "column",
-        //         height: "100vh",
-        //         width: "100vw",
-        //         bgcolor: "#EDE7F6",
-        //         position: "fixed",
-        //         top: "0px",
-        //         left: "0px",
-        //       }}
-        //     >
-        //       <LoginPage />
-        //     </Box>
-        //   )}
-        // </>
+      ) : (
+        <Box>
+          {isOpen && (
+            <>
+              {data?.data?._id && data?.data?.companyId?._id ? (
+                <App />
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    height: "100vh",
+                    width: "100vw",
+                    bgcolor: "#EDE7F6",
+                    position: "fixed",
+                    top: "0px",
+                    left: "0px",
+                  }}
+                >
+                  <LoginPage />
+                </Box>
+              )}
+            </>
+          )}
+          <Box sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}>
+            <IconButton
+              onClick={() => setIsOpen(!isOpen)}
+              sx={{
+                bgcolor: "#FFF",
+                color: "black",
+                boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+              }}
+            >
+              {isOpen ? <Close /> : <Add />}
+            </IconButton>
+          </Box>
+        </Box>
       )}
-      <Box sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}>
-        <IconButton
-          onClick={() => setIsOpen(!isOpen)}
-          sx={{
-            bgcolor: "#FFF",
-            color: "black",
-            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-          }}
-        >
-          {isOpen ? <Close /> : <Add />}
-        </IconButton>
-      </Box>
     </Box>
   );
 };

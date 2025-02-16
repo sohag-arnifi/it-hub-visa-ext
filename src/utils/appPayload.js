@@ -1,3 +1,5 @@
+import { getCSRFToken } from "./generateMessage";
+
 export const getSendOtpPayload = (item) => {
   const info = item?.info?.map((data) => {
     return {
@@ -172,20 +174,98 @@ export const getPayInvoicePayload = (item) => {
 
 export const getMobileVerifyPayload = (item) => {
   return {
-    _token: localStorage.getItem("_token"),
+    _token: getCSRFToken(),
     mobile_no: item?.phone,
   };
 };
 export const getPasswordVerifyPayload = (item) => {
   return {
-    _token: localStorage.getItem("_token"),
+    _token: getCSRFToken(),
     password: item?.password,
   };
 };
 
 export const getOtpVerifyPayload = (otp) => {
   return {
-    _token: localStorage.getItem("_token"),
+    _token: getCSRFToken(),
     otp: otp,
+  };
+};
+
+export const getApplicationInfoSubmitPayload = (item) => {
+  return {
+    _token: getCSRFToken(),
+    highcom: item?.center,
+    ivac_id: item?.ivac,
+    visa_type: item?.visaType,
+    webfile_id: item?.info[0]?.web_id,
+    webfile_id_repeat: item?.info[0]?.web_id,
+    family_count: item?.info?.length - 1,
+    visit_purpose: item?.visit_purpose,
+  };
+};
+
+export const getPersonalInfoSubmitPayload = (item) => {
+  const family1 = item?.info[0];
+
+  const formattedData = {};
+
+  if (item?.info?.length) {
+    item?.info?.forEach((member, index) => {
+      if (index > 0) {
+        console.log(member);
+        formattedData[`family[${index}][name]`] = member.name;
+        formattedData[`family[${index}][webfile_no]`] = member.web_id;
+        formattedData[`family[${index}][again_webfile_no]`] = member.web_id;
+      }
+    });
+  }
+  console.log(formattedData);
+
+  return {
+    _token: getCSRFToken(),
+    full__name: family1?.name,
+    email_name: item?.email,
+    pho_ne: item?.phone,
+    ...formattedData,
+  };
+};
+
+export const getOverviewInfoSubmitPayload = (item) => {
+  return {
+    _token: getCSRFToken(),
+  };
+};
+
+export const getPayOtpSendPayload = (resend) => {
+  return {
+    _token: getCSRFToken(),
+    resend: resend,
+  };
+};
+
+export const getPayOtpVerifyPayload = (otp) => {
+  return {
+    _token: getCSRFToken(),
+    otp: otp,
+  };
+};
+
+export const getTimeSlotPayload = (item) => {
+  return {
+    _token: getCSRFToken(),
+    appointment_date: item?.slot_dates[0],
+  };
+};
+
+export const getBookSlotPayload = (item) => {
+  return {
+    _token: getCSRFToken(),
+    appointment_date: item?.slot_dates[0],
+    appointment_time: 10,
+    hash_param: "hash_param",
+    selected_payment: {
+      ...item?.selected_payment,
+    },
   };
 };

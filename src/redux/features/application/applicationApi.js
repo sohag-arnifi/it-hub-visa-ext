@@ -118,25 +118,25 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         method: "GET",
         headers: { "content-type": "application/json" },
       }),
-      async onQueryStarted({ phone, userId }, { dispatch, queryFulfilled }) {
-        dispatch(
-          setHashParams({
-            hash_params: { token: "", message: "Solving.." },
-            phone,
-          })
-        );
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(
-            setHashParams({
-              hash_params: { token: data?.data, message: "Solved" },
-              phone,
-            })
-          );
-        } catch (err) {
-          console.log(err);
-        }
-      },
+      // async onQueryStarted({ phone, userId }, { dispatch, queryFulfilled }) {
+      //   dispatch(
+      //     setHashParams({
+      //       hash_params: { token: "", message: "Solving.." },
+      //       phone,
+      //     })
+      //   );
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(
+      //       setHashParams({
+      //         hash_params: { token: data?.data, message: "Solved" },
+      //         phone,
+      //       })
+      //     );
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
+      // },
     }),
 
     updatePaymentStatus: builder.mutation({
@@ -145,6 +145,14 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: data,
+      }),
+    }),
+
+    getProcessApplication: builder.query({
+      query: ({ id }) => ({
+        url: `/applications/get-process/${id}`,
+        method: "GET",
+        headers: { "content-type": "application/json" },
       }),
     }),
   }),
@@ -158,4 +166,5 @@ export const {
   useDeleteApplicationMutation,
   useUpdateApplicationMutation,
   useUpdatePaymentStatusMutation,
+  useGetProcessApplicationQuery,
 } = applicationApi;

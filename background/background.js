@@ -1,37 +1,26 @@
 __webpack_public_path__ = chrome.runtime.getURL("dist/");
 
-console.log("Background script loaded");
-
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   if (message.type === "logScope") {
-//     console.log("Scope data:", message.data);
-//   }
-// });
-
-// chrome.runtime.onInstalled.addListener(() => {
-//   console.log("Hot Reload Extension Installed");
-// });
-
-// chrome.commands.onCommand.addListener((command) => {
-//   if (command === "reload_extension") {
-//     chrome.runtime.reload();
-//     console.log("Extension reloaded");
-//   }
-// });
-
-// chrome.webRequest.onHeadersReceived.addListener(
-//   (details) => {
-//     const locationHeader = details.responseHeaders?.find(
-//       (header) => header.name.toLowerCase() === "location"
-//     );
-//     if (locationHeader) {
-//       console.log("Redirect URL:", locationHeader.value);
-//       // Handle the redirect URL as needed
-//     }
-//   },
-//   { urls: ["<all_urls>"] }, // Monitor all URLs or restrict to specific domains
-//   ["responseHeaders"]
-// );
-
-// const button = document.getElementById("emergencyNoticeCloseBtn");
-// console.log(button);
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "openIncognitoWindow") {
+    chrome.windows.create(
+      {
+        url: request.url,
+        width: 350,
+        height: 700,
+      },
+      (newWindow) => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error opening incognito window:",
+            chrome.runtime.lastError
+          );
+          sendResponse({ success: false });
+        } else {
+          console.log("Incognito window opened successfully:", newWindow);
+          sendResponse({ success: true });
+        }
+      }
+    );
+    return true; // Required to use sendResponse asynchronously
+  }
+});

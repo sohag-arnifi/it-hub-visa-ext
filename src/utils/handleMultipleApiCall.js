@@ -1,9 +1,23 @@
-import { getLoginInfo, getLoginOtpErrorMessage } from "./generateMessage";
+import {
+  getDateReleaseInfo,
+  getLoginInfo,
+  getLoginOtpErrorMessage,
+  setCSRFToken,
+} from "./generateMessage";
 
 const rootUrl = "https://payment.ivacbd.com/";
 const regUrl = "https://payment.ivacbd.com/registration";
 const authUrl = "https://payment.ivacbd.com/login-auth";
 const otpUrl = "https://payment.ivacbd.com/login-otp";
+const personalInfoUrl = "https://payment.ivacbd.com/personal-info";
+const overviewInfoUrl = "https://payment.ivacbd.com/overview";
+const paymentInfoUrl = "https://payment.ivacbd.com/payment";
+
+const modifyUrl = (resUrl) => {
+  const url = new URL(resUrl);
+  const pathName = url.pathname;
+  return `${"https://payment.ivacbd.com"}${pathName}`;
+};
 
 const handleMultipleApiCall = async (
   apiFn,
@@ -19,9 +33,12 @@ const handleMultipleApiCall = async (
   while (attempt < maxAttempts) {
     try {
       const response = await apiFn({ payload, signal: abortSignal }).unwrap();
-      console.log(response?.htmlContent);
 
       const redirectUrl = response?.redirectUrl;
+      console.log(response);
+
+      console.log(modifyUrl(redirectUrl));
+
       if (action === "mobile-verify") {
         if (redirectUrl === regUrl) {
           setMessage({
@@ -81,61 +98,72 @@ const handleMultipleApiCall = async (
             return false;
           }
         }
+      } else if (action === "create-session") {
+        if (redirectUrl === rootUrl) {
+          setCSRFToken(response?.htmlContent);
+          setMessage({
+            message: "Session created successfully!",
+            type: "success",
+          });
+          break;
+        }
+      } else if (action === "application-info-submit") {
+        if (redirectUrl === personalInfoUrl) {
+          const token = setCSRFToken(response?.htmlContent);
+          setMessage({
+            message: "Application submitted successfully!",
+            type: "success",
+          });
+        }
+      } else if (action === "personal-info-submit") {
+        if (redirectUrl === overviewInfoUrl) {
+          const token = setCSRFToken(response?.htmlContent);
+          setMessage({
+            message: "Personal Info submitted successfully!",
+            type: "success",
+          });
+        }
+      } else if (action === "overview-info-submit") {
+        if (redirectUrl === paymentInfoUrl) {
+          const token = setCSRFToken(response?.htmlContent);
+          setMessage({
+            message: "Overview Info submitted successfully!",
+            type: "success",
+          });
+        }
+      } else if (action === "pay-otp-send") {
+        if (response?.htmlContent?.success) {
+          setMessage({
+            message: "OTP sent successfully!",
+            type: "success",
+            response: response,
+          });
+          return true;
+        }
+      } else if (action === "pay-otp-verify") {
+        if (response?.htmlContent?.success) {
+          setMessage({
+            message: "OTP verified successfully!",
+            type: "success",
+          });
+          return response?.htmlContent;
+        }
+      } else if (action === "get-slot-time") {
+        if (response?.htmlContent?.success) {
+          setMessage({
+            message: "Slot time fetched successfully!",
+            type: "success",
+          });
+          return response?.htmlContent;
+        }
+      } else if (action === "pay-now") {
+        console.log(response);
       }
-      // if (response?.code === 200) {
-      //   if (payload?.action === "sendOtp" || payload?.action === "verifyOtp") {
-      //     setMessage({
-      //       message: response?.message[0] || "OTP Verified!",
-      //       type: "success",
-      //     });
-      //   }
-      //   return response;
-      // }
-      // if (response?.status === "FAIL") {
-      //   setMessage({
-      //     message:
-      //       response?.message ?? response?.errors ?? "Time Slot not found!",
-      //     type: "error",
-      //   });
-      //   return response;
-      // }
-
-      // if (response?.status === "OK") {
-      //   if (response?.url) {
-      //     setMessage({
-      //       message: "Slot booked successfully!",
-      //       type: "success",
-      //     });
-      //     return response;
-      //   }
-
-      //   setMessage({
-      //     message: response?.slot_times?.length
-      //       ? "Time Slot Generated!"
-      //       : "Time Slot not found!",
-      //     type: response?.slot_times?.length ? "success" : "error",
-      //   });
-
-      //   return response;
-      // }
-
-      // if (response?.code === 422) {
-      //   setMessage({
-      //     message: response?.message[0],
-      //     type: "error",
-      //   });
-      //   if (payload?.action === "sendOtp") {
-      //     // attempt++;
-      //     await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      //     continue;
-      //   } else {
-      //     break;
-      //   }
-      // }
-
       break;
     } catch (error) {
       console.log(error);
+
+      break;
 
       if (error?.status === "FETCH_ERROR") {
         break;

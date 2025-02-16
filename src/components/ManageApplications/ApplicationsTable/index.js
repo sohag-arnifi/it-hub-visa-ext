@@ -128,6 +128,7 @@ const ApplicationsTable = ({
                       <StyledTypography>
                         Login Password: {item?.password}
                       </StyledTypography>
+                      <StyledTypography>Email: {item?.email}</StyledTypography>
                     </Box>
                   </Grid>
 

@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   useAuthVerifyMutation,
   useLoginOtpVerifyMutation,
@@ -20,15 +20,11 @@ import {
 } from "../../../utils/appPayload";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
 
-const LoginContainer = ({ data }) => {
+const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
   const [loginOtp, setLoginOtp] = useState("");
-  const [loggedInUser, setLoggedInUser] = useState(() => {
-    const localUser = localStorage.getItem("userImg");
-    return localUser ? localUser : "";
-  });
 
   const [resMessage, setResMessage] = useState({
-    message: loggedInUser ? "Successfully Login" : "User not found",
+    message: loggedInUser ? "Successfully Login" : "Please login to continue!",
     type: loggedInUser ? "success" : "error",
   });
 
@@ -89,8 +85,8 @@ const LoginContainer = ({ data }) => {
 
     if (result?.userImg) {
       setLoggedInUser(result?.userImg);
-      setLoginTime(Date.now());
-      startCountdown();
+      // setLoginTime(Date.now());
+      // startCountdown();
     }
   };
 

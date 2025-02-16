@@ -140,9 +140,23 @@ const Header = ({ user, setIsOpenManageApplication }) => {
           placement="bottom-start"
           transition
           disablePortal
+          modifiers={[
+            {
+              name: "preventOverflow",
+              enabled: true,
+              options: {
+                altAxis: true,
+              },
+            },
+            {
+              name: "flip",
+              enabled: false,
+            },
+          ]}
           sx={{
             zIndex: 100,
             bgcolor: "#FFF",
+            padding: 0,
           }}
         >
           {({ TransitionProps, placement }) => (

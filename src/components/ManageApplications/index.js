@@ -16,6 +16,7 @@ const validationSchema = Yup.object({
   ivac: Yup.string().required("IVAC is required"),
   visaType: Yup.string().required("Visa Type is required"),
   password: Yup.string().required("Password is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
   phone: Yup.string()
     .matches(/^\d+$/, "Enter a valid number")
     .length(11, "Phone must be exactly 11 characters")
@@ -37,6 +38,7 @@ const emptyInidialvalues = {
   center: "",
   ivac: "",
   visaType: "",
+  email: "",
   phone: "",
   password: "",
   info: [

@@ -123,6 +123,10 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
           </Grid>
 
           <Grid item xs={4}>
+            <InputField name="email" label="Enter Email" type="email" />
+          </Grid>
+
+          <Grid item xs={4}>
             <InputField name="phone" label="Enter Phone Number" type="number" />
           </Grid>
           <Grid item xs={4}>

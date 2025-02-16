@@ -1,7 +1,112 @@
-import { alpha, Box, Typography } from "@mui/material";
-import React from "react";
+import { alpha, Avatar, Box, Button, Stack, Typography } from "@mui/material";
+import React, { useRef, useState } from "react";
+import {
+  useApplicationInfoSubmitMutation,
+  useCreateNewSessionMutation,
+  useOverviewInfoSubmitMutation,
+  usePersonalInfoSubmitMutation,
+} from "../../../redux/features/appBaseApi/appBaseApiSlice";
+import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
+import {
+  getApplicationInfoSubmitPayload,
+  getOverviewInfoSubmitPayload,
+  getPersonalInfoSubmitPayload,
+} from "../../../utils/appPayload";
 
-const InfoSession = ({ data }) => {
+const InfoSession = ({ data, loggedInUser }) => {
+  const [createNewSession, { isLoading: sessionLoading }] =
+    useCreateNewSessionMutation();
+
+  const [applicationInfoSubmit, { isLoading: applicationInfoLoading }] =
+    useApplicationInfoSubmitMutation();
+
+  const [personalInfoSubmit, { isLoading: personalInfoLoading }] =
+    usePersonalInfoSubmitMutation();
+
+  const [overviewInfoSubmit, { isLoading: overviewInfoLoading }] =
+    useOverviewInfoSubmitMutation();
+
+  const [resMessage, setResMessage] = useState(() => {
+    if (loggedInUser) {
+      return {
+        message: "User logged in successfully!",
+        type: "success",
+      };
+    }
+  });
+
+  const sessionAbortControllerRef = useRef(null);
+
+  const handleCreateNewSession = async () => {
+    const controller = new AbortController();
+    sessionAbortControllerRef.current = controller;
+    try {
+      const result = await handleMultipleApiCall(
+        createNewSession,
+        {},
+        setResMessage,
+        controller.signal,
+        "create-session"
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleApplicationInfoSubmit = async () => {
+    const payload = getApplicationInfoSubmitPayload(data);
+    const controller = new AbortController();
+    sessionAbortControllerRef.current = controller;
+    try {
+      const result = await handleMultipleApiCall(
+        applicationInfoSubmit,
+        payload,
+        setResMessage,
+        controller.signal,
+        "application-info-submit"
+      );
+
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handlePersonalInfoSubmit = async () => {
+    const payload = getPersonalInfoSubmitPayload(data);
+    const controller = new AbortController();
+    sessionAbortControllerRef.current = controller;
+    try {
+      const result = await handleMultipleApiCall(
+        personalInfoSubmit,
+        payload,
+        setResMessage,
+        controller.signal,
+        "perosnal-info-submit"
+      );
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOverviewInfoSubmit = async () => {
+    const payload = getOverviewInfoSubmitPayload(data);
+    const controller = new AbortController();
+    sessionAbortControllerRef.current = controller;
+    try {
+      const result = await handleMultipleApiCall(
+        overviewInfoSubmit,
+        payload,
+        setResMessage,
+        controller.signal,
+        "overview-info-submit"
+      );
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -10,51 +115,153 @@ const InfoSession = ({ data }) => {
         borderRadius: "3px",
       }}
     >
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: 600, lineHeight: "16px" }}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "start",
+        }}
       >
-        Application Info
-      </Typography>
-      <Box>
-        {data?.info?.map((item, i) => {
-          return (
-            <Typography
-              key={i}
+        <Box>
+          <Typography
+            sx={{ fontSize: "12px", fontWeight: 600, lineHeight: "16px" }}
+          >
+            Application Info
+          </Typography>
+          <Box>
+            {data?.info?.map((item, i) => {
+              return (
+                <Typography
+                  key={i}
+                  sx={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    lineHeight: "16px",
+                  }}
+                >
+                  {i + 1}. {item?.web_id}, {item?.name}
+                </Typography>
+              );
+            })}
+          </Box>
+          <Typography
+            sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}
+          >
+            Mobile: <span style={{ fontWeight: 600 }}>{data?.phone}</span>
+          </Typography>
+          <Typography
+            sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}
+          >
+            Email: <span style={{ fontWeight: 600 }}>{"abc@gmail.com"}</span>
+          </Typography>
+          <Typography
+            sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}
+          >
+            Date:{" "}
+            <span style={{ fontWeight: 600 }}>
+              {data?.slot_dates[0]} / 10:00 - 10:59
+            </span>
+          </Typography>
+        </Box>
+        <Box>
+          {loggedInUser ? (
+            <Avatar
               sx={{
-                fontSize: "12px",
-                fontWeight: 500,
-                lineHeight: "16px",
+                border: "2px solid green",
               }}
-            >
-              {i + 1}. {item?.web_id}, {item?.name}
-            </Typography>
-          );
-        })}
+              src={loggedInUser ?? ""}
+              alt="user"
+            />
+          ) : (
+            ""
+          )}
+        </Box>
       </Box>
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}
-      >
-        Mobile: <span style={{ fontWeight: 600 }}>{data?.phone}</span>
-      </Typography>
-      <Typography
-        sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}
-      >
-        Email: <span style={{ fontWeight: 600 }}>{"abc@gmail.com"}</span>
-      </Typography>
+
       <Box sx={{ marginTop: "5px" }}>
         <Typography
           sx={{
             fontSize: "14px",
             padding: "3px",
-            bgcolor: alpha("#F72C5B", 0.2),
+            bgcolor:
+              resMessage?.type === "success"
+                ? alpha("#C2FFC7", 1)
+                : alpha("#F72C5B", 0.2),
             borderRadius: "3px",
             textAlign: "center",
             fontWeight: 600,
-            color: "red",
+            color: resMessage?.type === "success" ? "green" : "red",
           }}
         >
-          Successfully Logged In
+          {resMessage?.message}
         </Typography>
+      </Box>
+
+      <Box>
+        <Stack sx={{ marginTop: "5px" }} direction={"row"} spacing={1}>
+          <Button
+            onClick={handleCreateNewSession}
+            disabled={sessionLoading}
+            variant="contained"
+            color="success"
+            size="small"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: "none",
+              width: "100%",
+            }}
+          >
+            {sessionLoading ? "Creating..." : "Create New Session"}
+          </Button>
+
+          <Button
+            onClick={handleApplicationInfoSubmit}
+            disabled={applicationInfoLoading}
+            variant="contained"
+            color="success"
+            size="small"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: "none",
+              width: "100%",
+            }}
+          >
+            {applicationInfoLoading
+              ? "Submitting..."
+              : "Application Info Submit"}
+          </Button>
+
+          <Button
+            onClick={handlePersonalInfoSubmit}
+            variant="contained"
+            color="success"
+            size="small"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: "none",
+              width: "100%",
+            }}
+          >
+            {personalInfoLoading ? "Submitting..." : "Personal Info Submit"}
+          </Button>
+          <Button
+            onClick={handleOverviewInfoSubmit}
+            variant="contained"
+            color="success"
+            size="small"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: "none",
+              width: "100%",
+            }}
+          >
+            {overviewInfoLoading ? "Submitting..." : "Overview Info Submit"}
+          </Button>
+        </Stack>
       </Box>
     </Box>
   );

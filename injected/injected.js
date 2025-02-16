@@ -1,23 +1,31 @@
-const aScope = window.angular ? angular.element(document.body).scope() : {};
-const token = window.csrf_token ?? "EanOLKZ42AMHNINafCkSW3JTis5f9ul5dzc0K6Dx";
-const key = aScope.apiKey ?? "EanOLKZ42AMHNINafCkSW3JTis5f9ul5dzc0K6Dx";
+const url = new URL(window.location.href);
+const params = new URLSearchParams(url.search);
+const applicationId = params.get("applicationId");
 
-let captchaWidgetId; // To store the widget ID
-let captchaToken; // To store captchatoken
-let captchaData;
-let userId;
+if (applicationId) {
+  localStorage.setItem(
+    "userImg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9KweB-UJmSMetSkHVtnLRrJux7bJv8ksIahpSmkcSNOygSfeXqgHmL6_1Op5fHQiTnNI&usqp=CAU"
+  );
 
-if (token && key) {
-  const userImgElement = document.querySelector("img.rounded-circle");
-  const userImg = userImgElement ? userImgElement.getAttribute("src") : "";
-
-  localStorage.setItem("_token", token);
-  localStorage.setItem("apiKey", key);
-
-  if (userImg) {
-    localStorage.setItem("userImg", userImg);
-  } else {
-    localStorage.setItem("userImg", "");
+  if (window?.csrf_token) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("key", window?.csrf_token);
+    window.history.pushState({}, "", url);
+    const userImgElement = document.querySelector("img.rounded-circle");
+    const userImg = userImgElement ? userImgElement.getAttribute("src") : "";
+    if (userImg) {
+      localStorage.setItem("userImg", userImg);
+    } else {
+      localStorage.setItem("userImg", "");
+      localStorage.setItem(
+        "relasedInfo",
+        JSON.stringify({
+          relased: false,
+          message: "Please login to continue!",
+        })
+      );
+    }
   }
 }
 
@@ -38,14 +46,8 @@ socketScript.onload = async () => {
   });
 
   socket.on("captcha-create", (data) => {
-    userId = localStorage.getItem("userId")
-      ? JSON.parse(localStorage.getItem("userId"))
-      : "";
-    if (data?.phone && data?.userId === userId) {
-      captchaData = data;
+    if (data?._id === applicationId) {
       const captchaContainer = document.getElementById("injected-container");
-      const messageContainer = document.getElementById("message");
-      messageContainer.innerText = `Captcha for - ${captchaData?.phone}`;
       captchaContainer.style.right = "0px";
     }
   });
@@ -54,7 +56,7 @@ socketScript.onload = async () => {
   closeBtn.addEventListener("click", () => {
     const captchaContainer = document.getElementById("injected-container");
     captchaContainer.style.right = "-500px";
-    socket.emit("container-close", captchaData);
+    socket.emit("container-close", { _id: applicationId });
   });
 
   // Handle remove button functionality
@@ -72,8 +74,7 @@ socketScript.onload = async () => {
   submitBtn.addEventListener("click", () => {
     socket.emit("captcha-solved", {
       token: captchaToken ?? "Captcha Not solved!",
-      userId: userId,
-      phone: captchaData?.phone,
+      _id: applicationId,
     });
     submitBtn.classList.remove("enabled");
     closeBtn.click();
@@ -180,7 +181,7 @@ injectStyle.innerHTML = `
   .message-container {
   width: 100%;
   display: flex;
-  justify-content: space-between; /* Fixed typo: "space-betwin" -> "space-between" */
+  justify-content: center; /* Fixed typo: "space-betwin" -> "space-between" */
   align-items: center;
   padding: 10px;
   background-color: #f9f9f9;
@@ -203,7 +204,7 @@ injectStyle.innerHTML = `
   font-size: 16px;
   cursor: pointer;
   padding: 5px 10px;
-  border-radius: 50%;
+  border-radius: 30px;
   transition: all 0.3s ease-in-out;
 }
 
@@ -222,8 +223,7 @@ document.head.appendChild(injectStyle);
 injectedContainer.innerHTML = `
   <div id="captchaContainer">
     <div class="message-container">
-  <p id="message">Captcha for - 01760567555</p>
-  <button id="closeBtn" title="Close">&times;</button>
+  <button id="closeBtn" title="Close">Close Captcha Container</button>
 </div>
     <div id="captcha-solver"></div>
     <div class="btn-container">
