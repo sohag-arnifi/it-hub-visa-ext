@@ -1,5 +1,21 @@
 import React, { useState } from "react";
-import { alpha, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  alpha,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Paper,
+  Stack,
+  styled,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { StyledTypography } from "../../ApplicationContainer";
 import {
   getCenter,
@@ -9,6 +25,13 @@ import {
 } from "../../../constanse";
 import GlobalLoader from "../../GlobalLoader";
 import { useDeleteApplicationMutation } from "../../../redux/features/application/applicationApi";
+import { InsertLinkRounded } from "@mui/icons-material";
+
+const StyledTypo = styled(Typography)(() => ({
+  fontSize: 12,
+  fontWeight: 600,
+  lineHeight: "18px",
+}));
 
 const style = {
   position: "absolute",
@@ -47,168 +70,245 @@ const ApplicationsTable = ({
     }
   };
 
+  const handleCopyCMD = (data) => {
+    console.log("click", data);
+    const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}`;
+    navigator.clipboard.writeText(applicationOpenUrl);
+  };
+
   return (
     <Box>
       <Box sx={{ marginTop: "2rem" }}>
         {isLoading ? (
           <GlobalLoader height="40vh" />
-        ) : !data?.length ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "40vh",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "1.5rem",
-                fontWeight: 600,
-                color: "red",
-              }}
-            >
-              No Applications Found!
-            </Typography>
-          </Box>
         ) : (
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
+              padding: "20px",
+              border: "1px solid rgba(0, 0, 0, 0.06)",
+              bgcolor: "#FFF",
+              borderRadius: "6px",
+              boxShadow:
+                "0px 0px 1px 0px rgba(40, 41, 61, 0.08), 0px 0.5px 2px 0px rgba(96, 97, 112, 0.16)",
             }}
           >
-            {data?.map((item, index) => (
-              <Box
-                key={index}
-                sx={{
-                  padding: "1rem",
-                  bgcolor: item?.status
-                    ? alpha("#5B913B", 0.15)
-                    : alpha("#F93827", 0.15),
-                  border: item?.status
-                    ? "1px solid #5B913B"
-                    : "1px solid #F93827",
-                  borderRadius: "5px",
-                }}
+            <TableContainer
+              component={Paper}
+              sx={{
+                boxShadow: "none",
+              }}
+            >
+              <Table
+                sx={{ minWidth: "800px", overflow: "hidden" }}
+                aria-label="simple table"
               >
-                <Grid container spacing={1}>
-                  <Grid item xs={1.5}>
-                    <Box>
-                      <StyledTypography>
-                        {index + 1}. {getCenter(item?.center)?.c_name}
-                      </StyledTypography>
-                      <StyledTypography>
-                        {getIVAC(item?.ivac)?.ivac_name}
-                      </StyledTypography>
-                      <StyledTypography>
-                        {getVisaType(item?.visaType)?.type_name}
-                      </StyledTypography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={2.5}>
-                    {item?.info?.map((item, i) => {
-                      return (
-                        <Box key={i}>
-                          <StyledTypography>
-                            {i + 1}. {item?.name} - {item?.web_id}
-                          </StyledTypography>
+                <TableHead
+                  sx={{
+                    borderRadius: "0.25rem",
+                    background: "#F7F5F2",
+                    padding: {
+                      sm: "1rem 1.3125rem 1rem 1.25rem",
+                      xs: "0.75rem 2rem 0.75rem 1rem",
+                    },
+                  }}
+                >
+                  <TableRow
+                    sx={{
+                      "& th": {
+                        color: "#0B0B29",
+                        fontSize: { sm: "0.875rem", xs: "0.75rem" },
+                        fontStyle: "normal",
+                        fontWeight: 600,
+                        lineHeight: { sm: "1.3125rem", xs: "1.125rem" },
+                      },
+                    }}
+                  >
+                    <TableCell>Application Info</TableCell>
+                    <TableCell>Web File</TableCell>
+                    <TableCell>File Info</TableCell>
+                    <TableCell>Payment Info</TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>Status</TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody
+                  sx={{
+                    "& tr> th,td": {
+                      color: "#0B0B29",
+                      fontFamily: "Inter",
+                      fontSize: { sm: "0.875rem", xs: "0.75rem" },
+                      fontStyle: "normal",
+                      fontWeight: 500,
+                      lineHeight: { sm: "1.3125rem", xs: "1.125rem" },
+                      borderBottomColor: "rgba(0, 0, 0, 0.10) !important",
+                    },
+                  }}
+                >
+                  {!data?.length ? (
+                    <TableRow>
+                      <TableCell colSpan={6}>
+                        <Box
+                          sx={{
+                            width: "100%",
+                            height: "250px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography
+                            sx={{ fontSize: "20px", fontWeight: 600 }}
+                          >
+                            No Application found!
+                          </Typography>
                         </Box>
-                      );
-                    })}
-                  </Grid>
-
-                  <Grid item xs={2}>
-                    <Box>
-                      <StyledTypography>
-                        Login Mobile: {item?.phone}
-                      </StyledTypography>
-                      <StyledTypography>
-                        Login Password: {item?.password}
-                      </StyledTypography>
-                      <StyledTypography>Email: {item?.email}</StyledTypography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={2}>
-                    <Box>
-                      <StyledTypography>
-                        Payment Option:{" "}
-                        {getPaymentMethod(item?.paymentMethod)?.name}
-                      </StyledTypography>
-
-                      <StyledTypography>
-                        Payment Number: {item?.paymentNumber}
-                      </StyledTypography>
-                      <StyledTypography>
-                        Payable Amount:{" "}
-                        {(item?.info?.length * 824).toLocaleString()}
-                      </StyledTypography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={2}>
-                    <Box>
-                      <StyledTypography>
-                        Current Status: {item?.status ? "Completed" : "Pending"}
-                      </StyledTypography>
-
-                      <StyledTypography>
-                        Agent Payment: {item?.paymentAmount.toLocaleString()}
-                      </StyledTypography>
-
-                      <StyledTypography>
-                        Created Date:{" "}
-                        {new Date(item?.createdAt).toLocaleDateString()}
-                      </StyledTypography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={2}>
-                    <Box sx={{ display: "flex", gap: "10px" }}>
-                      <Button
-                        disabled={item?.status}
-                        onClick={() => {
-                          setUpdatedValues(item);
-                          setOpenUpdateModal(true);
-                        }}
-                        variant="contained"
-                        size="small"
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    data?.map((row, i) => (
+                      <TableRow
+                        key={i}
                         sx={{
-                          width: "100%",
-                          textTransform: "none",
-                          boxShadow: "none",
-                          padding: "0.5rem 1rem",
+                          height: "100%",
+                          borderRadius: "0.375rem",
+                          cursor: "pointer",
+                          color: "red",
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                          "& *": {
+                            fontSize: "14px",
+                            fontWeight: 500,
+                          },
                         }}
                       >
-                        Edit
-                      </Button>
+                        <TableCell component="th" scope="row">
+                          <StyledTypo>
+                            {getCenter(row?.center)?.c_name}
+                          </StyledTypo>
+                          <StyledTypo>
+                            {getIVAC(row?.ivac)?.ivac_name}
+                          </StyledTypo>
+                          <StyledTypo>
+                            {getVisaType(row?.visaType)?.type_name}
+                          </StyledTypo>
+                        </TableCell>
+                        <TableCell>
+                          {row?.info?.map((info, i) => {
+                            return (
+                              <StyledTypo key={i}>
+                                {i + 1}. {info?.name}, {info?.web_id}
+                              </StyledTypo>
+                            );
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <StyledTypo>Mobile: {row?.phone}</StyledTypo>
+                          <StyledTypo>Password: {row?.password}</StyledTypo>
+                          <StyledTypo>Email: {row?.email}</StyledTypo>
+                        </TableCell>
+                        <TableCell>
+                          <StyledTypo>
+                            {getPaymentMethod(row?.paymentMethod)?.name}
+                          </StyledTypo>
+                          <StyledTypo>
+                            Payment: {row?.info?.length * 824}tk
+                          </StyledTypo>
+                          <StyledTypo>
+                            Agent Payment: {row?.paymentAmount}tk
+                          </StyledTypo>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            sx={{
+                              backgroundColor: `#FDF3E6 !important`,
+                              color: `#EE9322 !important`,
+                              textAlign: "center",
+                              padding: "10px 12px",
+                              borderRadius: "4px",
+                              fontSize: "14px",
+                              fontWeight: 500,
+                              lineHeight: "21px",
+                            }}
+                          >
+                            On going
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "5px",
+                              width: "100%",
+                            }}
+                          >
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              sx={{ width: "100%" }}
+                            >
+                              <Button
+                                onClick={() => {
+                                  setUpdatedValues(row);
+                                  setOpenUpdateModal(true);
+                                }}
+                                size="small"
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                  textTransform: "none",
+                                  width: "100%",
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setDeletedInfo(row);
+                                  setOpenModal(true);
+                                }}
+                                size="small"
+                                variant="contained"
+                                color="error"
+                                sx={{
+                                  textTransform: "none",
+                                  width: "100%",
+                                }}
+                              >
+                                Delete
+                              </Button>
+                            </Stack>
 
-                      <Button
-                        disabled={item?.status}
-                        onClick={() => {
-                          setDeletedInfo(item);
-                          setOpenModal(true);
-                        }}
-                        variant="contained"
-                        size="small"
-                        color={"error"}
-                        sx={{
-                          width: "100%",
-                          textTransform: "none",
-                          boxShadow: "none",
-                          padding: "0.5rem 1rem",
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-            ))}
+                            <Button
+                              onClick={() => handleCopyCMD(row)}
+                              startIcon={
+                                <InsertLinkRounded sx={{ rotate: "-45deg" }} />
+                              }
+                              size="small"
+                              variant="contained"
+                              color="secondary"
+                              sx={{
+                                textTransform: "none",
+                                width: "100%",
+                                bgcolor: "#000",
+                                color: "#FFF",
+                                "&:hover": {
+                                  bgcolor: "#000",
+                                  color: "#FFF",
+                                },
+                              }}
+                            >
+                              Copy CMD Link
+                            </Button>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         )}
       </Box>

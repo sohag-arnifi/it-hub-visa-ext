@@ -9,7 +9,7 @@ import Header from "./components/Header/Header";
 import ManageApplications from "./components/ManageApplications";
 
 const App = () => {
-  const [isOpenManageApplication, setIsOpenManageApplication] = useState(false);
+  const [isOpenManageApplication, setIsOpenManageApplication] = useState(true);
   const { isLoading } = useGetApplicationsQuery({});
   const user = useAppSelector((state) => state?.auth?.user);
 
