@@ -6,6 +6,31 @@ import Main from "../src/Main";
 
 __webpack_public_path__ = chrome.runtime.getURL("dist/");
 
+const url = new URL(window.location.href);
+const authToken = url?.searchParams.get("auth");
+let hasProcessedAuthToken = false;
+
+if (authToken && !hasProcessedAuthToken) {
+  hasProcessedAuthToken = true;
+  chrome.storage.local.set(
+    {
+      loggedIn: true,
+      logData: {
+        token: authToken,
+        _id: "",
+      },
+    },
+    () => {
+      if (chrome.runtime.lastError) {
+        console.error("Error setting storage:", chrome.runtime.lastError);
+      } else {
+        url.searchParams.delete("auth");
+        window.history.replaceState({}, "", url);
+      }
+    }
+  );
+}
+
 chrome.storage.local.get(["logData"], (result) => {
   const token = result.logData?.token;
   if (token) {
@@ -44,6 +69,5 @@ chrome.storage.local.get(["logData"], (result) => {
         <Main />
       </Provider>
     );
-    console.log("content loaded");
   }
 });

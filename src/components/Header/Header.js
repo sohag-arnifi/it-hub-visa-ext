@@ -13,6 +13,7 @@ import {
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 
 const Header = ({ user, setIsOpenManageApplication }) => {
+  const [currentTime, setCurrentTime] = useState(new Date());
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
 
@@ -53,6 +54,14 @@ const Header = ({ user, setIsOpenManageApplication }) => {
     }
     prevOpen.current = open;
   }, [open]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Box sx={{ zIndex: 100 }}>
@@ -106,87 +115,116 @@ const Header = ({ user, setIsOpenManageApplication }) => {
         }}
       >
         <Box
-          ref={anchorRef}
-          onClick={handleToggle}
           sx={{
             display: "flex",
-            gap: "5px",
-            justifyContent: "center",
             alignItems: "center",
-            cursor: "pointer",
-            borderRadius: "5px",
-            transition: "all 0.3s ease",
-            padding: "5px 10px",
-            "&:hover": {
-              color: "blue",
-            },
+            justifyContent: "center",
           }}
         >
-          <Typography sx={{ fontSize: "14px", fontWeight: 600 }}>
-            {user?.name}
-          </Typography>
-          <KeyboardArrowDownRoundedIcon
+          <Box
             sx={{
-              transform: open ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s ease",
+              paddingX: "10px",
+              bgcolor: "#F7F7F7",
+              borderRadius: "5px",
+              boxShadow: "0 2px 3px rgba(0, 0, 0, 0.1)",
             }}
-          />
-        </Box>
-
-        <Popper
-          open={open}
-          anchorEl={anchorRef.current}
-          role={undefined}
-          placement="bottom-start"
-          transition
-          disablePortal
-          modifiers={[
-            {
-              name: "preventOverflow",
-              enabled: true,
-              options: {
-                altAxis: true,
-              },
-            },
-            {
-              name: "flip",
-              enabled: false,
-            },
-          ]}
-          sx={{
-            zIndex: 100,
-            bgcolor: "#FFF",
-            padding: 0,
-          }}
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{
-                transformOrigin:
-                  placement === "bottom-start" ? "left top" : "left bottom",
+          >
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: "1.5rem",
+                fontWeight: 600,
+                color: "#E52020",
               }}
             >
-              <Paper>
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList
-                    autoFocusItem={open}
-                    id="composition-menu"
-                    aria-labelledby="composition-button"
-                    onKeyDown={handleListKeyDown}
-                  >
-                    <MenuItem onClick={handleApplicationToken}>
-                      Applications e-Token
-                    </MenuItem>
-                    <MenuItem onClick={handleManageApplication}>
-                      Manage Applications
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
+              {currentTime?.toLocaleTimeString()}
+            </Typography>
+          </Box>
+          <Box>
+            <Box
+              ref={anchorRef}
+              onClick={handleToggle}
+              sx={{
+                display: "flex",
+                gap: "5px",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+                borderRadius: "5px",
+                transition: "all 0.3s ease",
+                padding: "5px 10px",
+                "&:hover": {
+                  color: "blue",
+                },
+              }}
+            >
+              <Typography sx={{ fontSize: "14px", fontWeight: 600 }}>
+                {user?.name}
+              </Typography>
+              <KeyboardArrowDownRoundedIcon
+                sx={{
+                  transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.3s ease",
+                }}
+              />
+            </Box>
+
+            <Popper
+              open={open}
+              anchorEl={anchorRef.current}
+              role={undefined}
+              placement="bottom-start"
+              transition
+              disablePortal
+              modifiers={[
+                {
+                  name: "preventOverflow",
+                  enabled: true,
+                  options: {
+                    altAxis: true,
+                  },
+                },
+                {
+                  name: "flip",
+                  enabled: false,
+                },
+              ]}
+              sx={{
+                zIndex: 100,
+                bgcolor: "#FFF",
+                padding: 0,
+              }}
+            >
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{
+                    transformOrigin:
+                      placement === "bottom-start" ? "left top" : "left bottom",
+                  }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleClose}>
+                      <MenuList
+                        autoFocusItem={open}
+                        id="composition-menu"
+                        aria-labelledby="composition-button"
+                        onKeyDown={handleListKeyDown}
+                      >
+                        <MenuItem onClick={handleApplicationToken}>
+                          Applications e-Token
+                        </MenuItem>
+                        <MenuItem onClick={handleManageApplication}>
+                          Manage Applications
+                        </MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

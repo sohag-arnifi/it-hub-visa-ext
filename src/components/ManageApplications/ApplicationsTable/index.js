@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   alpha,
   Box,
@@ -25,7 +25,10 @@ import {
 } from "../../../constanse";
 import GlobalLoader from "../../GlobalLoader";
 import { useDeleteApplicationMutation } from "../../../redux/features/application/applicationApi";
-import { InsertLinkRounded } from "@mui/icons-material";
+import {
+  InsertLinkRounded,
+  CheckCircleOutlineRounded,
+} from "@mui/icons-material";
 
 const StyledTypo = styled(Typography)(() => ({
   fontSize: 12,
@@ -54,6 +57,12 @@ const ApplicationsTable = ({
 }) => {
   const [openModal, setOpenModal] = useState(false);
   const [deletedInfo, setDeletedInfo] = useState({});
+  const [isCopyed, setIsCopied] = useState({
+    status: false,
+    id: "",
+  });
+
+  const [auth, setAuth] = useState("");
 
   const [deleteApplication, { isLoading: deleteLoading }] =
     useDeleteApplicationMutation();
@@ -70,11 +79,70 @@ const ApplicationsTable = ({
     }
   };
 
-  const handleCopyCMD = (data) => {
-    console.log("click", data);
-    const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}`;
-    navigator.clipboard.writeText(applicationOpenUrl);
+  const handleCopyCMD = (data, index) => {
+    const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
+
+    // Define the path to the extension (update this path as needed)
+    const extensionPath = "D:\\It-Hub\\chorom-ext";
+
+    // Define the CMD script
+    const comment = `
+@echo off
+
+REM Define the URL to open
+set "URL=${applicationOpenUrl}"
+
+REM Define the path to the temporary user data directory
+set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
+
+REM Define the path to the extension
+set "EXTENSION_PATH=${extensionPath}"
+
+REM Ensure the temporary directory exists
+if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
+
+REM Open Chrome with the temporary user data directory and load the extension
+start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800
+
+REM Close the CMD prompt after opening Chrome
+exit
+`;
+
+    // Copy the CMD script to the clipboard
+    navigator.clipboard
+      .writeText(comment)
+      .then(() => {
+        setIsCopied({
+          status: true,
+          id: data?._id,
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to copy CMD script:", error);
+      });
   };
+
+  useEffect(() => {
+    if (isCopyed?.id && isCopyed?.status) {
+      setTimeout(() => {
+        setIsCopied({
+          status: false,
+          id: "",
+        });
+      }, 3000);
+    }
+  }, [isCopyed]);
+
+  useEffect(() => {
+    if (!auth) {
+      chrome.storage.local.get(["logData"], (result) => {
+        const token = result.logData?.token;
+        if (token) {
+          setAuth(token);
+        }
+      });
+    }
+  }, []);
 
   return (
     <Box>
@@ -165,146 +233,155 @@ const ApplicationsTable = ({
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data?.map((row, i) => (
-                      <TableRow
-                        key={i}
-                        sx={{
-                          height: "100%",
-                          borderRadius: "0.375rem",
-                          cursor: "pointer",
-                          color: "red",
-                          "&:last-child td, &:last-child th": {
-                            border: 0,
-                          },
-                          "& *": {
-                            fontSize: "14px",
-                            fontWeight: 500,
-                          },
-                        }}
-                      >
-                        <TableCell component="th" scope="row">
-                          <StyledTypo>
-                            {getCenter(row?.center)?.c_name}
-                          </StyledTypo>
-                          <StyledTypo>
-                            {getIVAC(row?.ivac)?.ivac_name}
-                          </StyledTypo>
-                          <StyledTypo>
-                            {getVisaType(row?.visaType)?.type_name}
-                          </StyledTypo>
-                        </TableCell>
-                        <TableCell>
-                          {row?.info?.map((info, i) => {
-                            return (
-                              <StyledTypo key={i}>
-                                {i + 1}. {info?.name}, {info?.web_id}
-                              </StyledTypo>
-                            );
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <StyledTypo>Mobile: {row?.phone}</StyledTypo>
-                          <StyledTypo>Password: {row?.password}</StyledTypo>
-                          <StyledTypo>Email: {row?.email}</StyledTypo>
-                        </TableCell>
-                        <TableCell>
-                          <StyledTypo>
-                            {getPaymentMethod(row?.paymentMethod)?.name}
-                          </StyledTypo>
-                          <StyledTypo>
-                            Payment: {row?.info?.length * 824}tk
-                          </StyledTypo>
-                          <StyledTypo>
-                            Agent Payment: {row?.paymentAmount}tk
-                          </StyledTypo>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            sx={{
-                              backgroundColor: `#FDF3E6 !important`,
-                              color: `#EE9322 !important`,
-                              textAlign: "center",
-                              padding: "10px 12px",
-                              borderRadius: "4px",
+                    data?.map((row, i) => {
+                      const isCMDCopyed = isCopyed?.id === row?._id;
+                      return (
+                        <TableRow
+                          key={i}
+                          sx={{
+                            height: "100%",
+                            borderRadius: "0.375rem",
+                            cursor: "pointer",
+                            color: "red",
+                            "&:last-child td, &:last-child th": {
+                              border: 0,
+                            },
+                            "& *": {
                               fontSize: "14px",
                               fontWeight: 500,
-                              lineHeight: "21px",
-                            }}
-                          >
-                            On going
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "5px",
-                              width: "100%",
-                            }}
-                          >
-                            <Stack
-                              direction="row"
-                              spacing={1}
-                              sx={{ width: "100%" }}
-                            >
-                              <Button
-                                onClick={() => {
-                                  setUpdatedValues(row);
-                                  setOpenUpdateModal(true);
-                                }}
-                                size="small"
-                                variant="contained"
-                                color="primary"
-                                sx={{
-                                  textTransform: "none",
-                                  width: "100%",
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                onClick={() => {
-                                  setDeletedInfo(row);
-                                  setOpenModal(true);
-                                }}
-                                size="small"
-                                variant="contained"
-                                color="error"
-                                sx={{
-                                  textTransform: "none",
-                                  width: "100%",
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </Stack>
-
-                            <Button
-                              onClick={() => handleCopyCMD(row)}
-                              startIcon={
-                                <InsertLinkRounded sx={{ rotate: "-45deg" }} />
-                              }
-                              size="small"
-                              variant="contained"
-                              color="secondary"
+                            },
+                          }}
+                        >
+                          <TableCell component="th" scope="row">
+                            <StyledTypo>
+                              {getCenter(row?.center)?.c_name}
+                            </StyledTypo>
+                            <StyledTypo>
+                              {getIVAC(row?.ivac)?.ivac_name}
+                            </StyledTypo>
+                            <StyledTypo>
+                              {getVisaType(row?.visaType)?.type_name}
+                            </StyledTypo>
+                          </TableCell>
+                          <TableCell>
+                            {row?.info?.map((info, i) => {
+                              return (
+                                <StyledTypo key={i}>
+                                  {i + 1}. {info?.name}, {info?.web_id}
+                                </StyledTypo>
+                              );
+                            })}
+                          </TableCell>
+                          <TableCell>
+                            <StyledTypo>Mobile: {row?.phone}</StyledTypo>
+                            <StyledTypo>Password: {row?.password}</StyledTypo>
+                            <StyledTypo>Email: {row?.email}</StyledTypo>
+                          </TableCell>
+                          <TableCell>
+                            <StyledTypo>
+                              {getPaymentMethod(row?.paymentMethod)?.name}
+                            </StyledTypo>
+                            <StyledTypo>
+                              Payment: {row?.info?.length * 824}tk
+                            </StyledTypo>
+                            <StyledTypo>
+                              Agent Payment: {row?.paymentAmount}tk
+                            </StyledTypo>
+                          </TableCell>
+                          <TableCell>
+                            <Typography
                               sx={{
-                                textTransform: "none",
-                                width: "100%",
-                                bgcolor: "#000",
-                                color: "#FFF",
-                                "&:hover": {
-                                  bgcolor: "#000",
-                                  color: "#FFF",
-                                },
+                                backgroundColor: `#FDF3E6 !important`,
+                                color: `#EE9322 !important`,
+                                textAlign: "center",
+                                padding: "10px 12px",
+                                borderRadius: "4px",
+                                fontSize: "14px",
+                                fontWeight: 500,
+                                lineHeight: "21px",
                               }}
                             >
-                              Copy CMD Link
-                            </Button>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                              On going
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "5px",
+                                width: "100%",
+                              }}
+                            >
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{ width: "100%" }}
+                              >
+                                <Button
+                                  onClick={() => {
+                                    setUpdatedValues(row);
+                                    setOpenUpdateModal(true);
+                                  }}
+                                  size="small"
+                                  variant="contained"
+                                  color="primary"
+                                  sx={{
+                                    textTransform: "none",
+                                    width: "100%",
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    setDeletedInfo(row);
+                                    setOpenModal(true);
+                                  }}
+                                  size="small"
+                                  variant="contained"
+                                  color="error"
+                                  sx={{
+                                    textTransform: "none",
+                                    width: "100%",
+                                  }}
+                                >
+                                  Delete
+                                </Button>
+                              </Stack>
+
+                              <Button
+                                onClick={() => handleCopyCMD(row, i)}
+                                startIcon={
+                                  isCMDCopyed ? (
+                                    <CheckCircleOutlineRounded />
+                                  ) : (
+                                    <InsertLinkRounded
+                                      sx={{ rotate: "-45deg" }}
+                                    />
+                                  )
+                                }
+                                size="small"
+                                variant="contained"
+                                sx={{
+                                  textTransform: "none",
+                                  width: "100%",
+                                  bgcolor: isCMDCopyed ? "#5CB338" : "#000",
+                                  fontWeight: isCMDCopyed ? 600 : 500,
+                                  color: "#FFF",
+                                  "&:hover": {
+                                    bgcolor: isCMDCopyed ? "#5CB338" : "#000",
+                                    color: "#FFF",
+                                  },
+                                }}
+                              >
+                                {isCMDCopyed ? "Copied" : "Copy CMD Link"}
+                              </Button>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>

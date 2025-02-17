@@ -101,44 +101,42 @@ const ManageApplications = () => {
 
   return (
     <Box>
-      <Box>
-        <Typography
-          sx={{
-            fontSize: "1.5rem",
-            fontWeight: 700,
-          }}
-        >
-          Manage Applications
-        </Typography>
+      <Typography
+        sx={{
+          fontSize: "1.5rem",
+          fontWeight: 700,
+        }}
+      >
+        Manage Applications
+      </Typography>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", gap: "10px" }}>
-            <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-              Total - {totalApplications}
-            </Typography>
-            <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-              Completed - {completedApplications}
-            </Typography>
-            <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-              Pending - {pendingApplications}
-            </Typography>
-          </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", gap: "10px" }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
+            Total - {totalApplications}
+          </Typography>
+          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
+            Completed - {completedApplications}
+          </Typography>
+          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
+            Pending - {pendingApplications}
+          </Typography>
+        </Box>
 
-          <Box sx={{ display: "flex", gap: "10px" }}>
-            <TextField label="Search" about="Search" size="small" />
-            <Button
-              onClick={() => setOpenModal(true)}
-              size="small"
-              variant="contained"
-              sx={{
-                textTransform: "none",
-                boxShadow: "none",
-                paddingX: "20px",
-              }}
-            >
-              Add New
-            </Button>
-          </Box>
+        <Box sx={{ display: "flex", gap: "10px" }}>
+          <TextField label="Search" about="Search" size="small" />
+          <Button
+            onClick={() => setOpenModal(true)}
+            size="small"
+            variant="contained"
+            sx={{
+              textTransform: "none",
+              boxShadow: "none",
+              paddingX: "20px",
+            }}
+          >
+            Add New
+          </Button>
         </Box>
       </Box>
 
