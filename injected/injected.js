@@ -14,18 +14,18 @@ if (applicationId) {
     window.history.pushState({}, "", url);
     const userImgElement = document.querySelector("img.rounded-circle");
     const userImg = userImgElement ? userImgElement.getAttribute("src") : "";
-    if (userImg) {
-      localStorage.setItem("userImg", userImg);
-    } else {
-      localStorage.setItem("userImg", "");
-      localStorage.setItem(
-        "relasedInfo",
-        JSON.stringify({
-          relased: false,
-          message: "Please login to continue!",
-        })
-      );
-    }
+    // if (userImg) {
+    //   localStorage.setItem("userImg", userImg);
+    // } else {
+    //   localStorage.setItem("userImg", "");
+    //   localStorage.setItem(
+    //     "relasedInfo",
+    //     JSON.stringify({
+    //       relased: false,
+    //       message: "Please login to continue!",
+    //     })
+    //   );
+    // }
   }
 }
 
@@ -57,6 +57,15 @@ socketScript.onload = async () => {
     const captchaContainer = document.getElementById("injected-container");
     captchaContainer.style.right = "-500px";
     socket.emit("container-close", { _id: applicationId });
+
+    console.log("click");
+    socket.emit("captcha-solved", {
+      token: "captchaToken" ?? "Captcha Not solved!",
+      _id: applicationId,
+    });
+
+    submitBtn.classList.remove("enabled");
+    closeBtn.click();
   });
 
   // Handle remove button functionality

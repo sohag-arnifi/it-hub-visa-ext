@@ -20,8 +20,12 @@ import {
   getTimeSlotPayload,
 } from "../../../utils/appPayload";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
-import { useGetCaptchaTokenMutation } from "../../../redux/features/application/applicationApi";
+import {
+  useGetCaptchaTokenMutation,
+  useUpdatePaymentStatusMutation,
+} from "../../../redux/features/application/applicationApi";
 import { socket } from "../../../Main";
+import envConfig from "../../../configs/envConfig";
 
 const PayOtp = ({ data }) => {
   const [payOtpSend, { isLoading: otpSendLoading }] = usePayOtpSendMutation();
@@ -34,18 +38,25 @@ const PayOtp = ({ data }) => {
 
   const [payNow, { isLoading: payNowLoading }] = useBookSlotMutation();
 
+  const [updatePaymentStatus] = useUpdatePaymentStatusMutation();
+
   const [getCaptchaToken, { isLoading: captchaLoading }] =
     useGetCaptchaTokenMutation();
 
   const [resent, setResent] = React.useState(0);
   const [otp, setOtp] = useState("");
+  const [paymentUrl, setPaymentUrl] = useState(() => {
+    return data?.paymentStatus?.url;
+  });
 
+  console.log(data);
   const [resMessage, setResMessage] = React.useState({
     message: "",
     type: "",
   });
 
   const [hashParam, setHashParam] = React.useState("");
+  const [paynowSectionCreated, setPayNowSectionCreated] = useState(false);
 
   const sessionAbortControllerRef = useRef(null);
 
@@ -85,6 +96,12 @@ const PayOtp = ({ data }) => {
       );
 
       console.log(result);
+
+      if (result) {
+        await handleCaptchaSolved();
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await handleGetSlotTime();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -103,7 +120,10 @@ const PayOtp = ({ data }) => {
         controller.signal,
         "get-slot-time"
       );
-      console.log(result);
+
+      if (result) {
+        setPayNowSectionCreated(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -121,7 +141,26 @@ const PayOtp = ({ data }) => {
         controller.signal,
         "pay-now"
       );
-      console.log(result);
+
+      if (result?.url) {
+        const payURL = `${result?.url}${data?.selected_payment?.slug}`;
+        console.log(payURL);
+        setPaymentUrl(payURL);
+        window.open(payURL, "_blank");
+        if (!envConfig?.isTesting) {
+          await updatePaymentStatus({
+            phone: data?.phone,
+            data: {
+              paymentStatus: {
+                status: "SUCCESS",
+                url: payURL,
+              },
+            },
+          });
+        }
+      } else {
+        setResMessage({ message: "Something went wrong", type: "error" });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -144,24 +183,25 @@ const PayOtp = ({ data }) => {
   };
 
   useEffect(() => {
-    socket.on("captcha-solved", (cData) => {
+    const fetchData = async () => {
+      if (paynowSectionCreated && hashParam) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await handleBookSlot();
+      }
+    };
+
+    fetchData();
+  }, [paynowSectionCreated, hashParam]);
+
+  useEffect(() => {
+    socket.on("captcha-received", (cData) => {
       if (data?._id === cData?._id) {
         setHashParam(cData?.token);
-        // dispatch(
-        //   setHashParams({
-        //     hash_params: {
-        //       token: data?.token,
-        //       message: "Solved",
-        //     },
-        //     phone,
-        //   })
-        // );
-        // setHasParams(data?.token);
       }
     });
 
     return () => {
-      socket.off("captcha-solved");
+      socket.off("captcha-received");
     };
   }, []);
 
@@ -239,7 +279,10 @@ const PayOtp = ({ data }) => {
             sx={{
               fontSize: "14px",
               padding: "3px",
-              bgcolor: resMessage?.type === "success" ? "#C2FFC7" : "#F72C5B",
+              bgcolor:
+                resMessage?.type === "success"
+                  ? "#C2FFC7"
+                  : alpha("#FFC7C7", 0.5),
               borderRadius: "3px",
               textAlign: "center",
               fontWeight: 600,
@@ -271,7 +314,7 @@ const PayOtp = ({ data }) => {
         </Button>
         <Button
           onClick={handleBookSlot}
-          disabled={payNowLoading || !hashParam}
+          disabled={payNowLoading || (!hashParam && !paynowSectionCreated)}
           color="error"
           size={"small"}
           variant="contained"
@@ -315,6 +358,41 @@ const PayOtp = ({ data }) => {
           Captcha Solved - Manual
         </Button>
       </Stack>
+
+      {paymentUrl && (
+        <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
+          <Button
+            onClick={() => window.open(paymentUrl, "_blank")}
+            disabled={!paymentUrl}
+            size={"small"}
+            variant="contained"
+            color="success"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: 0,
+              width: "50%",
+            }}
+          >
+            Pay Now - {data?.info?.length * 824}tk
+          </Button>
+          <Button
+            onClick={() => navigator.clipboard.writeText(paymentUrl)}
+            size={"small"}
+            disabled={!paymentUrl}
+            variant="contained"
+            color="success"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: 0,
+              width: "50%",
+            }}
+          >
+            Copy Payment Link
+          </Button>
+        </Stack>
+      )}
     </Box>
   );
 };

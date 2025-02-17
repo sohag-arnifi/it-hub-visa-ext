@@ -139,6 +139,13 @@ const handleMultipleApiCall = async (
             response: response,
           });
           return true;
+        } else {
+          setMessage({
+            message: response?.htmlContent?.message ?? "Something went wrong!",
+            type: "error",
+          });
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          continue;
         }
       } else if (action === "pay-otp-verify") {
         if (response?.htmlContent?.success) {
@@ -147,6 +154,11 @@ const handleMultipleApiCall = async (
             type: "success",
           });
           return response?.htmlContent;
+        } else {
+          setMessage({
+            message: response?.htmlContent?.message ?? "Fail to verify OTP!",
+            type: "error",
+          });
         }
       } else if (action === "get-slot-time") {
         if (response?.htmlContent?.success) {
@@ -154,23 +166,30 @@ const handleMultipleApiCall = async (
             message: "Slot time fetched successfully!",
             type: "success",
           });
-          return response?.htmlContent;
+          return true;
+        } else {
+          setMessage({
+            message: response?.htmlContent?.message ?? "Fail to get slot time!",
+            type: "error",
+          });
         }
       } else if (action === "pay-now") {
-        console.log(response);
+        if (response?.htmlContent?.success) {
+          setMessage({
+            message: response?.htmlContent?.message ?? "Slot booking initiated",
+            type: "success",
+          });
+          return response?.htmlContent;
+        }
       }
       break;
     } catch (error) {
       console.log(error);
-
-      break;
-
+      // break;
       if (error?.status === "FETCH_ERROR") {
         break;
       }
-      if (error?.status === 429) {
-        break;
-      }
+
       const status = error?.status || 500;
       if (status === 502) {
         setMessage({
@@ -199,7 +218,7 @@ const handleMultipleApiCall = async (
         });
       } else if (error?.status === 429) {
         setMessage({
-          message: "Too Many Requests(429)- Please change Network",
+          message: "Too Many Requests(429)",
           type: "error",
         });
         break;
@@ -208,7 +227,9 @@ const handleMultipleApiCall = async (
           message: "Request aborted",
           type: "error",
         });
+        break;
       }
+
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
   }
