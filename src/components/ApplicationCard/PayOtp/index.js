@@ -27,7 +27,7 @@ import {
 import { socket } from "../../../Main";
 import envConfig from "../../../configs/envConfig";
 
-const PayOtp = ({ data }) => {
+const PayOtp = ({ data, otpSendRef }) => {
   const [payOtpSend, { isLoading: otpSendLoading }] = usePayOtpSendMutation();
 
   const [payOtpVerify, { isLoading: otpVerifyLoading }] =
@@ -215,6 +215,7 @@ const PayOtp = ({ data }) => {
     >
       <Stack direction={"row"} spacing={1}>
         <Button
+          ref={otpSendRef}
           onClick={handlePayOtpSend}
           disabled={otpSendLoading}
           color="error"

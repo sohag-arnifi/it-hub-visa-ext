@@ -13,7 +13,7 @@ import {
   getPersonalInfoSubmitPayload,
 } from "../../../utils/appPayload";
 
-const InfoSession = ({ data, loggedInUser }) => {
+const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
   const [createNewSession, { isLoading: sessionLoading }] =
     useCreateNewSessionMutation();
 
@@ -66,7 +66,10 @@ const InfoSession = ({ data, loggedInUser }) => {
         "application-info-submit"
       );
 
-      console.log(result);
+      if (result) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await handlePersonalInfoSubmit();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -81,9 +84,13 @@ const InfoSession = ({ data, loggedInUser }) => {
         payload,
         setResMessage,
         controller.signal,
-        "perosnal-info-submit"
+        "personal-info-submit"
       );
-      console.log(result);
+
+      if (result) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await handleOverviewInfoSubmit();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -101,7 +108,11 @@ const InfoSession = ({ data, loggedInUser }) => {
         controller.signal,
         "overview-info-submit"
       );
+
       console.log(result);
+      if (result) {
+        otpSendRef.current.click();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -235,6 +246,7 @@ const InfoSession = ({ data, loggedInUser }) => {
 
           <Button
             onClick={handlePersonalInfoSubmit}
+            disabled={personalInfoLoading}
             variant="contained"
             color="success"
             size="small"
@@ -249,6 +261,7 @@ const InfoSession = ({ data, loggedInUser }) => {
           </Button>
           <Button
             onClick={handleOverviewInfoSubmit}
+            disabled={overviewInfoLoading}
             variant="contained"
             color="success"
             size="small"

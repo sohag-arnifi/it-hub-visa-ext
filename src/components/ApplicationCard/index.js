@@ -11,6 +11,8 @@ const ApplicationCard = () => {
   const url = new URL(window.location.href);
   const params = new URLSearchParams(url.search);
 
+  const payOtpSendRef = React.useRef(null);
+
   const [loggedInUser, setLoggedInUser] = useState(() => {
     const localUser = localStorage.getItem("userImg");
     return localUser ? localUser : "";
@@ -73,8 +75,9 @@ const ApplicationCard = () => {
                     <InfoSession
                       data={data?.data}
                       loggedInUser={loggedInUser}
+                      otpSendRef={payOtpSendRef}
                     />
-                    <PayOtp data={data?.data} />
+                    <PayOtp data={data?.data} otpSendRef={payOtpSendRef} />
                   </>
                 ) : (
                   <LoginContainer

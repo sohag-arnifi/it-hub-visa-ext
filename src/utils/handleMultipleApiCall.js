@@ -1,5 +1,4 @@
 import {
-  getDateReleaseInfo,
   getLoginInfo,
   getLoginOtpErrorMessage,
   setCSRFToken,
@@ -105,7 +104,7 @@ const handleMultipleApiCall = async (
             message: "Session created successfully!",
             type: "success",
           });
-          break;
+          return true;
         }
       } else if (action === "application-info-submit") {
         if (redirectUrl === personalInfoUrl) {
@@ -114,6 +113,13 @@ const handleMultipleApiCall = async (
             message: "Application submitted successfully!",
             type: "success",
           });
+          return true;
+        } else {
+          setMessage({
+            message: "Something went wrong! Application Info",
+            type: "error",
+          });
+          continue;
         }
       } else if (action === "personal-info-submit") {
         if (redirectUrl === overviewInfoUrl) {
@@ -122,6 +128,13 @@ const handleMultipleApiCall = async (
             message: "Personal Info submitted successfully!",
             type: "success",
           });
+          return true;
+        } else {
+          setMessage({
+            message: "Something went wrong! Personal Info",
+            type: "error",
+          });
+          continue;
         }
       } else if (action === "overview-info-submit") {
         if (redirectUrl === paymentInfoUrl) {
@@ -130,13 +143,19 @@ const handleMultipleApiCall = async (
             message: "Overview Info submitted successfully!",
             type: "success",
           });
+          return true;
+        } else {
+          setMessage({
+            message: "Something went wrong! Overview Info",
+            type: "error",
+          });
+          continue;
         }
       } else if (action === "pay-otp-send") {
         if (response?.htmlContent?.success) {
           setMessage({
             message: "OTP sent successfully!",
             type: "success",
-            response: response,
           });
           return true;
         } else {
@@ -187,6 +206,10 @@ const handleMultipleApiCall = async (
       console.log(error);
       // break;
       if (error?.status === "FETCH_ERROR") {
+        break;
+      }
+
+      if (error?.status === 404) {
         break;
       }
 
