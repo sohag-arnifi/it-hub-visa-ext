@@ -119,7 +119,8 @@ const handleMultipleApiCall = async (
             message: "Something went wrong! Application Info",
             type: "error",
           });
-          continue;
+          // continue;
+          break;
         }
       } else if (action === "personal-info-submit") {
         if (redirectUrl === overviewInfoUrl) {
@@ -134,7 +135,8 @@ const handleMultipleApiCall = async (
             message: "Something went wrong! Personal Info",
             type: "error",
           });
-          continue;
+          // continue;
+          break;
         }
       } else if (action === "overview-info-submit") {
         if (redirectUrl === paymentInfoUrl) {
@@ -149,7 +151,8 @@ const handleMultipleApiCall = async (
             message: "Something went wrong! Overview Info",
             type: "error",
           });
-          continue;
+          // continue;
+          break;
         }
       } else if (action === "pay-otp-send") {
         if (response?.htmlContent?.success) {
@@ -160,7 +163,8 @@ const handleMultipleApiCall = async (
           return true;
         } else {
           setMessage({
-            message: response?.htmlContent?.message ?? "Something went wrong!",
+            message:
+              response?.htmlContent?.message?.error ?? "Fail to send OTP!",
             type: "error",
           });
           await new Promise((resolve) => setTimeout(resolve, retryDelay));
@@ -204,7 +208,7 @@ const handleMultipleApiCall = async (
       break;
     } catch (error) {
       console.log(error);
-      // break;
+      break;
       if (error?.status === "FETCH_ERROR") {
         break;
       }

@@ -66,10 +66,10 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
         "application-info-submit"
       );
 
-      if (result) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await handlePersonalInfoSubmit();
-      }
+      // if (result) {
+      //   await new Promise((resolve) => setTimeout(resolve, 500));
+      //   await handlePersonalInfoSubmit();
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -87,10 +87,10 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
         "personal-info-submit"
       );
 
-      if (result) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        await handleOverviewInfoSubmit();
-      }
+      // if (result) {
+      //   await new Promise((resolve) => setTimeout(resolve, 500));
+      //   await handleOverviewInfoSubmit();
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -110,9 +110,9 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
       );
 
       console.log(result);
-      if (result) {
-        otpSendRef.current.click();
-      }
+      // if (result) {
+      //   otpSendRef.current.click();
+      // }
     } catch (error) {
       console.log(error);
     }
