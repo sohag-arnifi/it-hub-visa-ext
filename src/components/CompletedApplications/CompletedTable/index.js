@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  alpha,
   Box,
-  Button,
-  Grid,
-  Modal,
   Paper,
-  Stack,
   styled,
   Table,
   TableBody,
@@ -16,7 +11,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { StyledTypography } from "../../ApplicationContainer";
 import {
   getCenter,
   getIVAC,
@@ -24,11 +18,6 @@ import {
   getVisaType,
 } from "../../../constanse";
 import GlobalLoader from "../../GlobalLoader";
-import { useDeleteApplicationMutation } from "../../../redux/features/application/applicationApi";
-import {
-  InsertLinkRounded,
-  CheckCircleOutlineRounded,
-} from "@mui/icons-material";
 
 const StyledTypo = styled(Typography)(() => ({
   fontSize: 12,

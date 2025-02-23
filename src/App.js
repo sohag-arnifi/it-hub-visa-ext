@@ -1,9 +1,7 @@
-import { Box, Button, Paper } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import React, { useState } from "react";
 import { useGetApplicationsQuery } from "./redux/features/application/applicationApi";
-import ApplicationContainer from "./components/ApplicationContainer";
 import GlobalLoader from "./components/GlobalLoader";
-import TimerContainer from "./components/TimerContainer";
 import { useAppSelector } from "./redux/store";
 import Header from "./components/Header/Header";
 import ManageApplications from "./components/ManageApplications";
@@ -46,12 +44,7 @@ const App = () => {
           <ManageApplications />
         ) : isOpenCompletedApplication ? (
           <CompletedApplications />
-        ) : (
-          <>
-            <TimerContainer />
-            <ApplicationContainer />
-          </>
-        )}
+        ) : null}
       </Paper>
     </Box>
   );

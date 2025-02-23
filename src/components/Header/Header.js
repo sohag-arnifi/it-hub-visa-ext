@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import Marquee from "react-fast-marquee";
 
 const Header = ({
   user,
@@ -20,6 +21,9 @@ const Header = ({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
+
+  const isDuePending = user?.companyId?.currentBalance <= 0;
+  console.log("isDuePending", isDuePending);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -113,15 +117,49 @@ const Header = ({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: isDuePending ? "space-between" : "flex-end",
           alignItems: "center",
           marginTop: "10px",
           paddingRight: "15px",
           zIndex: 100,
         }}
       >
+        {isDuePending && (
+          <Box sx={{ width: "80%" }}>
+            <Marquee
+              gradientColor="white"
+              gradient={true}
+              speed={30}
+              loop={0}
+              autoFill
+            >
+              <Box
+                sx={{
+                  padding: "10px",
+                  bgcolor: "white",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderTop: "1px solid #E0E0E0",
+                  borderBottom: "1px solid #E0E0E0",
+                }}
+              >
+                <Typography
+                  sx={{ fontSize: "20px", fontWeight: 500, color: "red" }}
+                >
+                  We regret to inform you that no actions can be taken at this
+                  time because of an outstanding due amount. Kindly clear your
+                  dues to regain access to all features. If you have any
+                  questions or need assistance, please contact our support team.
+                </Typography>
+              </Box>
+            </Marquee>
+          </Box>
+        )}
+
         <Box
           sx={{
+            width: "20%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

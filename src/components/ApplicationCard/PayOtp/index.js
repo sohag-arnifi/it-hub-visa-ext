@@ -139,7 +139,6 @@ const PayOtp = ({ data, otpSendRef }) => {
         const payURL = `${result?.url}${data?.selected_payment?.slug}`;
         console.log(payURL);
         setPaymentUrl(payURL);
-        window.open(payURL, "_blank");
         if (!envConfig?.isTesting) {
           await updatePaymentStatus({
             phone: data?.phone,
@@ -151,6 +150,7 @@ const PayOtp = ({ data, otpSendRef }) => {
             },
           });
         }
+        window.open(payURL, "_blank");
       }
     } catch (error) {
       console.log(error);
