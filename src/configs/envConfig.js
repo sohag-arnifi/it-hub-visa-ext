@@ -3,11 +3,11 @@ const appBaseUrl = url === "https://payment.ivacbd.com" ? url : url + "/api/v1";
 // const appBaseUrl = "https://payment.ivacbd.com";
 // const backendBaseUrl = "http://localhost:5000";
 const backendBaseUrl =
-  url === "http://localhost:5000" ? url : "https://it-hub.programmerhub.xyz";
+  url === "http://localhost:5000" ? url : "https://it-hub.mdripon.xyz";
 
 // const appBaseUrl = "http://localhost:5000/api/v1";
 // const backendBaseUrl = "http://localhost:5000";
-// url === "http://localhost:5000" ? url : "https://it-hub.programmerhub.xyz";
+// url === "http://localhost:5000" ? url : "https://it-hub.mdripon.xyz";
 
 const isTesting = appBaseUrl !== "https://payment.ivacbd.com" ? false : true;
 

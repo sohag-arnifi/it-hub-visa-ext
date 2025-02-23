@@ -83,30 +83,30 @@ const ApplicationsTable = ({
     const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
 
     // Define the path to the extension (update this path as needed)
-    const extensionPath = "D:\\It-Hub\\chorom-ext";
+    const extensionPath = "C:\\ext\\it-hub";
 
     // Define the CMD script
     const comment = `
-@echo off
+  @echo off
 
-REM Define the URL to open
-set "URL=${applicationOpenUrl}"
+  REM Define the URL to open
+  set "URL=${applicationOpenUrl}"
 
-REM Define the path to the temporary user data directory
-set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
+  REM Define the path to the temporary user data directory
+  set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
 
-REM Define the path to the extension
-set "EXTENSION_PATH=${extensionPath}"
+  REM Define the path to the extension
+  set "EXTENSION_PATH=${extensionPath}"
 
-REM Ensure the temporary directory exists
-if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
+  REM Ensure the temporary directory exists
+  if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
 
-REM Open Chrome with the temporary user data directory and load the extension
-start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800
+  REM Open Chrome with the temporary user data directory and load the extension
+  start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800
 
-REM Close the CMD prompt after opening Chrome
-exit
-`;
+  REM Close the CMD prompt after opening Chrome
+  exit
+  `;
 
     // Copy the CMD script to the clipboard
     navigator.clipboard
@@ -121,6 +121,49 @@ exit
         console.error("Failed to copy CMD script:", error);
       });
   };
+
+  // const handleCopyCMD = (data, index) => {
+  //     const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
+
+  //     // Define the path to the extension (update this path as needed)
+  //     const extensionPath = "D:\\It-Hub\\chorom-ext";
+
+  //     // Define the CMD script
+  //     const comment = `
+  // @echo off
+
+  // REM Define the URL to open
+  // set "URL=${applicationOpenUrl}"
+
+  // REM Define the path to the temporary user data directory
+  // set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
+
+  // REM Define the path to the extension
+  // set "EXTENSION_PATH=${extensionPath}"
+
+  // REM Ensure the temporary directory exists
+  // if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
+
+  // REM Open Chrome with the temporary user data directory, load the extension, and disable caching
+  // start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800 --disk-cache-size=1 --media-cache-size=1 --disable-application-cache
+
+  // REM Close the CMD prompt after opening Chrome
+  // exit
+  // `;
+
+  //     // Copy the CMD script to the clipboard
+  //     navigator.clipboard
+  //       .writeText(comment)
+  //       .then(() => {
+  //         setIsCopied({
+  //           status: true,
+  //           id: data?._id,
+  //         });
+  //       })
+  //       .catch((error) => {
+  //         console.error("Failed to copy CMD script:", error);
+  //       });
+  //   };
 
   useEffect(() => {
     if (isCopyed?.id && isCopyed?.status) {

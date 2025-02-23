@@ -163,7 +163,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
           <Typography
             sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}
           >
-            Email: <span style={{ fontWeight: 600 }}>{"abc@gmail.com"}</span>
+            Email: <span style={{ fontWeight: 600 }}>{data?.email}</span>
           </Typography>
           <Typography
             sx={{ fontSize: "12px", fontWeight: 500, lineHeight: "16px" }}

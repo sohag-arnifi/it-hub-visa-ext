@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "My Chrome Extension",
-  "version": "1.0",
-  "description": "A sample Chrome extension",
+  "name": "It-hub | Extension",
+  "version": "2.0",
+  "description": "One e-Token for all your visas",
   "background": {
     "service_worker": "dist/background.bundle.js"
   },
@@ -28,7 +28,7 @@
       "matches": [
         "https://payment.ivacbd.com/*",
         "http://localhost:5000/*",
-        "https://it-hub.programmerhub.xyz/*"
+        "https://it-hub.mdripon.xyz/*"
       ],
       "js": ["dist/content.bundle.js"],
       "run_at": "document_end"

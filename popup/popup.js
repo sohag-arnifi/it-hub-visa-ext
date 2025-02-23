@@ -1,7 +1,7 @@
 const baseUrl =
   window.location.origin === "http://localhost:5000"
     ? "http://localhost:5000"
-    : "https://it-hub.programmerhub.xyz";
+    : "https://it-hub.mdripon.xyz";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Check if the user is logged in

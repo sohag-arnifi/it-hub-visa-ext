@@ -75,6 +75,7 @@ const ManageApplications = () => {
       companyId: user?.companyId?._id,
       assignTo: user?._id,
     };
+
     try {
       if (!initialValues?.status) {
         let response;
