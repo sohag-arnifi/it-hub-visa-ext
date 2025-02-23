@@ -140,7 +140,6 @@ const CompletedTable = ({ data, isLoading }) => {
                     </TableRow>
                   ) : (
                     data?.map((row, i) => {
-                      const isCMDCopyed = isCopyed?.id === row?._id;
                       return (
                         <TableRow
                           key={i}

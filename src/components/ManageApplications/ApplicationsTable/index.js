@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
-  alpha,
   Box,
   Button,
-  Grid,
   Modal,
   Paper,
   Stack,
@@ -16,7 +14,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { StyledTypography } from "../../ApplicationContainer";
 import {
   getCenter,
   getIVAC,
@@ -29,6 +26,7 @@ import {
   InsertLinkRounded,
   CheckCircleOutlineRounded,
 } from "@mui/icons-material";
+import { useAppSelector } from "../../../redux/store";
 
 const StyledTypo = styled(Typography)(() => ({
   fontSize: 12,
@@ -61,6 +59,9 @@ const ApplicationsTable = ({
     status: false,
     id: "",
   });
+
+  const { companyId } = useAppSelector((state) => state?.auth?.user);
+  const isDuePending = companyId?.currentBalance <= 0;
 
   const [auth, setAuth] = useState("");
 
@@ -122,49 +123,6 @@ const ApplicationsTable = ({
         console.error("Failed to copy CMD script:", error);
       });
   };
-
-  // const handleCopyCMD = (data, index) => {
-  //     const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
-
-  //     // Define the path to the extension (update this path as needed)
-  //     const extensionPath = "D:\\It-Hub\\chorom-ext";
-
-  //     // Define the CMD script
-  //     const comment = `
-  // @echo off
-
-  // REM Define the URL to open
-  // set "URL=${applicationOpenUrl}"
-
-  // REM Define the path to the temporary user data directory
-  // set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
-
-  // REM Define the path to the extension
-  // set "EXTENSION_PATH=${extensionPath}"
-
-  // REM Ensure the temporary directory exists
-  // if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
-
-  // REM Open Chrome with the temporary user data directory, load the extension, and disable caching
-  // start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800 --disk-cache-size=1 --media-cache-size=1 --disable-application-cache
-
-  // REM Close the CMD prompt after opening Chrome
-  // exit
-  // `;
-
-  //     // Copy the CMD script to the clipboard
-  //     navigator.clipboard
-  //       .writeText(comment)
-  //       .then(() => {
-  //         setIsCopied({
-  //           status: true,
-  //           id: data?._id,
-  //         });
-  //       })
-  //       .catch((error) => {
-  //         console.error("Failed to copy CMD script:", error);
-  //       });
-  //   };
 
   useEffect(() => {
     if (isCopyed?.id && isCopyed?.status) {
@@ -348,80 +306,102 @@ const ApplicationsTable = ({
                               On going
                             </Typography>
                           </TableCell>
-                          <TableCell>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "5px",
-                                width: "100%",
-                              }}
-                            >
-                              <Stack
-                                direction="row"
-                                spacing={1}
-                                sx={{ width: "100%" }}
-                              >
-                                <Button
-                                  onClick={() => {
-                                    setUpdatedValues(row);
-                                    setOpenUpdateModal(true);
-                                  }}
-                                  size="small"
-                                  variant="contained"
-                                  color="primary"
-                                  sx={{
-                                    textTransform: "none",
-                                    width: "100%",
-                                  }}
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  onClick={() => {
-                                    setDeletedInfo(row);
-                                    setOpenModal(true);
-                                  }}
-                                  size="small"
-                                  variant="contained"
-                                  color="error"
-                                  sx={{
-                                    textTransform: "none",
-                                    width: "100%",
-                                  }}
-                                >
-                                  Delete
-                                </Button>
-                              </Stack>
-
-                              <Button
-                                onClick={() => handleCopyCMD(row, i)}
-                                startIcon={
-                                  isCMDCopyed ? (
-                                    <CheckCircleOutlineRounded />
-                                  ) : (
-                                    <InsertLinkRounded
-                                      sx={{ rotate: "-45deg" }}
-                                    />
-                                  )
-                                }
-                                size="small"
-                                variant="contained"
+                          <TableCell align="center" sx={{}}>
+                            {isDuePending ? (
+                              <Box
                                 sx={{
-                                  textTransform: "none",
-                                  width: "100%",
-                                  bgcolor: isCMDCopyed ? "#5CB338" : "#000",
-                                  fontWeight: isCMDCopyed ? 600 : 500,
-                                  color: "#FFF",
-                                  "&:hover": {
-                                    bgcolor: isCMDCopyed ? "#5CB338" : "#000",
-                                    color: "#FFF",
-                                  },
+                                  width: "150px",
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
                                 }}
                               >
-                                {isCMDCopyed ? "Copied" : "Copy CMD Link"}
-                              </Button>
-                            </Box>
+                                <Typography
+                                  sx={{
+                                    fontSize: "12px",
+                                    color: "red",
+                                    fontWeight: 600,
+                                    lineHeight: "16px",
+                                  }}
+                                >
+                                  No actions available due to outstanding dues.
+                                </Typography>
+                              </Box>
+                            ) : (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                  width: "100%",
+                                }}
+                              >
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  sx={{ width: "100%" }}
+                                >
+                                  <Button
+                                    onClick={() => {
+                                      setUpdatedValues(row);
+                                      setOpenUpdateModal(true);
+                                    }}
+                                    size="small"
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{
+                                      textTransform: "none",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      setDeletedInfo(row);
+                                      setOpenModal(true);
+                                    }}
+                                    size="small"
+                                    variant="contained"
+                                    color="error"
+                                    sx={{
+                                      textTransform: "none",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    Delete
+                                  </Button>
+                                </Stack>
+
+                                <Button
+                                  onClick={() => handleCopyCMD(row, i)}
+                                  startIcon={
+                                    isCMDCopyed ? (
+                                      <CheckCircleOutlineRounded />
+                                    ) : (
+                                      <InsertLinkRounded
+                                        sx={{ rotate: "-45deg" }}
+                                      />
+                                    )
+                                  }
+                                  size="small"
+                                  variant="contained"
+                                  sx={{
+                                    textTransform: "none",
+                                    width: "100%",
+                                    bgcolor: isCMDCopyed ? "#5CB338" : "#000",
+                                    fontWeight: isCMDCopyed ? 600 : 500,
+                                    color: "#FFF",
+                                    "&:hover": {
+                                      bgcolor: isCMDCopyed ? "#5CB338" : "#000",
+                                      color: "#FFF",
+                                    },
+                                  }}
+                                >
+                                  {isCMDCopyed ? "Copied" : "Copy CMD Link"}
+                                </Button>
+                              </Box>
+                            )}
                           </TableCell>
                         </TableRow>
                       );
