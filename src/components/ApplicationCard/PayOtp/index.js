@@ -95,14 +95,6 @@ const PayOtp = ({ data, otpSendRef }) => {
         controller.signal,
         "pay-otp-verify"
       );
-
-      console.log(result);
-
-      if (result) {
-        await handleCaptchaSolved();
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await handleGetSlotTime();
-      }
     } catch (error) {
       console.log(error);
     }
@@ -159,8 +151,6 @@ const PayOtp = ({ data, otpSendRef }) => {
             },
           });
         }
-      } else {
-        setResMessage({ message: "Something went wrong", type: "error" });
       }
     } catch (error) {
       console.log(error);

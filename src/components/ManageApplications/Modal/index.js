@@ -3,7 +3,6 @@ import {
   Button,
   CircularProgress,
   Grid,
-  Modal,
   Stack,
   styled,
   Typography,
@@ -13,6 +12,7 @@ import React, { useEffect } from "react";
 import SelectField from "./SelectField";
 import { centers, ivacs, paymentMethod, visaTypes } from "../../../constanse";
 import InputField from "./InputField";
+import { useAppSelector } from "../../../redux/store";
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
@@ -38,6 +38,7 @@ const style = {
 
 const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
   const { values, setFieldValue } = useFormikContext();
+  const { companyId } = useAppSelector((state) => state?.auth?.user);
 
   const selectedIvacs = ivacs?.filter(
     (item) => item?.center_info_id === values?.center
@@ -57,7 +58,10 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
 
   useEffect(() => {
     if (values?.info?.length) {
-      setFieldValue("paymentAmount", values?.info?.length * 5000);
+      setFieldValue(
+        "paymentAmount",
+        values?.info?.length * companyId?.tokenAmount
+      );
     }
   }, [values?.info?.length]);
 

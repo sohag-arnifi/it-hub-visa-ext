@@ -7,9 +7,12 @@ import TimerContainer from "./components/TimerContainer";
 import { useAppSelector } from "./redux/store";
 import Header from "./components/Header/Header";
 import ManageApplications from "./components/ManageApplications";
+import CompletedApplications from "./components/CompletedApplications";
 
 const App = () => {
   const [isOpenManageApplication, setIsOpenManageApplication] = useState(true);
+  const [isOpenCompletedApplication, setIsOpenCompletedApplication] =
+    useState(false);
   const { isLoading } = useGetApplicationsQuery({});
   const user = useAppSelector((state) => state?.auth?.user);
 
@@ -34,12 +37,15 @@ const App = () => {
         <Header
           user={user}
           setIsOpenManageApplication={setIsOpenManageApplication}
+          setIsOpenCompletedApplication={setIsOpenCompletedApplication}
         />
 
         {isLoading ? (
           <GlobalLoader />
         ) : isOpenManageApplication ? (
           <ManageApplications />
+        ) : isOpenCompletedApplication ? (
+          <CompletedApplications />
         ) : (
           <>
             <TimerContainer />

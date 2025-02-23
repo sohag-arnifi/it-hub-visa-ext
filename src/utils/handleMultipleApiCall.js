@@ -208,11 +208,16 @@ const handleMultipleApiCall = async (
       } else if (action === "pay-now") {
         if (response?.htmlContent?.success) {
           setMessage({
-            message:
-              response?.htmlContent?.message?.error ?? "Slot booking initiated",
+            message: "Slot booking initiated",
             type: "success",
           });
           return response?.htmlContent;
+        } else {
+          setMessage({
+            message:
+              response?.htmlContent?.message?.error ?? "Fail to book slot!",
+            type: "error",
+          });
         }
       }
       break;

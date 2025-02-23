@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography, Modal } from "@mui/material";
+import { Box, Button, Typography, Modal } from "@mui/material";
 import React, { useState } from "react";
 import FormModal from "./Modal";
 import { Form, Formik } from "formik";
@@ -59,10 +59,8 @@ const ManageApplications = () => {
   const { data, isLoading } = useGetAllApplicationsQuery();
 
   const totalApplications = data?.data?.length ?? 0;
-  const completedApplications =
-    data?.data?.filter((item) => item?.status)?.length ?? 0;
-  const pendingApplications =
-    data?.data?.filter((item) => !item?.status)?.length ?? 0;
+  const totalFiles =
+    data?.data?.reduce((acc, item) => acc + item?.info?.length, 0) ?? 0;
 
   const [createNewApplication, { isLoading: createLoading }] =
     useCreateNewApplicationMutation();
@@ -108,24 +106,17 @@ const ManageApplications = () => {
           fontWeight: 700,
         }}
       >
-        Manage Applications
+        Ongoing Applications
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", gap: "10px" }}>
           <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-            Total - {totalApplications}
-          </Typography>
-          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-            Completed - {completedApplications}
-          </Typography>
-          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-            Pending - {pendingApplications}
+            Total - {totalApplications}, Web Files - {totalFiles}
           </Typography>
         </Box>
 
         <Box sx={{ display: "flex", gap: "10px" }}>
-          <TextField label="Search" about="Search" size="small" />
           <Button
             onClick={() => setOpenModal(true)}
             size="small"

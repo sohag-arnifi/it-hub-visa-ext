@@ -12,7 +12,11 @@ import {
 } from "@mui/material";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 
-const Header = ({ user, setIsOpenManageApplication }) => {
+const Header = ({
+  user,
+  setIsOpenManageApplication,
+  setIsOpenCompletedApplication,
+}) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -23,10 +27,12 @@ const Header = ({ user, setIsOpenManageApplication }) => {
 
   const handleManageApplication = () => {
     setIsOpenManageApplication(true);
+    setIsOpenCompletedApplication(false);
     setOpen(false);
   };
 
-  const handleApplicationToken = () => {
+  const handleCompletedApplication = () => {
+    setIsOpenCompletedApplication(true);
     setIsOpenManageApplication(false);
     setOpen(false);
   };
@@ -211,11 +217,12 @@ const Header = ({ user, setIsOpenManageApplication }) => {
                         aria-labelledby="composition-button"
                         onKeyDown={handleListKeyDown}
                       >
-                        <MenuItem onClick={handleApplicationToken}>
-                          Applications e-Token
-                        </MenuItem>
                         <MenuItem onClick={handleManageApplication}>
                           Manage Applications
+                        </MenuItem>
+
+                        <MenuItem onClick={handleCompletedApplication}>
+                          Completed Applications
                         </MenuItem>
                       </MenuList>
                     </ClickAwayListener>

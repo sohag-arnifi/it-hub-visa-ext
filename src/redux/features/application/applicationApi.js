@@ -75,6 +75,15 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
       },
     }),
 
+    getCompletedApplications: builder.query({
+      query: () => ({
+        url: `/applications/get-all-complete`,
+        method: "GET",
+        headers: { "content-type": "application/json" },
+      }),
+      providesTags: ["applications"],
+    }),
+
     createNewApplication: builder.mutation({
       query: (data) => ({
         url: `/applications`,
@@ -167,4 +176,5 @@ export const {
   useUpdateApplicationMutation,
   useUpdatePaymentStatusMutation,
   useGetProcessApplicationQuery,
+  useGetCompletedApplicationsQuery,
 } = applicationApi;
