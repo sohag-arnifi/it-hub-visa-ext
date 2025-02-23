@@ -168,6 +168,13 @@ const handleMultipleApiCall = async (
             type: "error",
           });
           await new Promise((resolve) => setTimeout(resolve, retryDelay));
+
+          if (
+            response?.htmlContent?.message?.error ===
+            "Booking session not found or invalid"
+          ) {
+            break;
+          }
           continue;
         }
       } else if (action === "pay-otp-verify") {
@@ -179,7 +186,8 @@ const handleMultipleApiCall = async (
           return response?.htmlContent;
         } else {
           setMessage({
-            message: response?.htmlContent?.message ?? "Fail to verify OTP!",
+            message:
+              response?.htmlContent?.message?.error ?? "Fail to verify OTP!",
             type: "error",
           });
         }
@@ -192,14 +200,16 @@ const handleMultipleApiCall = async (
           return true;
         } else {
           setMessage({
-            message: response?.htmlContent?.message ?? "Fail to get slot time!",
+            message:
+              response?.htmlContent?.message?.error ?? "Fail to get slot time!",
             type: "error",
           });
         }
       } else if (action === "pay-now") {
         if (response?.htmlContent?.success) {
           setMessage({
-            message: response?.htmlContent?.message ?? "Slot booking initiated",
+            message:
+              response?.htmlContent?.message?.error ?? "Slot booking initiated",
             type: "success",
           });
           return response?.htmlContent;

@@ -75,6 +75,7 @@ const ApplicationCard = () => {
                     <InfoSession
                       data={data?.data}
                       loggedInUser={loggedInUser}
+                      setLoggedInUser={setLoggedInUser}
                       otpSendRef={payOtpSendRef}
                     />
                     <PayOtp data={data?.data} otpSendRef={payOtpSendRef} />

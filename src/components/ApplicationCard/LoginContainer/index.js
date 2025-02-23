@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   useAuthVerifyMutation,
   useLoginOtpVerifyMutation,
@@ -19,6 +19,7 @@ import {
   getPasswordVerifyPayload,
 } from "../../../utils/appPayload";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
+import { socket } from "../../../Main";
 
 const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
   const [loginOtp, setLoginOtp] = useState("");
@@ -37,6 +38,7 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
     useLoginOtpVerifyMutation();
 
   const mobileVerifyAbortControllerRef = useRef(null);
+  const otpVerifyBtnRef = useRef(null);
 
   const handleMobileVerify = async () => {
     const controller = new AbortController();
@@ -97,6 +99,25 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
       console.log("API call aborted");
     }
   };
+
+  useEffect(() => {
+    const handleLoginOtpVefiry = ({ otp, phone }) => {
+      if (otp?.length === 6 && data?.phone === phone) {
+        setLoginOtp(otp); // Set the OTP state
+        setTimeout(async () => {
+          otpVerifyBtnRef.current.click();
+        }, 2000);
+      }
+    };
+
+    // Listen for the "login-send-otp" event
+    socket.on("login-send-otp", handleLoginOtpVefiry);
+
+    // Cleanup function to remove the event listener
+    return () => {
+      socket.off("login-send-otp", handleLoginOtpVefiry);
+    };
+  }, [data?.phone]);
 
   return (
     <Box
@@ -200,6 +221,7 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
               required
             />
             <Button
+              ref={otpVerifyBtnRef}
               disabled={loginOtpLoading || loginOtp?.length !== 6}
               type="submit"
               color="error"

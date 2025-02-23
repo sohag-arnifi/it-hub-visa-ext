@@ -96,21 +96,6 @@ const SendOtp = ({ data, applications, index, otpRef }) => {
     }
   };
 
-  useEffect(() => {
-    socket.once("otp-received", () => {
-      if (
-        !isRequestActiveRef.current &&
-        !isSendOtpRef.current &&
-        !data?.selected_payment?.link
-      ) {
-        handleSendOtp({ apiDelay: 1500 });
-      }
-    });
-    return () => {
-      socket.off("otp-received");
-    };
-  }, [index]);
-
   return (
     <Box
       sx={{

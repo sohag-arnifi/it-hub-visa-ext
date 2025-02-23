@@ -28,6 +28,8 @@ import { socket } from "../../../Main";
 import envConfig from "../../../configs/envConfig";
 
 const PayOtp = ({ data, otpSendRef }) => {
+  const payOtpVerifyButtonRef = useRef();
+
   const [payOtpSend, { isLoading: otpSendLoading }] = usePayOtpSendMutation();
 
   const [payOtpVerify, { isLoading: otpVerifyLoading }] =
@@ -49,7 +51,6 @@ const PayOtp = ({ data, otpSendRef }) => {
     return data?.paymentStatus?.url;
   });
 
-  console.log(data);
   const [resMessage, setResMessage] = React.useState({
     message: "",
     type: "",
@@ -205,6 +206,24 @@ const PayOtp = ({ data, otpSendRef }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const handlePayOtpVefiry = ({ otp, phone }) => {
+      if (otp?.length === 6 && data?.phone === phone) {
+        setOtp(otp); // Set the OTP state
+        setTimeout(async () => {
+          payOtpVerifyButtonRef.current.click();
+        }, 2000);
+      }
+    };
+
+    // Listen for the "login-send-otp" event
+    socket.on("pay-send-otp", handlePayOtpVefiry);
+    // Cleanup function to remove the event listener
+    return () => {
+      socket.off("pay-send-otp", handlePayOtpVefiry);
+    };
+  }, [data?.phone]);
+
   return (
     <Box
       sx={{
@@ -256,6 +275,7 @@ const PayOtp = ({ data, otpSendRef }) => {
             required
           />
           <Button
+            ref={payOtpVerifyButtonRef}
             onClick={handleOtpVerify}
             disabled={otp.length !== 6 || otpVerifyLoading}
             type="submit"

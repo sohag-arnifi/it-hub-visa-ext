@@ -12,8 +12,9 @@ import {
   getOverviewInfoSubmitPayload,
   getPersonalInfoSubmitPayload,
 } from "../../../utils/appPayload";
+import { setCSRFToken } from "../../../utils/generateMessage";
 
-const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
+const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
   const [createNewSession, { isLoading: sessionLoading }] =
     useCreateNewSessionMutation();
 
@@ -118,6 +119,22 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("https://payment.ivacbd.com/logout");
+
+      if (!response.ok) {
+        throw new Error(`Logout failed with status: ${response.status}`);
+      }
+      const htmlContent = await response.text();
+      setCSRFToken(htmlContent);
+      setLoggedInUser("");
+      localStorage.removeItem("userImg");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -174,7 +191,15 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
             </span>
           </Typography>
         </Box>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
           {loggedInUser ? (
             <Avatar
               sx={{
@@ -186,6 +211,20 @@ const InfoSession = ({ data, loggedInUser, otpSendRef }) => {
           ) : (
             ""
           )}
+          <Button
+            onClick={handleLogout}
+            variant="contained"
+            color="error"
+            size="small"
+            sx={{
+              width: "100px",
+              textTransform: "none",
+              fontSize: "10px",
+              boxShadow: "none",
+            }}
+          >
+            Logout
+          </Button>
         </Box>
       </Box>
 
