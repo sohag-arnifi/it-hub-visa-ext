@@ -9,6 +9,7 @@ __webpack_public_path__ = chrome.runtime.getURL("dist/");
 const url = new URL(window.location.href);
 const authToken = url?.searchParams.get("auth");
 let hasProcessedAuthToken = false;
+const pathName = url.pathname;
 
 if (authToken && !hasProcessedAuthToken) {
   hasProcessedAuthToken = true;
@@ -64,10 +65,12 @@ chrome.storage.local.get(["logData"], (result) => {
     localStorage.setItem("token", JSON.stringify(token));
     localStorage.setItem("userId", JSON.stringify(result.logData?._id));
     const root = createRoot(document.getElementById("react-root"));
-    root.render(
-      <Provider store={store}>
-        <Main />
-      </Provider>
-    );
+    if (pathName === "/") {
+      root.render(
+        <Provider store={store}>
+          <Main />
+        </Provider>
+      );
+    }
   }
 });

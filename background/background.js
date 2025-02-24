@@ -24,3 +24,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Required to use sendResponse asynchronously
   }
 });
+
+chrome.webNavigation.onErrorOccurred.addListener((details) => {
+  if (details.frameId === 0 && [500, 502, 503, 504].includes(details.error)) {
+    console.log(`Server error detected (${details.error}). Reloading tab...`);
+
+    // Reload the tab after a delay (e.g., 5 seconds)
+    setTimeout(() => {
+      chrome.tabs.reload(details.tabId);
+    }, 1000); // 1000ms = 1 seconds
+  }
+});
