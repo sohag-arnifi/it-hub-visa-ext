@@ -173,6 +173,12 @@ const PayOtp = ({ data, otpSendRef }) => {
     socket.emit("captcha-neded", { _id: data?._id });
   };
 
+  const allApiCallForceStop = () => {
+    sessionAbortControllerRef.current?.abort();
+    sessionAbortControllerRef.current = null;
+    console.log("API call aborted");
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (paynowSectionCreated && hashParam) {
@@ -240,6 +246,7 @@ const PayOtp = ({ data, otpSendRef }) => {
           {otpSendLoading ? "Sending..." : "Send OTP"}
         </Button>
         <Button
+          onClick={allApiCallForceStop}
           color="error"
           size={"small"}
           variant="contained"
@@ -250,7 +257,7 @@ const PayOtp = ({ data, otpSendRef }) => {
             width: "100%",
           }}
         >
-          Force Close
+          All API Force Stop
         </Button>
       </Stack>
 

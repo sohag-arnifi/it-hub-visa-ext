@@ -211,20 +211,37 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
           ) : (
             ""
           )}
-          <Button
-            onClick={handleLogout}
-            variant="contained"
-            color="error"
-            size="small"
-            sx={{
-              width: "100px",
-              textTransform: "none",
-              fontSize: "10px",
-              boxShadow: "none",
-            }}
-          >
-            Logout
-          </Button>
+          <Stack direction={"column"} spacing={1}>
+            <Button
+              onClick={handleCreateNewSession}
+              disabled={sessionLoading}
+              variant="contained"
+              color="success"
+              size="small"
+              sx={{
+                width: "100px",
+                textTransform: "none",
+                fontSize: "10px",
+                boxShadow: "none",
+              }}
+            >
+              {sessionLoading ? "Creating..." : "Create Session"}
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="contained"
+              color="error"
+              size="small"
+              sx={{
+                width: "100px",
+                textTransform: "none",
+                fontSize: "10px",
+                boxShadow: "none",
+              }}
+            >
+              Logout
+            </Button>
+          </Stack>
         </Box>
       </Box>
 
@@ -249,7 +266,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
 
       <Box>
         <Stack sx={{ marginTop: "5px" }} direction={"row"} spacing={1}>
-          <Button
+          {/* <Button
             onClick={handleCreateNewSession}
             disabled={sessionLoading}
             variant="contained"
@@ -263,7 +280,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
             }}
           >
             {sessionLoading ? "Creating..." : "Create New Session"}
-          </Button>
+          </Button> */}
 
           <Button
             onClick={handleApplicationInfoSubmit}
@@ -278,9 +295,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
               width: "100%",
             }}
           >
-            {applicationInfoLoading
-              ? "Submitting..."
-              : "Application Info Submit"}
+            {applicationInfoLoading ? "Submitting..." : "Application Submit"}
           </Button>
 
           <Button
@@ -309,9 +324,10 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
               fontSize: "12px",
               boxShadow: "none",
               width: "100%",
+              paddingY: "1rem",
             }}
           >
-            {overviewInfoLoading ? "Submitting..." : "Overview Info Submit"}
+            {overviewInfoLoading ? "Submitting..." : "Overview Submit"}
           </Button>
         </Stack>
       </Box>

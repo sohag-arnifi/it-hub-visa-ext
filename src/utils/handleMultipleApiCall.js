@@ -167,15 +167,16 @@ const handleMultipleApiCall = async (
               response?.htmlContent?.message?.error ?? "Fail to send OTP!",
             type: "error",
           });
-          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          // await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          // if (
+          //   response?.htmlContent?.message?.error ===
+          //   "Booking session not found or invalid"
+          // ) {
+          //   break;
+          // }
+          // continue;
 
-          if (
-            response?.htmlContent?.message?.error ===
-            "Booking session not found or invalid"
-          ) {
-            break;
-          }
-          continue;
+          break;
         }
       } else if (action === "pay-otp-verify") {
         if (response?.htmlContent?.success) {
@@ -223,7 +224,19 @@ const handleMultipleApiCall = async (
       break;
     } catch (error) {
       console.log(error);
-      break;
+
+      if (
+        action === "create-session" ||
+        action === "application-info-submit" ||
+        action === "personal-info-submit" ||
+        action === "overview-info-submit" ||
+        action === "mobile-verify" ||
+        action === "auth-verify" ||
+        action === "otp-verify"
+      ) {
+        break;
+      }
+
       if (error?.status === "FETCH_ERROR") {
         break;
       }
