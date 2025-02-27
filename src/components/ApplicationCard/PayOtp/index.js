@@ -56,6 +56,9 @@ const PayOtp = ({ data, otpSendRef }) => {
     type: "",
   });
 
+  const [timeSlot, setTimeSlot] = useState({});
+  const [specificDate, setSpecificDate] = useState("");
+
   const [hashParam, setHashParam] = React.useState("");
   const [paynowSectionCreated, setPayNowSectionCreated] = useState(false);
 
@@ -75,8 +78,13 @@ const PayOtp = ({ data, otpSendRef }) => {
       );
       if (result) {
         setResent(resent + 1);
+        if (envConfig.isTesting) {
+          socket.emit("otp-send", {
+            phone: data?.phone,
+            isTesting: envConfig.isTesting,
+          });
+        }
       }
-      console.log("result", result);
     } catch (error) {
       console.log(error);
     }
@@ -95,16 +103,29 @@ const PayOtp = ({ data, otpSendRef }) => {
         controller.signal,
         "pay-otp-verify"
       );
+
+      if (result?.success) {
+        const date = result?.data?.slot_dates[0];
+
+        if (date) {
+          setSpecificDate(date);
+        } else {
+          setSpecificDate(data?.slot_dates[0]);
+        }
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleGetSlotTime = async () => {
-    const payload = getTimeSlotPayload(data);
+    const payload = getTimeSlotPayload(
+      specificDate ? specificDate : data?.slot_dates[0]
+    );
+    console.log(payload);
+    console.log("data?.slot_dates[0]", data?.slot_dates[0]);
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
-
     try {
       const result = await handleMultipleApiCall(
         payTimeSlot,
@@ -114,7 +135,16 @@ const PayOtp = ({ data, otpSendRef }) => {
         "get-slot-time"
       );
 
-      if (result) {
+      if (result?.success) {
+        const timeData = result?.data?.slot_times?.length
+          ? result?.data?.slot_times[0]
+          : {};
+
+        if (timeData?.hour) {
+          setTimeSlot(timeData);
+        } else {
+          setTimeSlot({});
+        }
         setPayNowSectionCreated(true);
       }
     } catch (error) {
@@ -129,7 +159,12 @@ const PayOtp = ({ data, otpSendRef }) => {
     try {
       const result = await handleMultipleApiCall(
         payNow,
-        { ...payload, hash_param: hashParam },
+        {
+          ...payload,
+          hash_param: hashParam,
+          appointment_date: specificDate ? specificDate : data?.slot_dates[0],
+          appointment_time: timeSlot?.hour ? timeSlot?.hour : 10,
+        },
         setResMessage,
         controller.signal,
         "pay-now"
@@ -208,7 +243,7 @@ const PayOtp = ({ data, otpSendRef }) => {
         setOtp(otp); // Set the OTP state
         setTimeout(async () => {
           payOtpVerifyButtonRef.current.click();
-        }, 2000);
+        }, 1500);
       }
     };
 
@@ -219,6 +254,15 @@ const PayOtp = ({ data, otpSendRef }) => {
       socket.off("pay-send-otp", handlePayOtpVefiry);
     };
   }, [data?.phone]);
+
+  useEffect(() => {
+    if (specificDate && !timeSlot?.hour && !paynowSectionCreated) {
+      handleCaptchaSolved();
+      setTimeout(() => {
+        handleGetSlotTime();
+      }, 500);
+    }
+  }, [specificDate]);
 
   return (
     <Box
@@ -317,7 +361,7 @@ const PayOtp = ({ data, otpSendRef }) => {
       <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
         <Button
           onClick={handleGetSlotTime}
-          disabled={timeSlotLoading}
+          disabled={timeSlotLoading || !specificDate}
           color="error"
           size={"small"}
           variant="contained"
@@ -328,11 +372,15 @@ const PayOtp = ({ data, otpSendRef }) => {
             width: "50%",
           }}
         >
-          {timeSlotLoading ? "Getting..." : "Get Slot Time"}
+          {timeSlotLoading
+            ? "Getting..."
+            : `Get Slot Time ${
+                timeSlot?.availableSlot ? `(${timeSlot?.availableSlot})` : ""
+              }`}
         </Button>
         <Button
           onClick={handleBookSlot}
-          disabled={payNowLoading || (!hashParam && !paynowSectionCreated)}
+          disabled={payNowLoading || !hashParam || !paynowSectionCreated}
           color="error"
           size={"small"}
           variant="contained"

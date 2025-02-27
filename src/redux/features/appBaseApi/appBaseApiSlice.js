@@ -1,9 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import envConfig from "../../../configs/envConfig";
-// import { fetchBaseQuery } from "../../../axios/fetchBaseQuery";
+import envConfig, { url } from "../../../configs/envConfig";
 
-const isTest =
-  envConfig.appBaseUrl !== "https://payment.ivacbd.com" ? true : false;
+const isTest = url === "https://payment.ivacbd.com" ? false : true;
 const headers = new Headers();
 if (envConfig.appBaseUrl === "https://payment.ivacbd.com") {
   headers.set("x-requested-with", "XMLHttpRequest");
@@ -110,9 +108,9 @@ export const appBaseApiSlice = createApi({
         url: `/pay-otp-sent`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: payload,
-        // data: new URLSearchParams(payload),
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -121,9 +119,9 @@ export const appBaseApiSlice = createApi({
         url: `/pay-otp-verify`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        // data: new URLSearchParams(payload),
-        data: payload,
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -132,9 +130,9 @@ export const appBaseApiSlice = createApi({
         url: `/pay-slot-time`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        // data: new URLSearchParams(payload),
-        data: payload,
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -143,9 +141,9 @@ export const appBaseApiSlice = createApi({
         url: `/paynow`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        // data: new URLSearchParams(payload),
-        data: payload,
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
   }),

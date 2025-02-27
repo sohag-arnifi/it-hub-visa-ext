@@ -1,4 +1,4 @@
-const url = window.location.origin;
+export const url = window.location.origin;
 const appBaseUrl = url === "https://payment.ivacbd.com" ? url : url + "/api/v1";
 // const appBaseUrl = "https://payment.ivacbd.com";
 // const backendBaseUrl = "http://localhost:5000";
@@ -16,7 +16,7 @@ const backendBaseUrl =
 // const backendBaseUrl = "http://localhost:5000";
 // url === "http://localhost:5000" ? url : "https://it-hub.mdripon.xyz";
 
-const isTesting = appBaseUrl !== "https://payment.ivacbd.com" ? false : true;
+const isTesting = url === "https://payment.ivacbd.com" ? false : true;
 
 const backendProdApi = "https://it-hub-date-service.vercel.app/api";
 const devBaseUrl = "http://localhost:5000/api";

@@ -21,12 +21,6 @@ const Main = () => {
   const params = new URLSearchParams(url.search);
   const applicationId = params.get("applicationId");
 
-  const handleLogout = () => {
-    chrome.storage.local.clear(() => {
-      window.location.reload();
-    });
-  };
-
   useEffect(() => {
     if (data?.data?._id) {
       socket.emit("user-online", data?.data?._id);

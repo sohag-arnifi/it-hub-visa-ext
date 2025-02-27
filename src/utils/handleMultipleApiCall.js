@@ -96,7 +96,7 @@ const handleMultipleApiCall = async (
           return true;
         }
       } else if (action === "pay-otp-send") {
-        if (response?.htmlContent?.success) {
+        if (response?.success) {
           setMessage({
             message: "OTP sent successfully!",
             type: "success",
@@ -104,52 +104,48 @@ const handleMultipleApiCall = async (
           return true;
         } else {
           setMessage({
-            message:
-              response?.htmlContent?.message?.error ?? "Fail to send OTP!",
+            message: response?.message?.error ?? "Fail to send OTP!",
             type: "error",
           });
-
-          break;
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          continue;
         }
       } else if (action === "pay-otp-verify") {
-        if (response?.htmlContent?.success) {
+        if (response?.success) {
           setMessage({
             message: "OTP verified successfully!",
             type: "success",
           });
-          return response?.htmlContent;
+          return response;
         } else {
           setMessage({
-            message:
-              response?.htmlContent?.message?.error ?? "Fail to verify OTP!",
+            message: response?.message?.error ?? "Fail to verify OTP!",
             type: "error",
           });
         }
       } else if (action === "get-slot-time") {
-        if (response?.htmlContent?.success) {
+        if (response?.success) {
           setMessage({
             message: "Slot time fetched successfully!",
             type: "success",
           });
-          return response?.htmlContent;
+          return response;
         } else {
           setMessage({
-            message:
-              response?.htmlContent?.message?.error ?? "Fail to get slot time!",
+            message: response?.message?.error ?? "Fail to get slot time!",
             type: "error",
           });
         }
       } else if (action === "pay-now") {
-        if (response?.htmlContent?.success) {
+        if (response?.success) {
           setMessage({
             message: "Slot booking initiated",
             type: "success",
           });
-          return response?.htmlContent;
+          return response;
         } else {
           setMessage({
-            message:
-              response?.htmlContent?.message?.error ?? "Fail to book slot!",
+            message: response?.message?.error ?? "Fail to book slot!",
             type: "error",
           });
         }

@@ -249,10 +249,10 @@ export const getPayOtpVerifyPayload = (otp) => {
   };
 };
 
-export const getTimeSlotPayload = (item) => {
+export const getTimeSlotPayload = (date) => {
   return {
     _token: getCSRFToken(),
-    appointment_date: item?.slot_dates[0],
+    appointment_date: date,
   };
 };
 
