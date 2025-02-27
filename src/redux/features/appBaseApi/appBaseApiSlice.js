@@ -1,8 +1,9 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { axiosBaseQuery } from "../../../axios/axiosBaseQuery";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import envConfig from "../../../configs/envConfig";
+// import { fetchBaseQuery } from "../../../axios/fetchBaseQuery";
 
-// let headers = {};
+const isTest =
+  envConfig.appBaseUrl !== "https://payment.ivacbd.com" ? true : false;
 const headers = new Headers();
 if (envConfig.appBaseUrl === "https://payment.ivacbd.com") {
   headers.set("x-requested-with", "XMLHttpRequest");
@@ -11,60 +12,28 @@ if (envConfig.appBaseUrl === "https://payment.ivacbd.com") {
     "Content-Type",
     "application/x-www-form-urlencoded;charset=UTF-8;"
   );
-  // headers.set("Origin", "https://payment.ivacbd.com");
-  // headers.set("Referer", "https://payment.ivacbd.com/");
-  // headers = {
-  //   "x-requested-with": "XMLHttpRequest",
-  //   Accept: "application/x-www-form-urlencoded;charset=UTF-8;",
-  //   "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;",
-  // };
 } else {
   headers.set("x-requested-with", "XMLHttpRequest");
   headers.set("content-type", "application/json");
-  // headers = {
-  //   "x-requested-with": "XMLHttpRequest",
-  //   "content-type": "application/json",
-  // };
 }
 
 export const appBaseApiSlice = createApi({
   reducerPath: "appApi",
-  baseQuery: axiosBaseQuery({
+  // baseQuery: fetchBaseQuery({
+  //   baseUrl: envConfig.appBaseUrl, // Pass the base URL here
+  // }),
+  baseQuery: fetchBaseQuery({
     baseUrl: envConfig.appBaseUrl,
     withCredentials: true,
+    credentials: "include",
+    // redirect: "manual",
   }),
+  // baseQuery: fetchBaseQuery({
+  //   baseUrl: envConfig.appBaseUrl,
+  //   credentials: "include",
+  // }),
   tagTypes: ["applications"],
   endpoints: (builder) => ({
-    manageQueue: builder.mutation({
-      query: ({ payload, signal }) => ({
-        url: `/queue-manage`,
-        method: "POST",
-        headers,
-        signal,
-        data: payload,
-      }),
-    }),
-
-    generateSlotTime: builder.mutation({
-      query: ({ payload, signal }) => ({
-        url: `/get_payment_options_v2`,
-        method: "POST",
-        headers,
-        signal,
-        data: payload,
-      }),
-    }),
-
-    payInvoice: builder.mutation({
-      query: ({ payload, signal }) => ({
-        url: `/slot_pay_now`,
-        method: "POST",
-        headers,
-        signal,
-        data: payload,
-      }),
-    }),
-
     mobileVerify: builder.mutation({
       query: ({ payload, signal }) => ({
         url: `/mobile-verify`,
@@ -108,8 +77,9 @@ export const appBaseApiSlice = createApi({
         url: `/application-info-submit`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: new URLSearchParams(payload),
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -118,8 +88,9 @@ export const appBaseApiSlice = createApi({
         url: `/personal-info-submit`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: new URLSearchParams(payload),
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -128,9 +99,9 @@ export const appBaseApiSlice = createApi({
         url: `/overview-submit`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: payload,
-        // data: new URLSearchParams(payload),
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -181,9 +152,6 @@ export const appBaseApiSlice = createApi({
 });
 
 export const {
-  useManageQueueMutation,
-  useGenerateSlotTimeMutation,
-  usePayInvoiceMutation,
   useMobileVerifyMutation,
   useAuthVerifyMutation,
   useLoginOtpVerifyMutation,

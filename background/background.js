@@ -25,13 +25,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-chrome.webNavigation.onErrorOccurred.addListener((details) => {
-  if (details.frameId === 0 && [500, 502, 503, 504].includes(details.error)) {
-    console.log(`Server error detected (${details.error}). Reloading tab...`);
+chrome.webRequest.onHeadersReceived.addListener(
+  ({ statusCode = 0, url = "", responseHeaders = [], tabId }) => {
+    const redirectStatusCodes = [301, 302, 303, 307];
+    if (redirectStatusCodes.includes(statusCode)) {
+      const data = {
+        url,
+        statusCode,
+        redirectUrl: responseHeaders.find(({ name }) => name === "location")
+          ?.value,
+      };
 
-    // Reload the tab after a delay (e.g., 5 seconds)
-    setTimeout(() => {
-      chrome.tabs.reload(details.tabId);
-    }, 1000); // 1000ms = 1 seconds
-  }
-});
+      chrome.tabs.sendMessage(tabId, { type: "REDIRECT", data }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.warn(
+            "No listener in content script:",
+            chrome.runtime.lastError.message
+          );
+        }
+      });
+    }
+  },
+  { urls: ["<all_urls>"] },
+  ["responseHeaders"]
+);

@@ -2,8 +2,15 @@ const url = window.location.origin;
 const appBaseUrl = url === "https://payment.ivacbd.com" ? url : url + "/api/v1";
 // const appBaseUrl = "https://payment.ivacbd.com";
 // const backendBaseUrl = "http://localhost:5000";
+
+const dbblMobileBankingUrl = "http://127.0.0.1:5500";
+
 const backendBaseUrl =
-  url === "http://localhost:5000" ? url : "https://it-hub.mdripon.xyz";
+  url === "http://localhost:5000"
+    ? url
+    : url === dbblMobileBankingUrl
+    ? "http://localhost:5000"
+    : "https://it-hub.mdripon.xyz";
 
 // const appBaseUrl = "http://localhost:5000/api/v1";
 // const backendBaseUrl = "http://localhost:5000";

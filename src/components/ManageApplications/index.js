@@ -1,5 +1,5 @@
-import { Box, Button, Typography, Modal } from "@mui/material";
-import React, { useState } from "react";
+import { Box, Button, TextField, Typography, Modal } from "@mui/material";
+import React, { useState, useEffect } from "react";
 import FormModal from "./Modal";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
@@ -10,6 +10,7 @@ import {
   useUpdateApplicationMutation,
 } from "../../redux/features/application/applicationApi";
 import ApplicationsTable from "./ApplicationsTable";
+import axios from "axios";
 
 const validationSchema = Yup.object({
   center: Yup.string().required("Mission is required"),
@@ -59,8 +60,10 @@ const ManageApplications = () => {
   const { data, isLoading } = useGetAllApplicationsQuery();
 
   const totalApplications = data?.data?.length ?? 0;
-  const totalFiles =
-    data?.data?.reduce((acc, item) => acc + item?.info?.length, 0) ?? 0;
+  const completedApplications =
+    data?.data?.filter((item) => item?.status)?.length ?? 0;
+  const pendingApplications =
+    data?.data?.filter((item) => !item?.status)?.length ?? 0;
 
   const [createNewApplication, { isLoading: createLoading }] =
     useCreateNewApplicationMutation();
@@ -98,6 +101,44 @@ const ManageApplications = () => {
     setInitialValues(emptyInidialvalues);
   };
 
+  const handleClick = async () => {
+    try {
+      const res = await fetch(
+        "http://localhost:5000/api/v1/reports/redirect-test",
+        {
+          redirect: "manual",
+        }
+      );
+      console.log("res data", res);
+      // const res = await fetch(
+      //   "http://localhost:5000/api/v1/application-info-submit",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "x-requested-with": "XMLHttpRequest",
+      //       Accept: "application/x-www-form-urlencoded;charset=UTF-8;",
+      //       "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;",
+      //     },
+      //     redirect: "manual",
+      //     body: new URLSearchParams({}),
+      //   }
+      // );
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === "REDIRECT") {
+        window.dispatchEvent(
+          new CustomEvent("redirect", { detail: message.data })
+        );
+        console.log("Redirect Data Received:", message.data);
+      }
+    });
+  }, []);
+
   return (
     <Box>
       <Typography
@@ -108,15 +149,34 @@ const ManageApplications = () => {
       >
         Ongoing Applications
       </Typography>
+      <Button
+        onClick={handleClick}
+        size="small"
+        variant="contained"
+        sx={{
+          textTransform: "none",
+          boxShadow: "none",
+          paddingX: "20px",
+        }}
+      >
+        Check redirect
+      </Button>
 
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", gap: "10px" }}>
           <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
-            Total - {totalApplications}, Web Files - {totalFiles}
+            Total - {totalApplications}
+          </Typography>
+          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
+            Completed - {completedApplications}
+          </Typography>
+          <Typography sx={{ fontWeight: 700, fontSize: "14px" }}>
+            Pending - {pendingApplications}
           </Typography>
         </Box>
 
         <Box sx={{ display: "flex", gap: "10px" }}>
+          <TextField label="Search" about="Search" size="small" />
           <Button
             onClick={() => setOpenModal(true)}
             size="small"

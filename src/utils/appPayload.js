@@ -213,14 +213,12 @@ export const getPersonalInfoSubmitPayload = (item) => {
   if (item?.info?.length) {
     item?.info?.forEach((member, index) => {
       if (index > 0) {
-        console.log(member);
         formattedData[`family[${index}][name]`] = member.name;
         formattedData[`family[${index}][webfile_no]`] = member.web_id;
         formattedData[`family[${index}][again_webfile_no]`] = member.web_id;
       }
     });
   }
-  console.log(formattedData);
 
   return {
     _token: getCSRFToken(),

@@ -2,6 +2,10 @@ const url = new URL(window.location.href);
 const params = new URLSearchParams(url.search);
 const applicationId = params.get("applicationId");
 
+// const dbblMobileBankingUrl = "http://127.0.0.1:5500";
+// const ACCOUNT_NUMBER = "017605675557";
+// const ACCOUNT_PIN = "123456";
+
 if (applicationId) {
   localStorage.setItem(
     "userImg",
@@ -40,7 +44,7 @@ socketScript.onload = async () => {
   const socket = io(baseUrl, {
     transports: ["websocket"],
   });
-
+  window.socket = socket;
   socket.on("connect", () => {
     console.log("Connected to server: Inject js");
   });
@@ -88,9 +92,16 @@ socketScript.onload = async () => {
     submitBtn.classList.remove("enabled");
     closeBtn.click();
   });
+
+  // let isOtpSend = false;
+  // if (url?.origin === dbblMobileBankingUrl) {
+  //   if (!isOtpSend) {
+  //     dbblMobileBankingAutoPayment();
+  //     isOtpSend = true; // Set the flag to true after sending OTP
+  //   }
+  // }
 };
 document.head.appendChild(socketScript);
-
 function onRecaptchaLoad() {
   console.log("reCAPTCHA script loaded");
   // Render the captcha and store the widget ID
@@ -243,3 +254,32 @@ injectedContainer.innerHTML = `
 `;
 
 document.body.appendChild(injectedContainer);
+
+// const dbblMobileBankingAutoPayment = () => {
+//   const accContainer = document.getElementById("cardnr");
+//   const pinContainer = document.getElementById("cvc2");
+
+//   if (accContainer) accContainer.value = ACCOUNT_NUMBER;
+//   if (pinContainer) pinContainer.value = ACCOUNT_PIN;
+
+//   if (accContainer?.value?.length === 12 && pinContainer?.value?.length === 6) {
+//     const submitBtn = document.getElementById("pay");
+//     setTimeout(() => {
+//       submitBtn.click();
+//       console.log("OTP sent");
+//     }, 1500);
+//   }
+// };
+
+// const dbblMobileBankingAutoPaymentOTP = () => {
+//   const otp = "123456";
+//   const otpContainer = document.getElementById("otp");
+//   if (otpContainer) otpContainer.value = otp;
+//   if (otpContainer?.value?.length === 6) {
+//     const submitBtn = document.getElementById("submitBtn");
+//     setTimeout(() => {
+//       submitBtn.click();
+//       console.log("OTP sent");
+//     }, 1500);
+//   }
+// };

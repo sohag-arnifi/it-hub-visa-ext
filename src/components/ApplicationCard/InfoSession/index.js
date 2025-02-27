@@ -54,7 +54,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
     }
   };
 
-  const handleApplicationInfoSubmit = async () => {
+  const handleApplicationInfoSubmit = async (retryCount = 1) => {
     const payload = getApplicationInfoSubmitPayload(data);
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
@@ -67,10 +67,58 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         "application-info-submit"
       );
 
-      // if (result) {
-      //   await new Promise((resolve) => setTimeout(resolve, 500));
-      //   await handlePersonalInfoSubmit();
-      // }
+      console.log(result);
+
+      if (result?.isRedirect) {
+        const redirectPath = result?.redirectPath;
+        if (redirectPath === "/personal-info") {
+          setResMessage({
+            message: "Application submitted successfully!",
+            type: "success",
+          });
+          setTimeout(async () => {
+            await handlePersonalInfoSubmit();
+          }, 500);
+        } else if (redirectPath === "/") {
+          setResMessage({
+            message: "Something went wrong in Application submit!",
+            type: "error",
+          });
+          setTimeout(async () => {
+            await handleApplicationInfoSubmit();
+          }, 500);
+        }
+      } else {
+        const statusCode = result?.statusCode;
+        if (statusCode === 419) {
+          // recall 3 times and then logout
+          if (retryCount < 3) {
+            setTimeout(() => {
+              handleApplicationInfoSubmit(retryCount + 1);
+            }, 500);
+          } else {
+            // Maximum retries reached, trigger logout
+            setResMessage({
+              message: "Maximum retries reached. Logging out...",
+              type: "error",
+            });
+            // Call the logout function here (assuming there's a logout function)
+            // await handleLogout();
+          }
+
+          // if (retryCount < 3) {
+          //   setTimeout(async () => {
+          //     await handleApplicationInfoSubmit(retryCount + 1);
+          //   }, 500);
+          // } else {
+          //   // Maximum retries reached, trigger logout
+          //   setResMessage({
+          //     message: "Maximum retries reached. Logging out...",
+          //     type: "error",
+          //   });
+          // }
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -79,6 +127,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
     const payload = getPersonalInfoSubmitPayload(data);
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
+
     try {
       const result = await handleMultipleApiCall(
         personalInfoSubmit,
@@ -88,10 +137,28 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         "personal-info-submit"
       );
 
-      // if (result) {
-      //   await new Promise((resolve) => setTimeout(resolve, 500));
-      //   await handleOverviewInfoSubmit();
-      // }
+      if (result?.isRedirect) {
+        const redirectPath = result?.redirectPath;
+
+        if (redirectPath === "/overview") {
+          setResMessage({
+            message: "Personal Info submitted successfully!",
+            type: "success",
+          });
+
+          setTimeout(async () => {
+            await handleOverviewInfoSubmit();
+          }, 500);
+        } else if (redirectPath === "/") {
+          setResMessage({
+            message: "Something went wrong in Personal info submit!",
+            type: "error",
+          });
+          setTimeout(async () => {
+            await handleApplicationInfoSubmit();
+          }, 500);
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -110,10 +177,28 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         "overview-info-submit"
       );
 
-      console.log(result);
-      // if (result) {
-      //   otpSendRef.current.click();
-      // }
+      if (result?.isRedirect) {
+        const redirectPath = result?.redirectPath;
+
+        if (redirectPath === "/payment") {
+          setResMessage({
+            message: "Overview Info submitted successfully!",
+            type: "success",
+          });
+
+          setTimeout(async () => {
+            otpSendRef.current.click();
+          }, 500);
+        } else if (redirectPath === "/") {
+          setResMessage({
+            message: "Something went wrong in Overview submit!",
+            type: "error",
+          });
+          setTimeout(async () => {
+            await handleApplicationInfoSubmit();
+          }, 500);
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -132,6 +217,14 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
       localStorage.removeItem("userImg");
     } catch (error) {
       console.error("Error during logout:", error);
+    }
+  };
+
+  const abortHandlar = () => {
+    if (sessionAbortControllerRef.current) {
+      sessionAbortControllerRef.current.abort();
+      sessionAbortControllerRef.current = null;
+      console.log("API call aborted");
     }
   };
 
@@ -266,24 +359,8 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
 
       <Box>
         <Stack sx={{ marginTop: "5px" }} direction={"row"} spacing={1}>
-          {/* <Button
-            onClick={handleCreateNewSession}
-            disabled={sessionLoading}
-            variant="contained"
-            color="success"
-            size="small"
-            sx={{
-              textTransform: "none",
-              fontSize: "12px",
-              boxShadow: "none",
-              width: "100%",
-            }}
-          >
-            {sessionLoading ? "Creating..." : "Create New Session"}
-          </Button> */}
-
           <Button
-            onClick={handleApplicationInfoSubmit}
+            onClick={() => handleApplicationInfoSubmit()}
             disabled={applicationInfoLoading}
             variant="contained"
             color="success"
@@ -330,6 +407,23 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
             {overviewInfoLoading ? "Submitting..." : "Overview Submit"}
           </Button>
         </Stack>
+
+        <Box sx={{ paddingY: "10px" }}>
+          <Button
+            onClick={abortHandlar}
+            variant="contained"
+            color="error"
+            size="small"
+            sx={{
+              textTransform: "none",
+              fontSize: "12px",
+              boxShadow: "none",
+              width: "100%",
+            }}
+          >
+            Abort
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

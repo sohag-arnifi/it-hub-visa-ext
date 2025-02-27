@@ -23,7 +23,6 @@ const Header = ({
   const anchorRef = useRef(null);
 
   const isDuePending = user?.companyId?.currentBalance <= 0;
-  console.log("isDuePending", isDuePending);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "It-hub | Extension",
-  "version": "2.0",
+  "version": "2.0.5",
   "description": "One e-Token for all your visas",
   "background": {
     "service_worker": "dist/background.bundle.js"

@@ -3,20 +3,12 @@ import {
   getLoginOtpErrorMessage,
   setCSRFToken,
 } from "./generateMessage";
+import generateRedirectResponse from "./getRedirectResponse";
 
 const rootUrl = "https://payment.ivacbd.com/";
 const regUrl = "https://payment.ivacbd.com/registration";
 const authUrl = "https://payment.ivacbd.com/login-auth";
 const otpUrl = "https://payment.ivacbd.com/login-otp";
-const personalInfoUrl = "https://payment.ivacbd.com/personal-info";
-const overviewInfoUrl = "https://payment.ivacbd.com/overview";
-const paymentInfoUrl = "https://payment.ivacbd.com/payment";
-
-const modifyUrl = (resUrl) => {
-  const url = new URL(resUrl);
-  const pathName = url.pathname;
-  return `${"https://payment.ivacbd.com"}${pathName}`;
-};
 
 const handleMultipleApiCall = async (
   apiFn,
@@ -32,11 +24,8 @@ const handleMultipleApiCall = async (
   while (attempt < maxAttempts) {
     try {
       const response = await apiFn({ payload, signal: abortSignal }).unwrap();
-
-      const redirectUrl = response?.redirectUrl;
-      console.log(response);
-
-      console.log(modifyUrl(redirectUrl));
+      console.log("response", response);
+      const redirectUrl = "/";
 
       if (action === "mobile-verify") {
         if (redirectUrl === regUrl) {
@@ -106,54 +95,6 @@ const handleMultipleApiCall = async (
           });
           return true;
         }
-      } else if (action === "application-info-submit") {
-        if (redirectUrl === personalInfoUrl) {
-          const token = setCSRFToken(response?.htmlContent);
-          setMessage({
-            message: "Application submitted successfully!",
-            type: "success",
-          });
-          return true;
-        } else {
-          setMessage({
-            message: "Something went wrong! Application Info",
-            type: "error",
-          });
-          // continue;
-          break;
-        }
-      } else if (action === "personal-info-submit") {
-        if (redirectUrl === overviewInfoUrl) {
-          const token = setCSRFToken(response?.htmlContent);
-          setMessage({
-            message: "Personal Info submitted successfully!",
-            type: "success",
-          });
-          return true;
-        } else {
-          setMessage({
-            message: "Something went wrong! Personal Info",
-            type: "error",
-          });
-          // continue;
-          break;
-        }
-      } else if (action === "overview-info-submit") {
-        if (redirectUrl === paymentInfoUrl) {
-          const token = setCSRFToken(response?.htmlContent);
-          setMessage({
-            message: "Overview Info submitted successfully!",
-            type: "success",
-          });
-          return true;
-        } else {
-          setMessage({
-            message: "Something went wrong! Overview Info",
-            type: "error",
-          });
-          // continue;
-          break;
-        }
       } else if (action === "pay-otp-send") {
         if (response?.htmlContent?.success) {
           setMessage({
@@ -167,14 +108,6 @@ const handleMultipleApiCall = async (
               response?.htmlContent?.message?.error ?? "Fail to send OTP!",
             type: "error",
           });
-          // await new Promise((resolve) => setTimeout(resolve, retryDelay));
-          // if (
-          //   response?.htmlContent?.message?.error ===
-          //   "Booking session not found or invalid"
-          // ) {
-          //   break;
-          // }
-          // continue;
 
           break;
         }
@@ -198,7 +131,7 @@ const handleMultipleApiCall = async (
             message: "Slot time fetched successfully!",
             type: "success",
           });
-          return true;
+          return response?.htmlContent;
         } else {
           setMessage({
             message:
@@ -223,18 +156,24 @@ const handleMultipleApiCall = async (
       }
       break;
     } catch (error) {
-      console.log(error);
+      console.log("error", error);
 
-      if (
-        action === "create-session" ||
-        action === "application-info-submit" ||
-        action === "personal-info-submit" ||
-        action === "overview-info-submit" ||
-        action === "mobile-verify" ||
-        action === "auth-verify" ||
-        action === "otp-verify"
-      ) {
-        break;
+      if (error?.status === 0) {
+        const redirectResponse = await generateRedirectResponse();
+        return redirectResponse;
+      }
+
+      if (error?.status === 419) {
+        setMessage({
+          message: error?.data?.message ?? "Session Expired(419) - Trying...",
+          type: "error",
+        });
+
+        return {
+          isRedirect: false,
+          redirectPath: "/login",
+          statusCode: 419,
+        };
       }
 
       if (error?.status === "FETCH_ERROR") {
