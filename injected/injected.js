@@ -204,35 +204,26 @@ injectStyle.innerHTML = `
   justify-content: center; /* Fixed typo: "space-betwin" -> "space-between" */
   align-items: center;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: red;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin:10px 0px;
 }
 
-.message-container p {
-  margin: 0;
-  font-size: 14px;
-  color: #333;
-}
 
 .message-container button {
   background-color: transparent;
+  width: 100%;
+  height: 100%;
   border: none;
-  color: #555;
+  color: #FFF;
   font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 30px;
   transition: all 0.3s ease-in-out;
-}
-
-.message-container button:hover {
-  background-color: #f44336; /* Red hover effect */
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
-  transform: scale(1.1);
 }
 `;
 

@@ -262,8 +262,8 @@ export const getBookSlotPayload = (item) => {
     appointment_date: item?.slot_dates[0],
     appointment_time: 10,
     hash_param: "hash_param",
-    selected_payment: {
-      ...item?.selected_payment,
-    },
+    "selected_payment[name]": item?.selected_payment?.name,
+    "selected_payment[slug]": item?.selected_payment?.slug,
+    "selected_payment[link]": item?.selected_payment?.link,
   };
 };

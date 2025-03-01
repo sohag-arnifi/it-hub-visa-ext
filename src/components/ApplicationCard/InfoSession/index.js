@@ -430,7 +430,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
               width: "100%",
             }}
           >
-            Abort
+            Force Stop All Process
           </Button>
         </Box>
       </Box>

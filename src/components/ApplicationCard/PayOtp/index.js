@@ -125,8 +125,6 @@ const PayOtp = ({ data, otpSendRef }) => {
     const payload = getTimeSlotPayload(
       specificDate ? specificDate : data?.slot_dates[0]
     );
-    console.log(payload);
-    console.log("data?.slot_dates[0]", data?.slot_dates[0]);
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
     try {
@@ -159,6 +157,7 @@ const PayOtp = ({ data, otpSendRef }) => {
     const payload = getBookSlotPayload(data);
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
+
     try {
       const result = await handleMultipleApiCall(
         payNow,
@@ -304,7 +303,7 @@ const PayOtp = ({ data, otpSendRef }) => {
             width: "100%",
           }}
         >
-          All API Force Stop
+          Force Stop All Process
         </Button>
       </Stack>
 
@@ -364,7 +363,7 @@ const PayOtp = ({ data, otpSendRef }) => {
       <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
         <Button
           onClick={handleGetSlotTime}
-          disabled={timeSlotLoading || !specificDate}
+          // disabled={timeSlotLoading || !specificDate}
           color="error"
           size={"small"}
           variant="contained"
@@ -383,7 +382,7 @@ const PayOtp = ({ data, otpSendRef }) => {
         </Button>
         <Button
           onClick={handleBookSlot}
-          disabled={payNowLoading || !hashParam || !paynowSectionCreated}
+          // disabled={payNowLoading || !hashParam || !paynowSectionCreated}
           color="error"
           size={"small"}
           variant="contained"

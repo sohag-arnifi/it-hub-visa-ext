@@ -51,6 +51,9 @@ const emptyInidialvalues = {
   paymentMethod: "",
   paymentNumber: "",
   paymentAmount: 0,
+  autoPayment: false,
+  accountNumber: "",
+  pinNumber: "",
 };
 
 const ManageApplications = () => {
@@ -101,33 +104,6 @@ const ManageApplications = () => {
     setInitialValues(emptyInidialvalues);
   };
 
-  const handleClick = async () => {
-    try {
-      const res = await fetch(
-        "http://localhost:5000/api/v1/reports/redirect-test",
-        {
-          redirect: "manual",
-        }
-      );
-      console.log("res data", res);
-      // const res = await fetch(
-      //   "http://localhost:5000/api/v1/application-info-submit",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "x-requested-with": "XMLHttpRequest",
-      //       Accept: "application/x-www-form-urlencoded;charset=UTF-8;",
-      //       "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;",
-      //     },
-      //     redirect: "manual",
-      //     body: new URLSearchParams({}),
-      //   }
-      // );
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-
   useEffect(() => {
     chrome.runtime.onMessage.addListener((message) => {
       if (message.type === "REDIRECT") {
@@ -149,18 +125,6 @@ const ManageApplications = () => {
       >
         Ongoing Applications
       </Typography>
-      <Button
-        onClick={handleClick}
-        size="small"
-        variant="contained"
-        sx={{
-          textTransform: "none",
-          boxShadow: "none",
-          paddingX: "20px",
-        }}
-      >
-        Check redirect
-      </Button>
 
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", gap: "10px" }}>

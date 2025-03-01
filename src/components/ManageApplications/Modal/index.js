@@ -13,6 +13,7 @@ import SelectField from "./SelectField";
 import { centers, ivacs, paymentMethod, visaTypes } from "../../../constanse";
 import InputField from "./InputField";
 import { useAppSelector } from "../../../redux/store";
+import FormRadioField from "./RadioField";
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
@@ -167,8 +168,19 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
               </Grid>
             </Grid>
           ))}
+          <Box sx={{ paddingX: "16px", width: "100%" }}>
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: 600,
+                color: "red",
+              }}
+            >
+              Note: Please make sure 1st Application must be Account Holder.
+            </Typography>
+          </Box>
 
-          <Grid item xs={4}>
+          <Grid item xs={5}>
             <InputField name="visit_purpose" label="Visit Purpose" />
           </Grid>
 
@@ -183,9 +195,35 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
             />
           </Grid>
 
-          {/* <Grid item xs={4}>
-            <InputField name="paymentNumber" label="Phone Number" />
-          </Grid> */}
+          {values?.paymentMethod === "dbblmobilebanking" ? (
+            <>
+              <Grid item xs={12}>
+                <FormRadioField
+                  inline={true}
+                  name="autoPayment"
+                  label="Are you went to automated payment?"
+                  options={[
+                    { label: "Yes", value: true },
+                    { label: "No", value: false },
+                  ]}
+                />
+              </Grid>
+
+              {values?.autoPayment ? (
+                <>
+                  <Grid item xs={3}>
+                    <InputField
+                      name="accountNumber"
+                      label="Enter Account Number"
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <InputField name="pinNumber" label="Enter Pin" />
+                  </Grid>
+                </>
+              ) : null}
+            </>
+          ) : null}
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
