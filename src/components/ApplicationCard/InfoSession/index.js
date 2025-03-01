@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import {
   useApplicationInfoSubmitMutation,
   useCreateNewSessionMutation,
+  useLogOutMutation,
   useOverviewInfoSubmitMutation,
   usePersonalInfoSubmitMutation,
 } from "../../../redux/features/appBaseApi/appBaseApiSlice";
@@ -12,11 +13,13 @@ import {
   getOverviewInfoSubmitPayload,
   getPersonalInfoSubmitPayload,
 } from "../../../utils/appPayload";
-import { setCSRFToken } from "../../../utils/generateMessage";
+import { getLoginInfo, setCSRFToken } from "../../../utils/generateMessage";
 
 const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
   const [createNewSession, { isLoading: sessionLoading }] =
     useCreateNewSessionMutation();
+
+  const [logout, { isLoading: logoutLoading }] = useLogOutMutation();
 
   const [applicationInfoSubmit, { isLoading: applicationInfoLoading }] =
     useApplicationInfoSubmitMutation();
@@ -37,7 +40,6 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
   });
 
   const sessionAbortControllerRef = useRef(null);
-
   const handleCreateNewSession = async () => {
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
@@ -49,6 +51,12 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         controller.signal,
         "create-session"
       );
+      const info = getLoginInfo(result);
+      if (info?.userImg) {
+        setLoggedInUser(info?.userImg);
+      } else {
+        setLoggedInUser("");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -66,8 +74,6 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         controller.signal,
         "application-info-submit"
       );
-
-      console.log(result);
 
       if (result?.isRedirect) {
         const redirectPath = result?.redirectPath;
@@ -91,32 +97,16 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
       } else {
         const statusCode = result?.statusCode;
         if (statusCode === 419) {
-          // recall 3 times and then logout
           if (retryCount < 3) {
             setTimeout(() => {
               handleApplicationInfoSubmit(retryCount + 1);
             }, 500);
           } else {
-            // Maximum retries reached, trigger logout
             setResMessage({
               message: "Maximum retries reached. Logging out...",
               type: "error",
             });
-            // Call the logout function here (assuming there's a logout function)
-            // await handleLogout();
           }
-
-          // if (retryCount < 3) {
-          //   setTimeout(async () => {
-          //     await handleApplicationInfoSubmit(retryCount + 1);
-          //   }, 500);
-          // } else {
-          //   // Maximum retries reached, trigger logout
-          //   setResMessage({
-          //     message: "Maximum retries reached. Logging out...",
-          //     type: "error",
-          //   });
-          // }
         }
       }
     } catch (error) {
@@ -205,16 +195,34 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
   };
 
   const handleLogout = async () => {
+    const controller = new AbortController();
+    sessionAbortControllerRef.current = controller;
     try {
-      const response = await fetch("https://payment.ivacbd.com/logout");
+      const response = await handleMultipleApiCall(
+        logout,
+        {},
+        setResMessage,
+        controller.signal,
+        "logout"
+      );
 
-      if (!response.ok) {
-        throw new Error(`Logout failed with status: ${response.status}`);
+      if (response?.isRedirect) {
+        if (response?.redirectPath === "/") {
+          setResMessage({
+            message: "Logout successfully!",
+            type: "success",
+          });
+          await handleCreateNewSession();
+        }
       }
-      const htmlContent = await response.text();
-      setCSRFToken(htmlContent);
-      setLoggedInUser("");
-      localStorage.removeItem("userImg");
+
+      // if (!response.ok) {
+      //   throw new Error(`Logout failed with status: ${response.status}`);
+      // }
+      // const htmlContent = await response.text();
+      // setCSRFToken(htmlContent);
+      // setLoggedInUser("");
+      // localStorage.removeItem("userImg");
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -323,6 +331,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
             <Button
               onClick={handleLogout}
               variant="contained"
+              disabled={logoutLoading}
               color="error"
               size="small"
               sx={{
@@ -332,7 +341,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
                 boxShadow: "none",
               }}
             >
-              Logout
+              {logoutLoading ? "Logging out..." : "Logout"}
             </Button>
           </Stack>
         </Box>

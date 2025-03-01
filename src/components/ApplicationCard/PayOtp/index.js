@@ -76,6 +76,9 @@ const PayOtp = ({ data, otpSendRef }) => {
         controller.signal,
         "pay-otp-send"
       );
+
+      console.log(result);
+
       if (result) {
         setResent(resent + 1);
         if (envConfig.isTesting) {

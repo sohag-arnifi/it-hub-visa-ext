@@ -1,14 +1,5 @@
-import {
-  getLoginInfo,
-  getLoginOtpErrorMessage,
-  setCSRFToken,
-} from "./generateMessage";
+import { setCSRFToken } from "./generateMessage";
 import generateRedirectResponse from "./getRedirectResponse";
-
-const rootUrl = "https://payment.ivacbd.com/";
-const regUrl = "https://payment.ivacbd.com/registration";
-const authUrl = "https://payment.ivacbd.com/login-auth";
-const otpUrl = "https://payment.ivacbd.com/login-otp";
 
 const handleMultipleApiCall = async (
   apiFn,
@@ -24,77 +15,14 @@ const handleMultipleApiCall = async (
   while (attempt < maxAttempts) {
     try {
       const response = await apiFn({ payload, signal: abortSignal }).unwrap();
-      console.log("response", response);
-      const redirectUrl = "/";
 
-      if (action === "mobile-verify") {
-        if (redirectUrl === regUrl) {
-          setMessage({
-            message: "Account not found!",
-            type: "error",
-          });
-          return false;
-        } else if (redirectUrl === authUrl) {
-          setMessage({
-            message: "Mobile verified successfully!",
-            type: "success",
-          });
-          return true;
-        }
-      } else if (action === "auth-verify") {
-        if (redirectUrl === otpUrl) {
-          setMessage({
-            message: "OTP sent successfully!",
-            type: "success",
-          });
-          return true;
-        } else if (redirectUrl === authUrl) {
-          setMessage({
-            message: "Password did not match!",
-            type: "error",
-          });
-          return false;
-        } else {
-          setMessage({
-            message: "Authentication failed!",
-            type: "error",
-          });
-          return false;
-        }
-      } else if (action === "otp-verify") {
-        if (redirectUrl === otpUrl) {
-          const errorMessage = getLoginOtpErrorMessage(response?.htmlContent);
-          setMessage({
-            message: errorMessage,
-            type: "error",
-          });
-          return false;
-        } else {
-          const loginInfo = getLoginInfo(response?.htmlContent);
-          if (loginInfo?.userImg && loginInfo?.csrfToken) {
-            setMessage({
-              message: "Login successful!",
-              type: "success",
-            });
-
-            return loginInfo;
-          } else {
-            setMessage({
-              message: "Authentication failed!",
-              type: "error",
-            });
-            return false;
-          }
-        }
-      } else if (action === "create-session") {
-        if (redirectUrl === rootUrl) {
-          setCSRFToken(response?.htmlContent);
-          setMessage({
-            message: "Session created successfully!",
-            type: "success",
-          });
-          return true;
-        }
+      if (action === "create-session") {
+        setCSRFToken(response);
+        setMessage({
+          message: "Session created successfully!",
+          type: "success",
+        });
+        return response;
       } else if (action === "pay-otp-send") {
         if (response?.success) {
           setMessage({
@@ -103,12 +31,21 @@ const handleMultipleApiCall = async (
           });
           return true;
         } else {
-          setMessage({
-            message: response?.message?.error ?? "Fail to send OTP!",
-            type: "error",
-          });
-          await new Promise((resolve) => setTimeout(resolve, retryDelay));
-          continue;
+          const errMessage = response?.message?.error ?? "Fail to send OTP!";
+          if (errMessage === "Slot is not available") {
+            setMessage({
+              message: errMessage,
+              type: "error",
+            });
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            continue;
+          } else {
+            setMessage({
+              message: errMessage,
+              type: "error",
+            });
+            return response;
+          }
         }
       } else if (action === "pay-otp-verify") {
         if (response?.success) {

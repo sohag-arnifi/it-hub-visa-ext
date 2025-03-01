@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import {
   useAuthVerifyMutation,
+  useCreateNewSessionMutation,
   useLoginOtpVerifyMutation,
   useMobileVerifyMutation,
 } from "../../../redux/features/appBaseApi/appBaseApiSlice";
@@ -20,6 +21,7 @@ import {
 } from "../../../utils/appPayload";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
 import { socket } from "../../../Main";
+import { getLoginInfo } from "../../../utils/generateMessage";
 
 const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
   const [loginOtp, setLoginOtp] = useState("");
@@ -37,6 +39,9 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
   const [loginOtpVerify, { isLoading: loginOtpLoading }] =
     useLoginOtpVerifyMutation();
 
+  const [createNewSession, { isLoading: sessionLoading }] =
+    useCreateNewSessionMutation();
+
   const mobileVerifyAbortControllerRef = useRef(null);
   const otpVerifyBtnRef = useRef(null);
 
@@ -52,10 +57,26 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
       "mobile-verify"
     );
 
-    if (result) {
-      setTimeout(async () => {
-        await handlePasswordVerify();
-      }, 2000);
+    if (result?.isRedirect) {
+      if (result?.redirectPath === "/login-auth") {
+        setResMessage({
+          message: "Mobile number verified!",
+          type: "success",
+        });
+        setTimeout(async () => {
+          await handlePasswordVerify();
+        }, 100);
+      } else if (result?.redirectPath === "/registration") {
+        setResMessage({
+          message: "No Account Found!",
+          type: "error",
+        });
+      }
+    } else {
+      setResMessage({
+        message: "Something went wrong in Mobile number verification!",
+        type: "error",
+      });
     }
   };
 
@@ -70,6 +91,25 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
       controller.signal,
       "auth-verify"
     );
+
+    if (result?.isRedirect) {
+      if (result?.redirectPath === "/login-otp") {
+        setResMessage({
+          message: "OTP sent successfully!",
+          type: "success",
+        });
+      } else {
+        setResMessage({
+          message: "Password did not match!",
+          type: "error",
+        });
+      }
+    } else {
+      setResMessage({
+        message: "Password did not match!",
+        type: "error",
+      });
+    }
   };
 
   const otpSubmitHandlar = async (e) => {
@@ -85,10 +125,40 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
       "otp-verify"
     );
 
-    if (result?.userImg) {
-      setLoggedInUser(result?.userImg);
-      // setLoginTime(Date.now());
-      // startCountdown();
+    if (result?.isRedirect) {
+      if (result?.redirectPath === "/") {
+        setResMessage({
+          message: "Successfully Login!",
+          type: "success",
+        });
+        await handleCreateNewSession();
+      }
+    }
+  };
+
+  const handleCreateNewSession = async () => {
+    setResMessage({
+      message: "Login successfully! Session creating..",
+      type: "success",
+    });
+    const controller = new AbortController();
+    mobileVerifyAbortControllerRef.current = controller;
+    try {
+      const result = await handleMultipleApiCall(
+        createNewSession,
+        {},
+        setResMessage,
+        controller.signal,
+        "create-session"
+      );
+      const info = getLoginInfo(result);
+      if (info?.userImg) {
+        setLoggedInUser(info?.userImg);
+      } else {
+        setLoggedInUser("");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

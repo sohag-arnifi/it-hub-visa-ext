@@ -30,15 +30,16 @@ export const appBaseApiSlice = createApi({
   //   baseUrl: envConfig.appBaseUrl,
   //   credentials: "include",
   // }),
-  tagTypes: ["applications"],
+  tagTypes: ["sessions"],
   endpoints: (builder) => ({
     mobileVerify: builder.mutation({
       query: ({ payload, signal }) => ({
         url: `/mobile-verify`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: payload,
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
     authVerify: builder.mutation({
@@ -46,8 +47,9 @@ export const appBaseApiSlice = createApi({
         url: `/login-auth-submit`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: payload,
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
     }),
 
@@ -56,15 +58,42 @@ export const appBaseApiSlice = createApi({
         url: `/login-otp-submit`,
         method: "POST",
         headers,
+        redirect: "manual",
         signal,
-        data: payload,
+        body: !isTest ? new URLSearchParams(payload) : payload,
       }),
+      invalidatesTags: ["sessions"],
     }),
+
+    // createNewSession: builder.mutation({
+    //   query: ({ signal }) => ({
+    //     url: `/`,
+    //     method: "GET",
+    //     headers,
+    //     signal,
+    //   }),
+    //   providesTags: ["sessions"],
+    // }),
 
     createNewSession: builder.mutation({
       query: ({ signal }) => ({
         url: `/`,
         method: "GET",
+        headers,
+        signal,
+        responseHandler: (response) => response.text(),
+      }),
+      transformResponse: (response) => {
+        return response;
+      },
+      providesTags: ["sessions"],
+    }),
+
+    logOut: builder.mutation({
+      query: ({ signal }) => ({
+        url: `/logout`,
+        method: "GET",
+        redirect: "manual",
         headers,
         signal,
       }),
@@ -154,6 +183,7 @@ export const {
   useAuthVerifyMutation,
   useLoginOtpVerifyMutation,
   useCreateNewSessionMutation,
+  useLogOutMutation,
   useApplicationInfoSubmitMutation,
   usePersonalInfoSubmitMutation,
   useOverviewInfoSubmitMutation,

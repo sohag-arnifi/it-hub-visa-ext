@@ -8,6 +8,8 @@ export const setCSRFToken = (htmlString) => {
     url.searchParams.set("key", csrfToken);
     window.history.pushState({}, "", url);
   }
+
+  // getLoginInfo(htmlString);
   return csrfToken;
 };
 
