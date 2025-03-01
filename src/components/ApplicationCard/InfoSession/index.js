@@ -14,6 +14,7 @@ import {
   getPersonalInfoSubmitPayload,
 } from "../../../utils/appPayload";
 import { getLoginInfo, setCSRFToken } from "../../../utils/generateMessage";
+import AutoTimer from "./AutoTimer";
 
 const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
   const [createNewSession, { isLoading: sessionLoading }] =
@@ -39,6 +40,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
     }
   });
 
+  const applicationSubmitRef = useRef(null);
   const sessionAbortControllerRef = useRef(null);
   const handleCreateNewSession = async () => {
     const controller = new AbortController();
@@ -367,8 +369,13 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
       </Box>
 
       <Box>
+        <AutoTimer applicationSubmitRef={applicationSubmitRef} />
+      </Box>
+
+      <Box>
         <Stack sx={{ marginTop: "5px" }} direction={"row"} spacing={1}>
           <Button
+            ref={applicationSubmitRef}
             onClick={() => handleApplicationInfoSubmit()}
             disabled={applicationInfoLoading}
             variant="contained"
