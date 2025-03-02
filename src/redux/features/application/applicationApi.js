@@ -102,6 +102,7 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
       }),
       providesTags: ["applications"],
     }),
+
     deleteApplication: builder.mutation({
       query: (data) => ({
         url: `/applications/${data?._id}`,

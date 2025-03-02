@@ -44,7 +44,7 @@ const handleMultipleApiCall = async (
               message: errMessage,
               type: "error",
             });
-            return response;
+            return false;
           }
         }
       } else if (action === "pay-otp-verify") {
@@ -81,10 +81,20 @@ const handleMultipleApiCall = async (
           });
           return response;
         } else {
-          setMessage({
-            message: response?.message?.error ?? "Fail to book slot!",
-            type: "error",
-          });
+          if (response?.message === "Slot is not available.") {
+            setMessage({
+              message: response?.message,
+              type: "error",
+            });
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            continue;
+          } else {
+            setMessage({
+              message: response?.message?.error ?? "Fail to book slot!",
+              type: "error",
+            });
+            break;
+          }
         }
       }
       break;

@@ -36,7 +36,7 @@ if (applicationId) {
 const baseUrl =
   window.location.origin === "http://localhost:5000"
     ? "http://localhost:5000"
-    : "https://it-hub.mdripon.xyz";
+    : "https://api.it-hub.agency";
 
 const socketScript = document.createElement("script");
 socketScript.src = "https://cdn.socket.io/4.0.0/socket.io.min.js";

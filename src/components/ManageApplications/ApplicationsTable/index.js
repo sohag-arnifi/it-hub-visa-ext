@@ -27,6 +27,8 @@ import {
   CheckCircleOutlineRounded,
 } from "@mui/icons-material";
 import { useAppSelector } from "../../../redux/store";
+import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
+import envConfig from "../../../configs/envConfig";
 
 const StyledTypo = styled(Typography)(() => ({
   fontSize: 12,
@@ -60,6 +62,11 @@ const ApplicationsTable = ({
     id: "",
   });
 
+  const [isSmsLinkCopied, setIsSmsLinkCopied] = useState({
+    status: false,
+    id: "",
+  });
+
   const { companyId } = useAppSelector((state) => state?.auth?.user);
   const isDuePending = companyId?.currentBalance <= 0;
 
@@ -84,12 +91,12 @@ const ApplicationsTable = ({
     const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
 
     // Define the path to the extension (update this path as needed)
-    // const extensionPath = "C:\\ext\\it-hub";
-    const extensionPath = "D:\\It-Hub\\chorom-ext";
+    const extensionPath = "C:\\ext\\it-hub";
+    // const extensionPath = "D:\\It-Hub\\chorom-ext";
 
     // Define the CMD script
     const comment = `
-  @echo off
+  @echo off 
 
   REM Define the URL to open
   set "URL=${applicationOpenUrl}"
@@ -124,6 +131,23 @@ const ApplicationsTable = ({
       });
   };
 
+  const handleCopySMSLink = (data, index) => {
+    const baseUrl = envConfig?.backendBaseUrl;
+    const smsLink = `${baseUrl}/api/v1/messages/${data?.phone}?msg=`;
+
+    navigator.clipboard
+      .writeText(smsLink)
+      .then(() => {
+        setIsSmsLinkCopied({
+          status: true,
+          id: data?._id,
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to copy CMD script:", error);
+      });
+  };
+
   useEffect(() => {
     if (isCopyed?.id && isCopyed?.status) {
       setTimeout(() => {
@@ -134,6 +158,17 @@ const ApplicationsTable = ({
       }, 3000);
     }
   }, [isCopyed]);
+
+  useEffect(() => {
+    if (isSmsLinkCopied?.id && isSmsLinkCopied?.status) {
+      setTimeout(() => {
+        setIsSmsLinkCopied({
+          status: false,
+          id: "",
+        });
+      }, 3000);
+    }
+  }, [isSmsLinkCopied]);
 
   useEffect(() => {
     if (!auth) {
@@ -237,6 +272,7 @@ const ApplicationsTable = ({
                   ) : (
                     data?.map((row, i) => {
                       const isCMDCopyed = isCopyed?.id === row?._id;
+                      const isCopySMSLink = isSmsLinkCopied?.id === row?._id;
                       return (
                         <TableRow
                           key={i}
@@ -330,6 +366,7 @@ const ApplicationsTable = ({
                             ) : (
                               <Box
                                 sx={{
+                                  width: "200px",
                                   display: "flex",
                                   flexDirection: "column",
                                   gap: "5px",
@@ -373,33 +410,71 @@ const ApplicationsTable = ({
                                   </Button>
                                 </Stack>
 
-                                <Button
-                                  onClick={() => handleCopyCMD(row, i)}
-                                  startIcon={
-                                    isCMDCopyed ? (
-                                      <CheckCircleOutlineRounded />
-                                    ) : (
-                                      <InsertLinkRounded
-                                        sx={{ rotate: "-45deg" }}
-                                      />
-                                    )
-                                  }
-                                  size="small"
-                                  variant="contained"
-                                  sx={{
-                                    textTransform: "none",
-                                    width: "100%",
-                                    bgcolor: isCMDCopyed ? "#5CB338" : "#000",
-                                    fontWeight: isCMDCopyed ? 600 : 500,
-                                    color: "#FFF",
-                                    "&:hover": {
-                                      bgcolor: isCMDCopyed ? "#5CB338" : "#000",
-                                      color: "#FFF",
-                                    },
-                                  }}
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  sx={{ width: "100%" }}
                                 >
-                                  {isCMDCopyed ? "Copied" : "Copy CMD Link"}
-                                </Button>
+                                  <Button
+                                    onClick={() => handleCopyCMD(row, i)}
+                                    startIcon={
+                                      isCMDCopyed ? (
+                                        <CheckCircleOutlineRounded />
+                                      ) : (
+                                        <InsertLinkRounded
+                                          sx={{ rotate: "-45deg" }}
+                                        />
+                                      )
+                                    }
+                                    size="small"
+                                    variant="contained"
+                                    sx={{
+                                      textTransform: "none",
+                                      width: "100%",
+                                      bgcolor: isCMDCopyed ? "#5CB338" : "#000",
+                                      fontWeight: isCMDCopyed ? 600 : 500,
+                                      color: "#FFF",
+                                      "&:hover": {
+                                        bgcolor: isCMDCopyed
+                                          ? "#5CB338"
+                                          : "#000",
+                                        color: "#FFF",
+                                      },
+                                    }}
+                                  >
+                                    {isCMDCopyed ? "Copied" : "CMD Link"}
+                                  </Button>
+
+                                  <Button
+                                    onClick={() => handleCopySMSLink(row, i)}
+                                    startIcon={
+                                      isCopySMSLink ? (
+                                        <CheckCircleOutlineRounded />
+                                      ) : (
+                                        <ContentCopyRoundedIcon />
+                                      )
+                                    }
+                                    size="small"
+                                    variant="contained"
+                                    sx={{
+                                      textTransform: "none",
+                                      width: "100%",
+                                      bgcolor: isCopySMSLink
+                                        ? "#5CB338"
+                                        : "#000",
+                                      fontWeight: isCopySMSLink ? 600 : 500,
+                                      color: "#FFF",
+                                      "&:hover": {
+                                        bgcolor: isCopySMSLink
+                                          ? "#5CB338"
+                                          : "#000",
+                                        color: "#FFF",
+                                      },
+                                    }}
+                                  >
+                                    {isCopySMSLink ? "Copied" : "SMS App"}
+                                  </Button>
+                                </Stack>
                               </Box>
                             )}
                           </TableCell>

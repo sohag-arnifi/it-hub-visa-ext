@@ -217,14 +217,6 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
           await handleCreateNewSession();
         }
       }
-
-      // if (!response.ok) {
-      //   throw new Error(`Logout failed with status: ${response.status}`);
-      // }
-      // const htmlContent = await response.text();
-      // setCSRFToken(htmlContent);
-      // setLoggedInUser("");
-      // localStorage.removeItem("userImg");
     } catch (error) {
       console.error("Error during logout:", error);
     }

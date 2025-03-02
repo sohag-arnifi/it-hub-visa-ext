@@ -194,8 +194,7 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
               }))}
             />
           </Grid>
-
-          {values?.paymentMethod === "dbblmobilebanking" ? (
+          {/* {values?.paymentMethod === "dbblmobilebanking" ? (
             <>
               <Grid item xs={12}>
                 <FormRadioField
@@ -223,7 +222,7 @@ const FormModal = ({ handleModalClose, isLoading, initialValues }) => {
                 </>
               ) : null}
             </>
-          ) : null}
+          ) : null} */}
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

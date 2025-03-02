@@ -10,11 +10,11 @@ const backendBaseUrl =
     ? url
     : url === dbblMobileBankingUrl
     ? "http://localhost:5000"
-    : "https://it-hub.mdripon.xyz";
+    : "https://api.it-hub.agency";
 
 // const appBaseUrl = "http://localhost:5000/api/v1";
 // const backendBaseUrl = "http://localhost:5000";
-// url === "http://localhost:5000" ? url : "https://it-hub.mdripon.xyz";
+// url === "http://localhost:5000" ? url : "https://api.it-hub.agency";
 
 const isTesting = url === "https://payment.ivacbd.com" ? false : true;
 

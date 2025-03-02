@@ -124,7 +124,7 @@ const Header = ({
         }}
       >
         {isDuePending && (
-          <Box sx={{ width: "80%" }}>
+          <Box sx={{ width: "75%" }}>
             <Marquee
               gradientColor="white"
               gradient={true}
@@ -158,10 +158,10 @@ const Header = ({
 
         <Box
           sx={{
-            width: "20%",
+            width: "25%",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-end",
           }}
         >
           <Box

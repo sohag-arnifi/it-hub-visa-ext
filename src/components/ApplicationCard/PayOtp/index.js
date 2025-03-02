@@ -77,8 +77,6 @@ const PayOtp = ({ data, otpSendRef }) => {
         "pay-otp-send"
       );
 
-      console.log(result);
-
       if (result) {
         setResent(resent + 1);
         if (envConfig.isTesting) {
@@ -109,7 +107,6 @@ const PayOtp = ({ data, otpSendRef }) => {
 
       if (result?.success) {
         const date = result?.data?.slot_dates[0];
-
         if (date) {
           setSpecificDate(date);
         } else {
@@ -174,7 +171,6 @@ const PayOtp = ({ data, otpSendRef }) => {
 
       if (result?.url) {
         const payURL = `${result?.url}${data?.selected_payment?.slug}`;
-        console.log(payURL);
         setPaymentUrl(payURL);
         if (!envConfig?.isTesting) {
           await updatePaymentStatus({
@@ -382,7 +378,7 @@ const PayOtp = ({ data, otpSendRef }) => {
         </Button>
         <Button
           onClick={handleBookSlot}
-          // disabled={payNowLoading || !hashParam || !paynowSectionCreated}
+          disabled={payNowLoading || !hashParam || !paynowSectionCreated}
           color="error"
           size={"small"}
           variant="contained"

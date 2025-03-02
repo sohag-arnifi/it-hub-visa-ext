@@ -105,6 +105,14 @@ export const paymentMethod = [
     slug: "dbblmobilebanking",
   },
   {
+    name: "VISA",
+    slug: "visacard",
+  },
+  {
+    name: "MASTER",
+    slug: "mastercard",
+  },
+  {
     name: "Bkash",
     slug: "bkash",
   },
