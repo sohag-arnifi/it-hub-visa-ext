@@ -10,11 +10,7 @@ const url = new URL(window.location.href);
 const authToken = url?.searchParams.get("auth");
 let hasProcessedAuthToken = false;
 const pathName = url?.pathname ?? "/";
-const ivacBaseUrls = [
-  "https://payment.ivacbd.com",
-  "http://localhost:5000",
-  "https://api.it-hub.agency",
-];
+const ivacBaseUrl = "https://payment.ivacbd.com";
 
 if (authToken && !hasProcessedAuthToken) {
   localStorage.clear();
@@ -72,8 +68,13 @@ chrome.storage.local.get(["logData"], (result) => {
     localStorage.setItem("token", JSON.stringify(token));
     localStorage.setItem("userId", JSON.stringify(result.logData?._id));
     const root = createRoot(document.getElementById("react-root"));
+    // root.render(
+    //   <Provider store={store}>
+    //     <Main />
+    //   </Provider>
+    // );
 
-    if (pathName === "/" && ivacBaseUrls?.includes(url?.origin)) {
+    if (pathName === "/" && url?.origin === ivacBaseUrl) {
       root.render(
         <Provider store={store}>
           <Main />

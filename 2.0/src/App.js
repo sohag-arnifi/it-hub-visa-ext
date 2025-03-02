@@ -1,5 +1,7 @@
 import { Box, Paper } from "@mui/material";
 import React, { useState } from "react";
+import { useGetApplicationsQuery } from "./redux/features/application/applicationApi";
+import GlobalLoader from "./components/GlobalLoader";
 import { useAppSelector } from "./redux/store";
 import Header from "./components/Header/Header";
 import ManageApplications from "./components/ManageApplications";
@@ -9,6 +11,7 @@ const App = () => {
   const [isOpenManageApplication, setIsOpenManageApplication] = useState(true);
   const [isOpenCompletedApplication, setIsOpenCompletedApplication] =
     useState(false);
+  const { isLoading } = useGetApplicationsQuery({});
   const user = useAppSelector((state) => state?.auth?.user);
 
   return (
@@ -35,7 +38,9 @@ const App = () => {
           setIsOpenCompletedApplication={setIsOpenCompletedApplication}
         />
 
-        {isOpenManageApplication ? (
+        {isLoading ? (
+          <GlobalLoader />
+        ) : isOpenManageApplication ? (
           <ManageApplications />
         ) : isOpenCompletedApplication ? (
           <CompletedApplications />

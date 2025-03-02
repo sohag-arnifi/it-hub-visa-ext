@@ -10,6 +10,7 @@ import {
   useUpdateApplicationMutation,
 } from "../../redux/features/application/applicationApi";
 import ApplicationsTable from "./ApplicationsTable";
+import axios from "axios";
 
 const validationSchema = Yup.object({
   center: Yup.string().required("Mission is required"),
@@ -30,17 +31,6 @@ const validationSchema = Yup.object({
     })
   ),
   paymentAmount: Yup.string().required("Payment Amount is required"),
-  autoPayment: Yup.boolean(),
-  accountNumber: Yup.string().when("autoPayment", {
-    is: true,
-    then: (schema) => schema.required("Account number is required"),
-    otherwise: (schema) => schema,
-  }),
-  pinNumber: Yup.string().when("autoPayment", {
-    is: true,
-    then: (schema) => schema.required("PIN is required"),
-    otherwise: (schema) => schema,
-  }),
 });
 
 const emptyInidialvalues = {
@@ -89,8 +79,6 @@ const ManageApplications = () => {
       companyId: user?.companyId?._id,
       assignTo: user?._id,
     };
-
-    console.log(values);
 
     try {
       if (!initialValues?.status) {
