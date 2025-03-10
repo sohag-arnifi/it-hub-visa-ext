@@ -17,19 +17,11 @@ if (envConfig.appBaseUrl === "https://payment.ivacbd.com") {
 
 export const appBaseApiSlice = createApi({
   reducerPath: "appApi",
-  // baseQuery: fetchBaseQuery({
-  //   baseUrl: envConfig.appBaseUrl, // Pass the base URL here
-  // }),
   baseQuery: fetchBaseQuery({
     baseUrl: envConfig.appBaseUrl,
     withCredentials: true,
     credentials: "include",
-    // redirect: "manual",
   }),
-  // baseQuery: fetchBaseQuery({
-  //   baseUrl: envConfig.appBaseUrl,
-  //   credentials: "include",
-  // }),
   tagTypes: ["sessions"],
   endpoints: (builder) => ({
     mobileVerify: builder.mutation({
@@ -64,16 +56,6 @@ export const appBaseApiSlice = createApi({
       }),
       invalidatesTags: ["sessions"],
     }),
-
-    // createNewSession: builder.mutation({
-    //   query: ({ signal }) => ({
-    //     url: `/`,
-    //     method: "GET",
-    //     headers,
-    //     signal,
-    //   }),
-    //   providesTags: ["sessions"],
-    // }),
 
     createNewSession: builder.mutation({
       query: ({ signal }) => ({

@@ -24,14 +24,20 @@ const handleMultipleApiCall = async (
         });
         return response;
       } else if (action === "pay-otp-send") {
-        if (response?.success) {
+        if (
+          response?.success &&
+          response?.message === "Sms send successfully"
+        ) {
           setMessage({
             message: "OTP sent successfully!",
             type: "success",
           });
           return true;
         } else {
-          const errMessage = response?.message?.error ?? "Fail to send OTP!";
+          const errMessage =
+            typeof response?.message === "string"
+              ? response?.message
+              : response?.message?.error ?? "Fail to send OTP!";
           if (errMessage === "Slot is not available") {
             setMessage({
               message: errMessage,
@@ -56,7 +62,10 @@ const handleMultipleApiCall = async (
           return response;
         } else {
           setMessage({
-            message: response?.message?.error ?? "Fail to verify OTP!",
+            message:
+              typeof response?.message === "string"
+                ? response?.message
+                : response?.message?.error ?? "Fail to verify OTP!",
             type: "error",
           });
         }
@@ -69,7 +78,10 @@ const handleMultipleApiCall = async (
           return response;
         } else {
           setMessage({
-            message: response?.message?.error ?? "Fail to get slot time!",
+            message:
+              typeof response?.message === "string"
+                ? response?.message
+                : response?.message?.error ?? "Fail to get slot time!",
             type: "error",
           });
         }
@@ -90,7 +102,10 @@ const handleMultipleApiCall = async (
             continue;
           } else {
             setMessage({
-              message: response?.message?.error ?? "Fail to book slot!",
+              message:
+                typeof response?.message === "string"
+                  ? response?.message
+                  : response?.message?.error ?? "Fail to book slot!",
               type: "error",
             });
             break;
