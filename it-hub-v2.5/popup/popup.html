@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>It-hub | Login</title>
+  </head>
+  <body>
+    <div class="container">
+      <img src="../icons/128.png" alt="logo" />
+
+      <h1 style="text-align: center">IT-Hub | v2.0</h1>
+      <!-- <p style="text-align: center; font-weight: bold">
+        Indian Visa Appointment App
+      </p> -->
+
+      <div class="form-container">
+        <form method="post" id="login-form">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            placeholder="Enter your username"
+          />
+
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            placeholder="Enter your password"
+          />
+
+          <button type="submit" id="login">Login</button>
+        </form>
+
+        <button id="logout" style="display: none">Logout</button>
+
+        <div id="loading" style="display: none">Loading...</div>
+        <div id="error-message" style="color: red; display: none"></div>
+      </div>
+
+      <footer>
+        <p>&copy; 2023 it-hub.agency. All rights reserved.</p>
+        <p>Contact Support: 24/7</p>
+      </footer>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

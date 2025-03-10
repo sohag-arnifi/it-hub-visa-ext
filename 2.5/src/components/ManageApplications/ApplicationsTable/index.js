@@ -91,8 +91,8 @@ const ApplicationsTable = ({
     const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
 
     // Define the path to the extension (update this path as needed)
-    const extensionPath = "C:\\ext\\it-hub";
-    // const extensionPath = "D:\\It-Hub\\chorom-ext";
+    // const extensionPath = "C:\\ext\\it-hub";
+    const extensionPath = "D:\\It-Hub\\chorom-ext";
 
     // Define the CMD script
     const comment = `
@@ -180,6 +180,10 @@ const ApplicationsTable = ({
       });
     }
   }, []);
+
+  // "accountNumber": "017605675557",
+  //           "autoPayment": true,
+  //           "pinNumber": "1234"
 
   return (
     <Box>

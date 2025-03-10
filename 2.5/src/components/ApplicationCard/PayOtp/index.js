@@ -377,7 +377,7 @@ const PayOtp = ({ data, otpSendRef }) => {
         </Button>
         <Button
           onClick={handleBookSlot}
-          disabled={payNowLoading || !hashParam || !paynowSectionCreated}
+          // disabled={payNowLoading || !hashParam || !paynowSectionCreated}
           color="error"
           size={"small"}
           variant="contained"
