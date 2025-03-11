@@ -49,3 +49,23 @@ chrome.webRequest.onHeadersReceived.addListener(
   { urls: ["<all_urls>"] },
   ["responseHeaders"]
 );
+
+chrome.webRequest.onHeadersReceived.addListener(
+  ({ statusCode = 0, method = "", url = "" }) => {
+    const urlObj = new URL(url);
+    const pathName = urlObj.pathname;
+    if (
+      pathName === "/" &&
+      method === "GET" &&
+      [500, 502, 503, 504].includes(statusCode)
+    ) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        setTimeout(() => {
+          chrome.tabs.reload(tabs[0].id);
+        }, 500);
+      });
+    }
+  },
+  { urls: ["<all_urls>"] },
+  ["responseHeaders"]
+);

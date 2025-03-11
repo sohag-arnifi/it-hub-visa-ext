@@ -60,6 +60,15 @@ const PayOtp = ({ data, otpSendRef }) => {
   const [specificDate, setSpecificDate] = useState("");
 
   const [hashParam, setHashParam] = React.useState("");
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [captchaMessage, setCaptchaMessage] = useState({
+    type: "",
+    message: "",
+  });
+
+  const [warningMessage, setWarningMessage] = useState("");
+  const [expiredMessage, setExpiredMessage] = useState("");
+
   const [paynowSectionCreated, setPayNowSectionCreated] = useState(false);
 
   const sessionAbortControllerRef = useRef(null);
@@ -151,7 +160,6 @@ const PayOtp = ({ data, otpSendRef }) => {
   };
 
   const handleBookSlot = async () => {
-    // window.open("http://127.0.0.1:5500/", "_blank");
     const payload = getBookSlotPayload(data);
     const controller = new AbortController();
     sessionAbortControllerRef.current = controller;
@@ -193,6 +201,13 @@ const PayOtp = ({ data, otpSendRef }) => {
     try {
       const response = await getCaptchaToken({}).unwrap();
       if (response?.data) {
+        if (payNowLoading && hashParam) {
+          setHashParam("");
+          for (let i = 0; i < 5; i++) {
+            sessionAbortControllerRef.current?.abort();
+            sessionAbortControllerRef.current = null;
+          }
+        }
         setHashParam(response?.data);
       }
     } catch (error) {
@@ -210,6 +225,67 @@ const PayOtp = ({ data, otpSendRef }) => {
     sessionAbortControllerRef.current = null;
     console.log("API call aborted");
   };
+
+  useEffect(() => {
+    let warningTimeout, countdownInterval;
+
+    if (hashParam) {
+      setRemainingTime(120);
+
+      // Set initial message
+      setCaptchaMessage({
+        type: "success",
+        message: `Captcha Token Found - Expires in 2:00 mins`,
+      });
+
+      warningTimeout = setTimeout(() => {
+        console.log("warningTimeout");
+        console.log("call captcha token here");
+
+        setCaptchaMessage({
+          type: "warning",
+          message: `Captcha Token Expires Soon - 0:30 mins`,
+        });
+      }, 90000); // 90 seconds
+
+      // Set up countdown interval
+      countdownInterval = setInterval(() => {
+        setRemainingTime((prevTime) => {
+          const newTime = prevTime - 1;
+          if (newTime <= 0) {
+            clearInterval(countdownInterval);
+            setCaptchaMessage({
+              type: "error",
+              message: "Captcha Token Expired",
+            });
+          } else if (newTime <= 30 && newTime > 0) {
+            setCaptchaMessage({
+              type: "warning",
+              message: `Captcha Token Expires Soon - ${Math.floor(
+                newTime / 60
+              )}:${newTime % 60 < 10 ? `0${newTime % 60}` : newTime % 60} mins`,
+            });
+          } else {
+            setCaptchaMessage({
+              type: "success",
+              message: `Captcha Token Found - Expires in ${Math.floor(
+                newTime / 60
+              )}:${newTime % 60 < 10 ? `0${newTime % 60}` : newTime % 60} mins`,
+            });
+          }
+          return newTime;
+        });
+      }, 1000);
+    } else {
+      setCaptchaMessage({ type: "error", message: "Captcha Token Not Found" });
+      setRemainingTime(0); // Reset remaining time
+    }
+
+    return () => {
+      clearTimeout(warningTimeout);
+      clearInterval(countdownInterval);
+    };
+  }, [hashParam]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -358,7 +434,7 @@ const PayOtp = ({ data, otpSendRef }) => {
       <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
         <Button
           onClick={handleGetSlotTime}
-          // disabled={timeSlotLoading || !specificDate}
+          disabled={timeSlotLoading || !specificDate}
           color="error"
           size={"small"}
           variant="contained"
@@ -391,6 +467,32 @@ const PayOtp = ({ data, otpSendRef }) => {
           {payNowLoading ? "Booking..." : "Book Slot"}
         </Button>
       </Stack>
+
+      <Box sx={{ marginY: "10px" }}>
+        <Typography
+          sx={{
+            fontSize: "14px",
+            padding: "3px",
+            bgcolor:
+              captchaMessage?.type === "success"
+                ? "#C2FFC7"
+                : captchaMessage?.type === "warning"
+                ? alpha("#FFF7C7", 0.5)
+                : alpha("#FFC7C7", 0.5),
+            borderRadius: "3px",
+            textAlign: "center",
+            fontWeight: 600,
+            color:
+              captchaMessage?.type === "success"
+                ? "green"
+                : captchaMessage?.type === "warning"
+                ? "orange"
+                : "red",
+          }}
+        >
+          {captchaMessage?.message}
+        </Typography>
+      </Box>
 
       <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
         <Button

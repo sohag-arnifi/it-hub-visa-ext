@@ -24,9 +24,10 @@ const handleMultipleApiCall = async (
         });
         return response;
       } else if (action === "pay-otp-send") {
+        console.log("response", response);
         if (
           response?.success &&
-          response?.message === "Sms send successfully"
+          response?.message === "Sms send successfully"
         ) {
           setMessage({
             message: "OTP sent successfully!",
