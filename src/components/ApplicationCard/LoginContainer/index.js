@@ -57,6 +57,8 @@ const LoginContainer = ({ data, loggedInUser, setLoggedInUser }) => {
       "mobile-verify"
     );
 
+    console.log(result);
+
     if (result?.isRedirect) {
       if (result?.redirectPath === "/login-auth") {
         setResMessage({

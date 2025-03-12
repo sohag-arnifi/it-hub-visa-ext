@@ -21,7 +21,6 @@ export const appBaseApiSlice = createApi({
     baseUrl: envConfig.appBaseUrl,
     withCredentials: true,
     credentials: "include",
-    keepalive: true,
   }),
   tagTypes: ["sessions"],
   endpoints: (builder) => ({

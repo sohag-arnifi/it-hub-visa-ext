@@ -26,7 +26,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 chrome.webRequest.onHeadersReceived.addListener(
-  ({ statusCode = 0, url = "", responseHeaders = [], tabId }) => {
+  ({ statusCode = 0, url = "", responseHeaders = [], method = "", tabId }) => {
+    console.log(statusCode, url);
+
     const redirectStatusCodes = [301, 302, 303, 307];
     if (redirectStatusCodes.includes(statusCode)) {
       const data = {
@@ -43,26 +45,6 @@ chrome.webRequest.onHeadersReceived.addListener(
             chrome.runtime.lastError.message
           );
         }
-      });
-    }
-  },
-  { urls: ["<all_urls>"] },
-  ["responseHeaders"]
-);
-
-chrome.webRequest.onHeadersReceived.addListener(
-  ({ statusCode = 0, method = "", url = "" }) => {
-    const urlObj = new URL(url);
-    const pathName = urlObj.pathname;
-    if (
-      pathName === "/" &&
-      method === "GET" &&
-      [500, 502, 503, 504].includes(statusCode)
-    ) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        setTimeout(() => {
-          chrome.tabs.reload(tabs[0].id);
-        }, 500);
       });
     }
   },

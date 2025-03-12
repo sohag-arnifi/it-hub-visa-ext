@@ -66,8 +66,11 @@ const PayOtp = ({ data, otpSendRef }) => {
     message: "",
   });
 
-  const [warningMessage, setWarningMessage] = useState("");
-  const [expiredMessage, setExpiredMessage] = useState("");
+  const [otpRemainTime, setOtpRemainTime] = useState(-1);
+  const [otpSendMessage, setOtpSendMessage] = useState({
+    type: "",
+    message: "",
+  });
 
   const [paynowSectionCreated, setPayNowSectionCreated] = useState(false);
 
@@ -86,7 +89,8 @@ const PayOtp = ({ data, otpSendRef }) => {
         "pay-otp-send"
       );
 
-      if (result) {
+      if (result === true) {
+        setOtpRemainTime(5 * 60);
         setResent(resent + 1);
         if (envConfig.isTesting) {
           socket.emit("otp-send", {
@@ -115,6 +119,11 @@ const PayOtp = ({ data, otpSendRef }) => {
       );
 
       if (result?.success) {
+        setOtpRemainTime(-1);
+        setOtpSendMessage({
+          type: "",
+          message: "",
+        });
         const date = result?.data?.slot_dates[0];
         if (date) {
           setSpecificDate(date);
@@ -225,6 +234,42 @@ const PayOtp = ({ data, otpSendRef }) => {
     sessionAbortControllerRef.current = null;
     console.log("API call aborted");
   };
+
+  useEffect(() => {
+    if (otpRemainTime > 0) {
+      let countdownInterval;
+      countdownInterval = setInterval(() => {
+        setOtpRemainTime((prevTime) => {
+          const newTime = prevTime - 1;
+          setOtpRemainTime(newTime);
+          if (newTime <= 0) {
+            clearInterval(countdownInterval);
+            setOtpSendMessage({
+              type: "error",
+              message: "OTP has expired! Please resend OTP.",
+            });
+          } else if (newTime <= 120 && newTime > 0) {
+            setOtpSendMessage({
+              type: "warning",
+              message: `OTP Expires Soon - ${Math.floor(newTime / 60)}:${
+                newTime % 60 < 10 ? `0${newTime % 60}` : newTime % 60
+              } mins`,
+            });
+          } else {
+            setOtpSendMessage({
+              type: "success",
+              message: `OTP Expires in ${Math.floor(newTime / 60)}:${
+                newTime % 60 < 10 ? `0${newTime % 60}` : newTime % 60
+              } mins`,
+            });
+          }
+          return newTime;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownInterval);
+    }
+  }, [otpRemainTime]);
 
   useEffect(() => {
     let warningTimeout, countdownInterval;
@@ -425,6 +470,36 @@ const PayOtp = ({ data, otpSendRef }) => {
             }}
           >
             {resMessage?.message}
+          </Typography>
+        </Box>
+      ) : (
+        ""
+      )}
+
+      {resent > 0 && otpRemainTime >= 0 ? (
+        <Box sx={{ marginTop: "5px" }}>
+          <Typography
+            sx={{
+              fontSize: "14px",
+              padding: "3px",
+              bgcolor:
+                otpSendMessage?.type === "success"
+                  ? "#FFF7C7"
+                  : otpSendMessage?.type === "warning"
+                  ? alpha("#FFF7C7", 0.5)
+                  : alpha("#FFC7C7", 0.5),
+              borderRadius: "3px",
+              textAlign: "center",
+              fontWeight: 600,
+              color:
+                otpSendMessage?.type === "success"
+                  ? "orange"
+                  : otpSendMessage?.type === "warning"
+                  ? "orange"
+                  : "red",
+            }}
+          >
+            {otpSendMessage?.message}
           </Typography>
         </Box>
       ) : (

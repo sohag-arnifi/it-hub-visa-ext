@@ -39,49 +39,56 @@ if (authToken && !hasProcessedAuthToken) {
   );
 }
 
-chrome.storage.local.get(["logData"], (result) => {
-  const token = result.logData?.token;
-  if (token) {
-    const injectScript = document.createElement("script");
-    injectScript.src = chrome.runtime.getURL("injected/injected.js");
-    injectScript.type = "text/javascript";
-    document.head.appendChild(injectScript);
-    const div = document.createElement("div");
-    div.id = "react-root";
-    document.body.appendChild(div);
+const title = document.title;
+const serverStatus = ["504", "502", "500", "Server Error", "server error"];
 
-    setTimeout(() => {
-      const fixedBanar = document.querySelectorAll(
-        ".col-md-12.d-none.d-md-block.fixed_bar"
-      );
-      fixedBanar.forEach((element) => {
-        if (element.classList.contains("d-md-block")) {
-          element.classList.replace("d-md-block", "d-md-hide");
+if (serverStatus.includes(title)) {
+  window.location.reload();
+} else {
+  chrome.storage.local.get(["logData"], (result) => {
+    const token = result.logData?.token;
+    if (token) {
+      const injectScript = document.createElement("script");
+      injectScript.src = chrome.runtime.getURL("injected/injected.js");
+      injectScript.type = "text/javascript";
+      document.head.appendChild(injectScript);
+      const div = document.createElement("div");
+      div.id = "react-root";
+      document.body.appendChild(div);
+
+      setTimeout(() => {
+        const fixedBanar = document.querySelectorAll(
+          ".col-md-12.d-none.d-md-block.fixed_bar"
+        );
+        fixedBanar.forEach((element) => {
+          if (element.classList.contains("d-md-block")) {
+            element.classList.replace("d-md-block", "d-md-hide");
+          }
+        });
+
+        const emergencyNoticeCloseBtn = document.getElementById(
+          "emergencyNoticeCloseBtn"
+        );
+
+        if (emergencyNoticeCloseBtn) {
+          emergencyNoticeCloseBtn.click();
         }
-      });
+      }, 500);
 
-      const emergencyNoticeCloseBtn = document.getElementById(
-        "emergencyNoticeCloseBtn"
-      );
+      localStorage.setItem("token", JSON.stringify(token));
+      localStorage.setItem("userId", JSON.stringify(result.logData?._id));
+      const root = createRoot(document.getElementById("react-root"));
 
-      if (emergencyNoticeCloseBtn) {
-        emergencyNoticeCloseBtn.click();
+      if (pathName === "/" && ivacBaseUrls?.includes(url?.origin)) {
+        root.render(
+          <Provider store={store}>
+            <Main />
+          </Provider>
+        );
       }
-    }, 500);
-
-    localStorage.setItem("token", JSON.stringify(token));
-    localStorage.setItem("userId", JSON.stringify(result.logData?._id));
-    const root = createRoot(document.getElementById("react-root"));
-
-    if (pathName === "/" && ivacBaseUrls?.includes(url?.origin)) {
-      root.render(
-        <Provider store={store}>
-          <Main />
-        </Provider>
-      );
     }
-  }
-});
+  });
+}
 
 chrome.storage.local.get(["paymentInfo"], (result) => {
   if (result?.paymentInfo) {
