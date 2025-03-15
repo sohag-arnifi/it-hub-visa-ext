@@ -95,31 +95,62 @@ const ApplicationsTable = ({
     const extensionPath = "D:\\It-Hub\\chorom-ext";
 
     // Define the CMD script
-    const comment = `
-  @echo off 
+    //   const comment = `
+    // @echo off
 
-  REM Define the URL to open
-  set "URL=${applicationOpenUrl}"
+    // REM Define the URL to open
+    // set "URL=${applicationOpenUrl}"
 
-  REM Define the path to the temporary user data directory
-  set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
+    // REM Define the path to the temporary user data directory
+    // set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
 
-  REM Define the path to the extension
-  set "EXTENSION_PATH=${extensionPath}"
+    // REM Define the path to the extension
+    // set "EXTENSION_PATH=${extensionPath}"
 
-  REM Ensure the temporary directory exists
-  if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
+    // REM Ensure the temporary directory exists
+    // if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
 
-  REM Open Chrome with the temporary user data directory and load the extension
-  start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800
+    // REM Open Chrome with the temporary user data directory and load the extension
+    // start "" "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800
 
-  REM Close the CMD prompt after opening Chrome
-  exit
+    // REM Close the CMD prompt after opening Chrome
+    // exit
+    // `;
+
+    const command = `
+  @echo off
+
+REM Define the URL to open
+set "URL=${applicationOpenUrl}"
+
+REM Define the path to the temporary user data directory
+set "TEMP_PROFILE_DIR=%TEMP%\\ChromeTempProfile${index}"
+
+REM Define the path to the extension
+set "EXTENSION_PATH=${extensionPath}"
+
+REM Define the path to Chrome executable
+set "CHROME_PATH=C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+
+REM Ensure the temporary directory exists
+if not exist "%TEMP_PROFILE_DIR%" mkdir "%TEMP_PROFILE_DIR%"
+
+REM Check if Chrome executable exists
+if exist "%CHROME_PATH%" (
+    REM Open Chrome with the temporary user data directory and load the extension
+    start "" "%CHROME_PATH%" --user-data-dir="%TEMP_PROFILE_DIR%" --load-extension="%EXTENSION_PATH%" --new-window "%URL%" --window-size=500,800
+) else (
+    echo Chrome executable not found at "%CHROME_PATH%"
+    pause
+)
+
+REM Close the CMD prompt after opening Chrome
+exit
   `;
 
     // Copy the CMD script to the clipboard
     navigator.clipboard
-      .writeText(comment)
+      .writeText(command)
       .then(() => {
         setIsCopied({
           status: true,

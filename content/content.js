@@ -40,13 +40,9 @@ if (authToken && !hasProcessedAuthToken) {
 }
 
 const title = document.title;
-const serverStatus = ["504", "502", "500", "Server Error", "server error"];
+const ivacTitle = "Online Application | IVAC";
 
-console.log("title", title);
-
-if (serverStatus.includes(title)) {
-  window.location.reload();
-} else {
+if (ivacTitle === title && ivacBaseUrls?.includes(url?.origin)) {
   chrome.storage.local.get(["logData"], (result) => {
     const token = result.logData?.token;
     if (token) {
@@ -90,6 +86,8 @@ if (serverStatus.includes(title)) {
       }
     }
   });
+} else {
+  window.location.reload();
 }
 
 chrome.storage.local.get(["paymentInfo"], (result) => {
