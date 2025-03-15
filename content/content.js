@@ -42,6 +42,8 @@ if (authToken && !hasProcessedAuthToken) {
 const title = document.title;
 const serverStatus = ["504", "502", "500", "Server Error", "server error"];
 
+console.log("title", title);
+
 if (serverStatus.includes(title)) {
   window.location.reload();
 } else {

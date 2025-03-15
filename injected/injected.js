@@ -8,10 +8,10 @@ const slotPaymentUrls = [
 ];
 
 if (applicationId) {
-  // localStorage.setItem(
-  //   "userImg",
-  //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9KweB-UJmSMetSkHVtnLRrJux7bJv8ksIahpSmkcSNOygSfeXqgHmL6_1Op5fHQiTnNI&usqp=CAU"
-  // );
+  localStorage.setItem(
+    "userImg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9KweB-UJmSMetSkHVtnLRrJux7bJv8ksIahpSmkcSNOygSfeXqgHmL6_1Op5fHQiTnNI&usqp=CAU"
+  );
 
   if (window?.csrf_token) {
     const url = new URL(window.location.href);
@@ -22,14 +22,14 @@ if (applicationId) {
     if (userImg) {
       localStorage.setItem("userImg", userImg);
     } else {
-      localStorage.setItem("userImg", "");
-      localStorage.setItem(
-        "relasedInfo",
-        JSON.stringify({
-          relased: false,
-          message: "Please login to continue!",
-        })
-      );
+      // localStorage.setItem("userImg", "");
+      // localStorage.setItem(
+      //   "relasedInfo",
+      //   JSON.stringify({
+      //     relased: false,
+      //     message: "Please login to continue!",
+      //   })
+      // );
     }
   }
 }

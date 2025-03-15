@@ -128,30 +128,19 @@ const applicationApi = backendBaseApiSlice.injectEndpoints({
         method: "GET",
         headers: { "content-type": "application/json" },
       }),
-      // async onQueryStarted({ phone, userId }, { dispatch, queryFulfilled }) {
-      //   dispatch(
-      //     setHashParams({
-      //       hash_params: { token: "", message: "Solving.." },
-      //       phone,
-      //     })
-      //   );
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     dispatch(
-      //       setHashParams({
-      //         hash_params: { token: data?.data, message: "Solved" },
-      //         phone,
-      //       })
-      //     );
-      //   } catch (err) {
-      //     console.log(err);
-      //   }
-      // },
+    }),
+
+    getCaptchaTokenByAnti: builder.mutation({
+      query: ({ phone }) => ({
+        url: `/recaptcha-token/anti`,
+        method: "GET",
+        headers: { "content-type": "application/json" },
+      }),
     }),
 
     updatePaymentStatus: builder.mutation({
-      query: ({ phone, data }) => ({
-        url: `/applications/payment-status/${phone}`,
+      query: ({ id, data }) => ({
+        url: `/applications/payment-status/${id}`,
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: data,
@@ -178,4 +167,5 @@ export const {
   useUpdatePaymentStatusMutation,
   useGetProcessApplicationQuery,
   useGetCompletedApplicationsQuery,
+  useGetCaptchaTokenByAntiMutation,
 } = applicationApi;

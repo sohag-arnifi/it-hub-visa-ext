@@ -21,6 +21,7 @@ import {
 } from "../../../utils/appPayload";
 import handleMultipleApiCall from "../../../utils/handleMultipleApiCall";
 import {
+  useGetCaptchaTokenByAntiMutation,
   useGetCaptchaTokenMutation,
   useUpdatePaymentStatusMutation,
 } from "../../../redux/features/application/applicationApi";
@@ -44,6 +45,9 @@ const PayOtp = ({ data, otpSendRef }) => {
 
   const [getCaptchaToken, { isLoading: captchaLoading }] =
     useGetCaptchaTokenMutation();
+
+  const [getCaptchaTokenByAnti, { isLoading: captchaLoadingByAnti }] =
+    useGetCaptchaTokenByAntiMutation();
 
   const [resent, setResent] = React.useState(0);
   const [otp, setOtp] = useState("");
@@ -124,6 +128,7 @@ const PayOtp = ({ data, otpSendRef }) => {
           type: "",
           message: "",
         });
+
         const date = result?.data?.slot_dates[0];
         if (date) {
           setSpecificDate(date);
@@ -190,16 +195,35 @@ const PayOtp = ({ data, otpSendRef }) => {
         setPaymentUrl(payURL);
         if (!envConfig?.isTesting) {
           await updatePaymentStatus({
-            phone: data?.phone,
+            id: data?._id,
             data: {
               paymentStatus: {
                 status: "SUCCESS",
                 url: payURL,
               },
+              paymentDate: new Date().toISOString(),
             },
           });
         }
         window.open(payURL, "_blank");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCaptchaSolvedAnti = async () => {
+    try {
+      const response = await getCaptchaTokenByAnti({}).unwrap();
+      if (response?.data) {
+        if (payNowLoading && hashParam) {
+          setHashParam("");
+          for (let i = 0; i < 5; i++) {
+            sessionAbortControllerRef.current?.abort();
+            sessionAbortControllerRef.current = null;
+          }
+        }
+        setHashParam(response?.data);
       }
     } catch (error) {
       console.log(error);
@@ -376,6 +400,7 @@ const PayOtp = ({ data, otpSendRef }) => {
   useEffect(() => {
     if (specificDate && !timeSlot?.hour && !paynowSectionCreated) {
       handleCaptchaSolved();
+      handleCaptchaSolvedAnti();
       setTimeout(() => {
         handleGetSlotTime();
       }, 500);
@@ -571,8 +596,8 @@ const PayOtp = ({ data, otpSendRef }) => {
 
       <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
         <Button
-          onClick={handleCaptchaSolved}
-          disabled={captchaLoading}
+          onClick={handleCaptchaSolvedAnti}
+          disabled={captchaLoadingByAnti}
           size={"small"}
           variant="contained"
           sx={{
@@ -582,7 +607,9 @@ const PayOtp = ({ data, otpSendRef }) => {
             width: "50%",
           }}
         >
-          {captchaLoading ? "Captcha Request..." : "Captcha Request - API"}
+          {captchaLoadingByAnti
+            ? "Captcha Request..."
+            : "Captcha Request - API"}
         </Button>
         <Button
           onClick={handleOpenCaptchaContainer}
