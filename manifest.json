@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "It-hub | Extension v2.5",
-  "version": "2.1.5",
+  "name": "It-hub | Extension v3.0",
+  "version": "3.0",
   "description": "One e-Token for all your visas",
   "background": {
     "service_worker": "dist/background.bundle.js"
@@ -30,7 +30,10 @@
         "http://localhost:5000/*",
         "https://api.it-hub.agency/*",
         "http://127.0.0.1:5500/*",
-        "https://ecom1.dutchbanglabank.com/*"
+        "https://ecom1.dutchbanglabank.com/*",
+        "https://vps-it-hub.pkshohag240.workers.dev/*",
+        "http://127.0.0.1:8787/*",
+        "https://it-hub-vps.pkshohag240.workers.dev/*"
       ],
       "js": ["dist/content.bundle.js"],
       "run_at": "document_end"

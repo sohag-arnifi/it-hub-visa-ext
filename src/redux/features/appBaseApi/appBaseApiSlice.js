@@ -13,6 +13,7 @@ if (envConfig.appBaseUrl === "https://payment.ivacbd.com") {
 } else {
   headers.set("x-requested-with", "XMLHttpRequest");
   headers.set("content-type", "application/json");
+  headers.set("Accept", "application/x-www-form-urlencoded;charset=UTF-8;");
 }
 
 export const appBaseApiSlice = createApi({
@@ -28,10 +29,13 @@ export const appBaseApiSlice = createApi({
       query: ({ payload, signal }) => ({
         url: `/mobile-verify`,
         method: "POST",
-        headers,
+        headers: {
+          "content-type": "application/json",
+        },
         redirect: "manual",
         signal,
-        body: !isTest ? new URLSearchParams(payload) : payload,
+        // body: !isTest ? new URLSearchParams(payload) : payload,
+        body: payload,
       }),
     }),
     authVerify: builder.mutation({

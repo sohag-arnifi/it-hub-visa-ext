@@ -80,12 +80,6 @@ socketScript.onload = async () => {
     captchaContainer.style.right = "-500px";
     socket.emit("container-close", { _id: applicationId });
 
-    console.log("click");
-    socket.emit("captcha-solved", {
-      token: "captchaToken" ?? "Captcha Not solved!",
-      _id: applicationId,
-    });
-
     submitBtn.classList.remove("enabled");
     closeBtn.click();
   });

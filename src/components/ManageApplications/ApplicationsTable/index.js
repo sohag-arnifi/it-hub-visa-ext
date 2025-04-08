@@ -89,10 +89,11 @@ const ApplicationsTable = ({
 
   const handleCopyCMD = (data, index) => {
     const applicationOpenUrl = `https://payment.ivacbd.com/?applicationId=${data?._id}&auth=${auth}`;
+    // const applicationOpenUrl = `${envConfig.appBaseUrl}/?applicationId=${data?._id}&auth=${auth}`;
 
     // Define the path to the extension (update this path as needed)
-    // const extensionPath = "C:\\ext\\it-hub";
-    const extensionPath = "D:\\It-Hub\\chorom-ext";
+    const extensionPath = "C:\\ext\\it-hub";
+    // const extensionPath = "D:\\It-Hub\\chorom-ext";
 
     // Define the CMD script
     //   const comment = `
