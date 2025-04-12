@@ -80,40 +80,42 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         "application-info-submit"
       );
 
-      if (result?.isRedirect) {
-        const redirectPath = result?.redirectPath;
-        if (redirectPath === "/personal-info") {
-          setResMessage({
-            message: "Application submitted successfully!",
-            type: "success",
-          });
-          setTimeout(async () => {
-            await handlePersonalInfoSubmit();
-          }, 500);
-        } else if (redirectPath === "/") {
-          setResMessage({
-            message: "Something went wrong in Application submit!",
-            type: "error",
-          });
-          setTimeout(async () => {
-            await handleApplicationInfoSubmit();
-          }, 500);
-        }
-      } else {
-        const statusCode = result?.statusCode;
-        if (statusCode === 419) {
-          if (retryCount < 3) {
-            setTimeout(() => {
-              handleApplicationInfoSubmit(retryCount + 1);
-            }, 500);
-          } else {
-            setResMessage({
-              message: "Maximum retries reached. Logging out...",
-              type: "error",
-            });
-          }
-        }
-      }
+      console.log("application-info-submit", result);
+
+      // if (result?.isRedirect) {
+      //   const redirectPath = result?.redirectPath;
+      //   if (redirectPath === "/personal-info") {
+      //     setResMessage({
+      //       message: "Application submitted successfully!",
+      //       type: "success",
+      //     });
+      //     setTimeout(async () => {
+      //       await handlePersonalInfoSubmit();
+      //     }, 500);
+      //   } else if (redirectPath === "/") {
+      //     setResMessage({
+      //       message: "Something went wrong in Application submit!",
+      //       type: "error",
+      //     });
+      //     setTimeout(async () => {
+      //       await handleApplicationInfoSubmit();
+      //     }, 500);
+      //   }
+      // } else {
+      //   const statusCode = result?.statusCode;
+      //   if (statusCode === 419) {
+      //     if (retryCount < 3) {
+      //       setTimeout(() => {
+      //         handleApplicationInfoSubmit(retryCount + 1);
+      //       }, 500);
+      //     } else {
+      //       setResMessage({
+      //         message: "Maximum retries reached. Logging out...",
+      //         type: "error",
+      //       });
+      //     }
+      //   }
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -132,28 +134,30 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         "personal-info-submit"
       );
 
-      if (result?.isRedirect) {
-        const redirectPath = result?.redirectPath;
+      console.log("personal-info-submit", result);
 
-        if (redirectPath === "/overview") {
-          setResMessage({
-            message: "Personal Info submitted successfully!",
-            type: "success",
-          });
+      // if (result?.isRedirect) {
+      //   const redirectPath = result?.redirectPath;
 
-          setTimeout(async () => {
-            await handleOverviewInfoSubmit();
-          }, 500);
-        } else if (redirectPath === "/") {
-          setResMessage({
-            message: "Something went wrong in Personal info submit!",
-            type: "error",
-          });
-          setTimeout(async () => {
-            await handleApplicationInfoSubmit();
-          }, 500);
-        }
-      }
+      //   if (redirectPath === "/overview") {
+      //     setResMessage({
+      //       message: "Personal Info submitted successfully!",
+      //       type: "success",
+      //     });
+
+      //     setTimeout(async () => {
+      //       await handleOverviewInfoSubmit();
+      //     }, 500);
+      //   } else if (redirectPath === "/") {
+      //     setResMessage({
+      //       message: "Something went wrong in Personal info submit!",
+      //       type: "error",
+      //     });
+      //     setTimeout(async () => {
+      //       await handleApplicationInfoSubmit();
+      //     }, 500);
+      //   }
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -172,28 +176,29 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
         "overview-info-submit"
       );
 
-      if (result?.isRedirect) {
-        const redirectPath = result?.redirectPath;
+      console.log("overview-info-submit", result);
+      // if (result?.isRedirect) {
+      //   const redirectPath = result?.redirectPath;
 
-        if (redirectPath === "/payment") {
-          setResMessage({
-            message: "Overview Info submitted successfully!",
-            type: "success",
-          });
+      //   if (redirectPath === "/payment") {
+      //     setResMessage({
+      //       message: "Overview Info submitted successfully!",
+      //       type: "success",
+      //     });
 
-          setTimeout(async () => {
-            otpSendRef.current.click();
-          }, 500);
-        } else if (redirectPath === "/") {
-          setResMessage({
-            message: "Something went wrong in Overview submit!",
-            type: "error",
-          });
-          setTimeout(async () => {
-            await handleApplicationInfoSubmit();
-          }, 500);
-        }
-      }
+      //     setTimeout(async () => {
+      //       otpSendRef.current.click();
+      //     }, 500);
+      //   } else if (redirectPath === "/") {
+      //     setResMessage({
+      //       message: "Something went wrong in Overview submit!",
+      //       type: "error",
+      //     });
+      //     setTimeout(async () => {
+      //       await handleApplicationInfoSubmit();
+      //     }, 500);
+      //   }
+      // }
     } catch (error) {
       console.log(error);
     }
@@ -438,7 +443,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
           <Button
             ref={applicationSubmitRef}
             onClick={() => handleApplicationInfoSubmit()}
-            disabled={applicationInfoLoading}
+            // disabled={applicationInfoLoading}
             variant="contained"
             color="success"
             size="small"
@@ -454,7 +459,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
 
           <Button
             onClick={handlePersonalInfoSubmit}
-            disabled={personalInfoLoading}
+            // disabled={personalInfoLoading}
             variant="contained"
             color="success"
             size="small"
@@ -469,7 +474,7 @@ const InfoSession = ({ data, loggedInUser, otpSendRef, setLoggedInUser }) => {
           </Button>
           <Button
             onClick={handleOverviewInfoSubmit}
-            disabled={overviewInfoLoading}
+            // disabled={overviewInfoLoading}
             variant="contained"
             color="success"
             size="small"

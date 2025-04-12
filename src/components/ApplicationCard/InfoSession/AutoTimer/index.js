@@ -56,6 +56,7 @@ const AutoTimer = ({ applicationSubmitRef }) => {
       }
     }
   }, [isAuto, currentTime, selectedTime]);
+
   return (
     <Box
       sx={{
@@ -80,7 +81,9 @@ const AutoTimer = ({ applicationSubmitRef }) => {
             color: "#E52020",
           }}
         >
-          {currentTime?.toLocaleTimeString()}
+          {currentTime?.toLocaleTimeString("en-US", {
+            hour12: true,
+          })}
         </Typography>
 
         {isAuto ? (

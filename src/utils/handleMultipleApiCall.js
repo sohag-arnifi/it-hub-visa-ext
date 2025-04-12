@@ -43,8 +43,9 @@ const handleMultipleApiCall = async (
               message: errMessage,
               type: "error",
             });
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-            continue;
+            // await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            // continue;
+            return false;
           } else {
             setMessage({
               message: errMessage,
@@ -98,8 +99,9 @@ const handleMultipleApiCall = async (
               message: response?.message,
               type: "error",
             });
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-            continue;
+            // await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            // continue;
+            break;
           } else {
             setMessage({
               message:
@@ -181,8 +183,8 @@ const handleMultipleApiCall = async (
         });
         break;
       }
-
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      break;
+      // await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
   }
 };

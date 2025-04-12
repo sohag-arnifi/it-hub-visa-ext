@@ -419,7 +419,7 @@ const PayOtp = ({ data, otpSendRef }) => {
         <Button
           ref={otpSendRef}
           onClick={handlePayOtpSend}
-          disabled={otpSendLoading}
+          // disabled={otpSendLoading}
           color="error"
           size={"small"}
           variant="contained"
@@ -461,7 +461,8 @@ const PayOtp = ({ data, otpSendRef }) => {
           <Button
             ref={payOtpVerifyButtonRef}
             onClick={handleOtpVerify}
-            disabled={otp.length !== 6 || otpVerifyLoading}
+            disabled={otp.length !== 6}
+            // disabled={otp.length !== 6 || otpVerifyLoading}
             type="submit"
             color="error"
             size={"small"}
@@ -534,7 +535,8 @@ const PayOtp = ({ data, otpSendRef }) => {
       <Stack direction={"row"} spacing={1} sx={{ marginTop: "12px" }}>
         <Button
           onClick={handleGetSlotTime}
-          disabled={timeSlotLoading || !specificDate}
+          // disabled={timeSlotLoading || !specificDate}
+          // disabled={!specificDate}
           color="error"
           size={"small"}
           variant="contained"
@@ -553,7 +555,8 @@ const PayOtp = ({ data, otpSendRef }) => {
         </Button>
         <Button
           onClick={handleBookSlot}
-          disabled={payNowLoading || !hashParam || !paynowSectionCreated}
+          // disabled={!hashParam || !paynowSectionCreated}
+          // disabled={payNowLoading || !hashParam || !paynowSectionCreated}
           color="error"
           size={"small"}
           variant="contained"
